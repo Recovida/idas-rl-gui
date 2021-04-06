@@ -1,3 +1,5 @@
+package com.cidacs.rl.editor;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -27,6 +29,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -101,8 +104,8 @@ public class MainWindow {
      */
     private void initialize() {
         frame = new JFrame();
-        frame.setMinimumSize(new Dimension(500, 300));
-        frame.setBounds(100, 100, 611, 389);
+        frame.setMinimumSize(new Dimension(700, 400));
+        frame.setBounds(100, 100, 586, 377);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout(0, 0));
 
@@ -390,22 +393,46 @@ public class MainWindow {
 
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("Linkage columns", null, panel_1, null);
-        panel_1.setLayout(new BorderLayout(0, 0));
 
         table = new JTable();
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        table.setShowVerticalLines(true);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        DefaultTableModel model = new DefaultTableModel() {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+
+        };
         model.addColumn("Number");
         model.addColumn("ID");
         model.addColumn("Type");
         model.addColumn("Weight");
         model.addColumn("Phon. weight");
-        model.addColumn("Column name");
-        model.addColumn("Renamed");
-        model.addColumn("Column name");
-        model.addColumn("Renamed", new Object[] { "item1" });
+        model.addColumn("Column name (A)");
+        model.addColumn("Renamed (A)");
+        model.addColumn("Column name (B)");
+        model.addColumn("Renamed (B)", new Object[] { "item1", "item2", "item3",
+                "item4", "item5", "item6", "item7", "item8", "item9", "item10",
+                "item11", "item12", "item13", "item14", "item15", "item16",
+                "item17", "item18", "item19", "item20", "item1", "item2",
+                "item3", "item4", "item5", "item6", "item7", "item8", "item9",
+                "item10", "item11", "item12", "item13", "item14", "item15",
+                "item16", "item17", "item18", "item19", "item20", "item1",
+                "item2", "item3", "item4", "item5", "item6", "item7", "item8",
+                "item9", "item10", "item11", "item12", "item13", "item14",
+                "item15", "item16", "item17", "item18", "item19", "item20" });
+        panel_1.setLayout(new BorderLayout(0, 0));
+        table.setModel(model);
 
         JScrollPane scrollPane = new JScrollPane(table);
-        panel_1.add(scrollPane, BorderLayout.CENTER);
+        panel_1.add(scrollPane);
+
+        LinkageColumnPanel panel_7 = new LinkageColumnPanel();
+        panel_1.add(panel_7, BorderLayout.SOUTH);
 
         JPanel panel_2 = new JPanel();
         tabbedPane.addTab("Extra columns", null, panel_2, null);

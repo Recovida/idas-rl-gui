@@ -1,3 +1,4 @@
+package com.cidacs.rl.editor;
 import javax.swing.JComponent;
 
 public abstract class SettingItem<T1, T2 extends JComponent> {
