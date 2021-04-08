@@ -17,6 +17,8 @@ public abstract class SettingItem<T1, T2 extends JComponent> {
         this.defaultValue = defaultValue;
     }
 
+    public abstract void setValue(T1 newValue);
+
     abstract void onChange(T1 newValue);
 
     abstract void onLeave();

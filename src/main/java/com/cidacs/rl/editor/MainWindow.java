@@ -58,6 +58,8 @@ public class MainWindow {
     private JTable linkageColsTable;
     private JTextField linkageDirField;
     private JTextField indexDirField;
+    private JSpinner minScoreField;
+    private JSpinner maxRowsField;
 
     /**
      * Launch the application.
@@ -79,16 +81,6 @@ public class MainWindow {
      * Create the application.
      */
     public MainWindow() {
-//        try {
-//            String os = System.getProperty("os.name");
-//            if (os != null && os.toUpperCase().startsWith("LINUX"))
-//                UIManager.setLookAndFeel(
-//                        "com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-//            else
-//                UIManager.setLookAndFeel(
-//                        UIManager.getSystemLookAndFeelClassName());
-//        } catch (Exception e) {
-//        }
         try {
             for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -369,7 +361,7 @@ public class MainWindow {
         gbc_minScoreLbl.gridx = 0;
         gbc_minScoreLbl.gridy = 3;
         optionsTabPanel.add(minScoreLbl, gbc_minScoreLbl);
-        JSpinner minScoreField = new JSpinner(minScoreModel);
+        minScoreField = new JSpinner(minScoreModel);
         GridBagConstraints gbc_minScoreField = new GridBagConstraints();
         gbc_minScoreField.anchor = GridBagConstraints.WEST;
         gbc_minScoreField.insets = new Insets(0, 0, 5, 0);
@@ -391,7 +383,7 @@ public class MainWindow {
         gbc_maxRowsLbl.gridx = 0;
         gbc_maxRowsLbl.gridy = 4;
         optionsTabPanel.add(maxRowsLbl, gbc_maxRowsLbl);
-        JSpinner maxRowsField = new JSpinner(maxRowsModel);
+        maxRowsField = new JSpinner(maxRowsModel);
         GridBagConstraints gbc_maxRowsField = new GridBagConstraints();
         gbc_maxRowsField.anchor = GridBagConstraints.WEST;
         gbc_maxRowsField.gridx = 1;

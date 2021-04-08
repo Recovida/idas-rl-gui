@@ -23,7 +23,6 @@ import javax.swing.SwingConstants;
 public class LinkageColumnPanel extends JPanel {
     private JTextField firstRenameField;
     private JTextField secondRenameField;
-    private JTextField idField;
 
     /**
      * Create the panel.
@@ -143,16 +142,6 @@ public class LinkageColumnPanel extends JPanel {
         panel.add(secondRenameField, gbc_secondRenameField);
         secondRenameField.setColumns(10);
 
-        JLabel idLbl = new JLabel("ID");
-        idLbl.setVerticalAlignment(SwingConstants.BOTTOM);
-        idLbl.setVerticalTextPosition(SwingConstants.BOTTOM);
-        GridBagConstraints gbc_idLbl = new GridBagConstraints();
-        gbc_idLbl.fill = GridBagConstraints.VERTICAL;
-        gbc_idLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_idLbl.gridx = 0;
-        gbc_idLbl.gridy = 2;
-        panel.add(idLbl, gbc_idLbl);
-
         JLabel typeLbl = new JLabel("Type");
         typeLbl.setVerticalAlignment(SwingConstants.BOTTOM);
         typeLbl.setPreferredSize(new Dimension(29, 25));
@@ -189,16 +178,6 @@ public class LinkageColumnPanel extends JPanel {
         gbc_phonWeightLbl.gridx = 3;
         gbc_phonWeightLbl.gridy = 2;
         panel.add(phonWeightLbl, gbc_phonWeightLbl);
-
-        idField = new JTextField();
-        idField.setPreferredSize(new Dimension(10, 29));
-        GridBagConstraints gbc_idField = new GridBagConstraints();
-        gbc_idField.fill = GridBagConstraints.BOTH;
-        gbc_idField.insets = new Insets(0, 0, 0, 5);
-        gbc_idField.gridx = 0;
-        gbc_idField.gridy = 3;
-        panel.add(idField, gbc_idField);
-        idField.setColumns(10);
 
         JComboBox typeField = new JComboBox();
         typeField.setEditable(true);
