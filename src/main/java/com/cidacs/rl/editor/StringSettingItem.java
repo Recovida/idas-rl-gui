@@ -22,15 +22,17 @@ public class StringSettingItem extends SettingItem<String, JTextField> {
         this.replaceBlankWithDefaultValue = replaceBlankWithDefaultValue;
     }
 
-    public StringSettingItem(String key, String currentValue,
-            String defaultValue, JTextField guiComponent) {
-        super(key, currentValue, defaultValue, guiComponent);
+    public StringSettingItem(String currentValue, String defaultValue,
+            JTextField guiComponent) {
+        super(currentValue, defaultValue, guiComponent);
         guiComponent.setText(currentValue);
         guiComponent.addFocusListener(new FocusListener() {
 
+            @Override
             public void focusGained(FocusEvent e) {
             }
 
+            @Override
             public void focusLost(FocusEvent e) {
                 onLeave();
             }
@@ -38,14 +40,17 @@ public class StringSettingItem extends SettingItem<String, JTextField> {
         });
         guiComponent.getDocument().addDocumentListener(new DocumentListener() {
 
+            @Override
             public void removeUpdate(DocumentEvent e) {
                 changedUpdate(e);
             }
 
+            @Override
             public void insertUpdate(DocumentEvent e) {
                 changedUpdate(e);
             }
 
+            @Override
             public void changedUpdate(DocumentEvent e) {
                 try {
                     String value = e.getDocument().getText(0,
@@ -74,6 +79,7 @@ public class StringSettingItem extends SettingItem<String, JTextField> {
     void onLeave() {
         if (replaceBlankWithDefaultValue && guiComponent.getText().isEmpty())
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     guiComponent.setText(defaultValue);
                 }

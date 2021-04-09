@@ -15,7 +15,9 @@ import java.nio.file.Paths;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -38,6 +40,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 import com.cidacs.rl.editor.gui.LinkageColumnPanel;
+import com.cidacs.rl.editor.undo.UndoHistory;
 
 /**
  *
@@ -66,6 +69,7 @@ public class MainWindow {
      */
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 try {
                     MainWindow window = new MainWindow();
@@ -91,6 +95,25 @@ public class MainWindow {
         } catch (Exception e) {
         }
         initialize();
+
+        UndoHistory history = new UndoHistory();
+
+        ConfigurationFile cf = new ConfigurationFile();
+
+        cf.addSettingItem("db_a",
+                new StringSettingItem("", "", firstDatasetField));
+        cf.addSettingItem("db_b",
+                new StringSettingItem("", "", secondDatasetField));
+//        new StringSettingItem("suffix_a", "_dsa", "_dsa",
+//                firstDatasetSuffixField).setReplaceBlankWithDefaultValue(true);
+//        new StringSettingItem("suffix_b", "_dsb", "_dsb",
+//                secondDatasetSuffixField).setReplaceBlankWithDefaultValue(true);
+//        new StringSettingItem("row_num_col_a", "#A", "#A",
+//                firstDatasetRowNumColField)
+//                        .setReplaceBlankWithDefaultValue(true);
+//        new StringSettingItem("row_num_col_b", "#B", "#B",
+//                secondDatasetRowNumColField)
+//                        .setReplaceBlankWithDefaultValue(true);
     }
 
     /**
@@ -157,6 +180,7 @@ public class MainWindow {
 
         JButton firstDatasetBtn = new JButton("Select...");
         firstDatasetBtn.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String current = firstDatasetField.getText();
                 String result = selectDatasetFile(
@@ -187,6 +211,7 @@ public class MainWindow {
 
         JButton secondDatasetBtn = new JButton("Select...");
         secondDatasetBtn.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String current = secondDatasetField.getText();
                 String result = selectDatasetFile(
@@ -311,6 +336,7 @@ public class MainWindow {
 
         JButton linkageDirBtn = new JButton("Select...");
         linkageDirBtn.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
             }
         });
@@ -348,6 +374,7 @@ public class MainWindow {
 
         JButton indexDirBtn = new JButton("Select...");
         indexDirBtn.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
             }
         });
@@ -486,6 +513,11 @@ public class MainWindow {
         JMenuItem aboutMenuItem = new JMenuItem("About");
         helpMenu.add(aboutMenuItem);
 
+        JComboBox languageCbox = new JComboBox();
+        languageCbox
+                .setModel(new DefaultComboBoxModel(new String[] { "English" }));
+        menuBar.add(languageCbox);
+
         Component menuGlue = Box.createGlue();
         menuBar.add(menuGlue);
 
@@ -497,18 +529,6 @@ public class MainWindow {
                 .createRigidArea(new Dimension(20, 20));
         menuBar.add(currentFileSpacer);
 
-        new StringSettingItem("db_a", "", "", firstDatasetField);
-        new StringSettingItem("db_b", "", "", secondDatasetField);
-        new StringSettingItem("suffix_a", "_dsa", "_dsa",
-                firstDatasetSuffixField).setReplaceBlankWithDefaultValue(true);
-        new StringSettingItem("suffix_b", "_dsb", "_dsb",
-                secondDatasetSuffixField).setReplaceBlankWithDefaultValue(true);
-        new StringSettingItem("row_num_col_a", "#A", "#A",
-                firstDatasetRowNumColField)
-                        .setReplaceBlankWithDefaultValue(true);
-        new StringSettingItem("row_num_col_b", "#B", "#B",
-                secondDatasetRowNumColField)
-                        .setReplaceBlankWithDefaultValue(true);
     }
 
     private String selectDatasetFile(String currentFileName) {
