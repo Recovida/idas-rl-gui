@@ -16,7 +16,7 @@ public class UndoHistory {
     protected int cleanIndex;
 
     public UndoHistory() {
-        commandList = new LinkedList<Command>();
+        commandList = new LinkedList<>();
         commandListIterator = commandList.listIterator();
         cleanIndex = 0;
     }
@@ -42,12 +42,21 @@ public class UndoHistory {
     }
 
     public void push(Command command) {
-        if (cleanIndex >= commandListIterator.nextIndex())
+        if (cleanIndex > commandListIterator.nextIndex())
             cleanIndex = -1;
-        while (commandListIterator.hasNext()) {
+        else if (isClean() && commandListIterator.hasPrevious()
+                && !commandListIterator.hasNext()) {
+            Command previousCommand = commandListIterator.previous();
             commandListIterator.next();
-            commandListIterator.remove();
-        }
+            if (previousCommand.merge(command)) {
+                command.redo();
+                return;
+            }
+        } else
+            while (commandListIterator.hasNext()) {
+                commandListIterator.next();
+                commandListIterator.remove();
+            }
         command.redo();
         commandListIterator.add(command);
     }

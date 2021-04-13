@@ -4,9 +4,9 @@ import javax.swing.JComponent;
 
 public abstract class SettingItem<T1, T2 extends JComponent> {
 
-    T1 currentValue;
-    T1 defaultValue;
-    T2 guiComponent;
+    protected T1 currentValue;
+    protected T1 defaultValue;
+    protected T2 guiComponent;
 
     public SettingItem(T1 currentValue, T1 defaultValue, T2 guiComponent) {
         this.currentValue = currentValue;
@@ -15,6 +15,8 @@ public abstract class SettingItem<T1, T2 extends JComponent> {
     }
 
     public abstract void setValue(T1 newValue);
+
+    public abstract void setValueFromString(String newValue);
 
     abstract void onChange(T1 newValue);
 

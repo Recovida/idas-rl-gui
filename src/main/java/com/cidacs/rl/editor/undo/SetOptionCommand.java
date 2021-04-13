@@ -27,9 +27,15 @@ public class SetOptionCommand<T> extends Command {
         settingItem.setValue(newValue);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean merge(Command that) {
-        return false;
+        if (!(that instanceof SetOptionCommand<?>))
+            return false;
+        if (this.settingItem != ((SetOptionCommand<T>) that).settingItem)
+            return false;
+        this.newValue = ((SetOptionCommand<T>) that).newValue;
+        return true;
     }
 
 }

@@ -6,6 +6,8 @@ public abstract class Command {
 
     public abstract void redo();
 
-    public abstract boolean merge(Command that);
+    public boolean merge(Command that) {
+        return false;
+    }
 
 }

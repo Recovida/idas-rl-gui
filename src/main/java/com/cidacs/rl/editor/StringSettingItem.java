@@ -64,6 +64,12 @@ public class StringSettingItem extends SettingItem<String, JTextField> {
         });
     }
 
+    public StringSettingItem(String currentValue, String defaultValue,
+            JTextField guiComponent, boolean replaceBlankWithDefaultValue) {
+        this(currentValue, defaultValue, guiComponent);
+        this.replaceBlankWithDefaultValue = replaceBlankWithDefaultValue;
+    }
+
     @Override
     void onChange(String newValue) {
         if (newValue.equals(currentValue))
@@ -90,6 +96,11 @@ public class StringSettingItem extends SettingItem<String, JTextField> {
     @Override
     public void setValue(String newValue) {
         guiComponent.setText(newValue);
+    }
+
+    @Override
+    public void setValueFromString(String newValue) {
+        setValue(newValue);
     }
 
 }

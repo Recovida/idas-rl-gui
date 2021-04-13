@@ -4,15 +4,18 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -63,6 +66,18 @@ public class MainWindow {
     private JTextField indexDirField;
     private JSpinner minScoreField;
     private JSpinner maxRowsField;
+    private JMenuItem exitMenuItem;
+    private JMenuItem newFileMenuItem;
+    private JMenuItem openFileMenuItem;
+    private JMenuItem saveFileMenuItem;
+    private JMenuItem saveAsFileMenuItem;
+
+    /* Non-GUI items */
+    UndoHistory history = new UndoHistory();
+    ConfigurationFile cf = new ConfigurationFile();
+    String currentFileName = null;
+    private JLabel currentFileLbl;
+    boolean dirty = true;
 
     /**
      * Launch the application.
@@ -96,24 +111,46 @@ public class MainWindow {
         }
         initialize();
 
-        UndoHistory history = new UndoHistory();
-
-        ConfigurationFile cf = new ConfigurationFile();
-
         cf.addSettingItem("db_a",
                 new StringSettingItem("", "", firstDatasetField));
         cf.addSettingItem("db_b",
                 new StringSettingItem("", "", secondDatasetField));
-//        new StringSettingItem("suffix_a", "_dsa", "_dsa",
-//                firstDatasetSuffixField).setReplaceBlankWithDefaultValue(true);
-//        new StringSettingItem("suffix_b", "_dsb", "_dsb",
-//                secondDatasetSuffixField).setReplaceBlankWithDefaultValue(true);
-//        new StringSettingItem("row_num_col_a", "#A", "#A",
-//                firstDatasetRowNumColField)
-//                        .setReplaceBlankWithDefaultValue(true);
-//        new StringSettingItem("row_num_col_b", "#B", "#B",
-//                secondDatasetRowNumColField)
-//                        .setReplaceBlankWithDefaultValue(true);
+        cf.addSettingItem("suffix_a",
+                new StringSettingItem("", "", firstDatasetSuffixField, true));
+        cf.addSettingItem("suffix_b",
+                new StringSettingItem("", "", secondDatasetSuffixField, true));
+        cf.addSettingItem("row_num_col_a", new StringSettingItem("", "",
+                firstDatasetRowNumColField, true));
+        cf.addSettingItem("row_num_col_b", new StringSettingItem("", "",
+                secondDatasetRowNumColField, true));
+
+        exitMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+            }
+        });
+
+        openFileMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String newConfigFileName = selectConfigFile(
+                        currentFileName == null ? null
+                                : Paths.get(currentFileName).toAbsolutePath()
+                                        .toString());
+                if (newConfigFileName != null) {
+                    try {
+                        cf.load(newConfigFileName);
+                        currentFileName = newConfigFileName;
+                        dirty = false;
+                        updateConfigFileLabel();
+                    } catch (IOException e1) {
+                        System.err.println("ERROR");
+                    }
+                }
+            }
+        });
+
     }
 
     /**
@@ -147,7 +184,9 @@ public class MainWindow {
         gbc_datasetsTabTopMargin.gridy = 0;
         datasetsTabPanel.add(datasetsTabTopMargin, gbc_datasetsTabTopMargin);
 
-        JLabel firstDatasetLabel = new JLabel("<html><b>Dataset A");
+        JLabel firstDatasetLabel = new JLabel("Dataset A");
+        firstDatasetLabel
+                .setFont(firstDatasetLabel.getFont().deriveFont(Font.BOLD));
         GridBagConstraints gbc_firstDatasetLabel = new GridBagConstraints();
         gbc_firstDatasetLabel.weightx = 1.0;
         gbc_firstDatasetLabel.insets = new Insets(0, 0, 5, 5);
@@ -155,7 +194,9 @@ public class MainWindow {
         gbc_firstDatasetLabel.gridy = 1;
         datasetsTabPanel.add(firstDatasetLabel, gbc_firstDatasetLabel);
 
-        JLabel secondDatasetLabel = new JLabel("<html><b>Dataset B");
+        JLabel secondDatasetLabel = new JLabel("Dataset B");
+        secondDatasetLabel
+                .setFont(secondDatasetLabel.getFont().deriveFont(Font.BOLD));
         GridBagConstraints gbc_secondDatasetLabel = new GridBagConstraints();
         gbc_secondDatasetLabel.weightx = 1.0;
         gbc_secondDatasetLabel.insets = new Insets(0, 0, 5, 0);
@@ -474,28 +515,28 @@ public class MainWindow {
         JMenu fileMenu = new JMenu("File");
         menuBar.add(fileMenu);
 
-        JMenuItem newFileMenuItem = new JMenuItem("New");
+        newFileMenuItem = new JMenuItem("New");
         fileMenu.add(newFileMenuItem);
 
         JSeparator separator_1 = new JSeparator();
         fileMenu.add(separator_1);
 
-        JMenuItem openFileMenuItem = new JMenuItem("Open...");
+        openFileMenuItem = new JMenuItem("Open...");
         fileMenu.add(openFileMenuItem);
 
         JSeparator separator_2 = new JSeparator();
         fileMenu.add(separator_2);
 
-        JMenuItem saveFileMenuItem = new JMenuItem("Save");
+        saveFileMenuItem = new JMenuItem("Save");
         fileMenu.add(saveFileMenuItem);
 
-        JMenuItem saveAsFileMenuItem = new JMenuItem("Save as...");
+        saveAsFileMenuItem = new JMenuItem("Save as...");
         fileMenu.add(saveAsFileMenuItem);
 
         JSeparator separator = new JSeparator();
         fileMenu.add(separator);
 
-        JMenuItem exitMenuItem = new JMenuItem("Exit");
+        exitMenuItem = new JMenuItem("Exit");
         fileMenu.add(exitMenuItem);
 
         JMenu editMenu = new JMenu("Edit");
@@ -514,6 +555,7 @@ public class MainWindow {
         helpMenu.add(aboutMenuItem);
 
         JComboBox languageCbox = new JComboBox();
+        languageCbox.setMaximumSize(new Dimension(1000, 32767));
         languageCbox
                 .setModel(new DefaultComboBoxModel(new String[] { "English" }));
         menuBar.add(languageCbox);
@@ -521,7 +563,9 @@ public class MainWindow {
         Component menuGlue = Box.createGlue();
         menuBar.add(menuGlue);
 
-        JLabel currentFileLbl = new JLabel("<html><i>[New file] *");
+        currentFileLbl = new JLabel("[Unsaved file]");
+        currentFileLbl
+                .setFont(currentFileLbl.getFont().deriveFont(Font.ITALIC));
         currentFileLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         menuBar.add(currentFileLbl);
 
@@ -540,8 +584,7 @@ public class MainWindow {
                 "Supported datasets (csv, dbf)", "csv", "dbf");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
-        int returnVal = chooser.showOpenDialog(null);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             Path here = Paths.get(".").toAbsolutePath().getParent();
             String f = chooser.getSelectedFile().getAbsolutePath();
             if (f.startsWith(here.toString() + File.separator))
@@ -552,4 +595,33 @@ public class MainWindow {
         return null;
     }
 
+    private String selectConfigFile(String fileName) {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(
+                fileName != null ? new File(fileName).getParentFile()
+                        : new File(".").getAbsoluteFile());
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "Properties file (properties)", "properties", "ini");
+        chooser.setFileFilter(filter);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            return chooser.getSelectedFile().getAbsolutePath();
+        }
+        return null;
+    }
+
+    private void updateConfigFileLabel() {
+        currentFileLbl.setText((dirty ? "[*] " : "") + currentFileName);
+    }
+
+    private class SwingAction extends AbstractAction {
+        public SwingAction() {
+            putValue(NAME, "SwingAction");
+            putValue(SHORT_DESCRIPTION, "Some short description");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+        }
+    }
 }
