@@ -115,14 +115,18 @@ public class MainWindow {
                 new StringSettingItem("", "", firstDatasetField));
         cf.addSettingItem("db_b",
                 new StringSettingItem("", "", secondDatasetField));
-        cf.addSettingItem("suffix_a",
-                new StringSettingItem("", "", firstDatasetSuffixField, true));
-        cf.addSettingItem("suffix_b",
-                new StringSettingItem("", "", secondDatasetSuffixField, true));
-        cf.addSettingItem("row_num_col_a", new StringSettingItem("", "",
+        cf.addSettingItem("suffix_a", new StringSettingItem("", "dsa",
+                firstDatasetSuffixField, true));
+        cf.addSettingItem("suffix_b", new StringSettingItem("", "dsb",
+                secondDatasetSuffixField, true));
+        cf.addSettingItem("row_num_col_a", new StringSettingItem("", "#A",
                 firstDatasetRowNumColField, true));
-        cf.addSettingItem("row_num_col_b", new StringSettingItem("", "",
+        cf.addSettingItem("row_num_col_b", new StringSettingItem("", "#B",
                 secondDatasetRowNumColField, true));
+        cf.addSettingItem("db_index", new StringSettingItem("",
+                File.separator + "index_dir", indexDirField, true));
+        cf.addSettingItem("linkage_folder", new StringSettingItem("",
+                "assets" + File.separator + "linkage", linkageDirField, true));
 
         exitMenuItem.addActionListener(new ActionListener() {
             @Override
