@@ -4,28 +4,23 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 
+import com.cidacs.rl.editor.gui.JTextFieldWithPlaceholder;
+
 public class StringSettingItem extends SettingItem<String, JTextField> {
-
-    protected boolean replaceBlankWithDefaultValue = false;
-
-    public boolean isReplaceBlankWithDefaultValue() {
-        return replaceBlankWithDefaultValue;
-    }
-
-    public void setReplaceBlankWithDefaultValue(
-            boolean replaceBlankWithDefaultValue) {
-        this.replaceBlankWithDefaultValue = replaceBlankWithDefaultValue;
-    }
 
     public StringSettingItem(String currentValue, String defaultValue,
             JTextField guiComponent) {
         super(currentValue, defaultValue, guiComponent);
         guiComponent.setText(currentValue);
+        if (defaultValue != null && defaultValue.length() > 0
+                && guiComponent instanceof JTextFieldWithPlaceholder) {
+            ((JTextFieldWithPlaceholder) guiComponent)
+                    .setPlaceholder(defaultValue);
+        }
         guiComponent.addFocusListener(new FocusListener() {
 
             @Override
@@ -65,32 +60,20 @@ public class StringSettingItem extends SettingItem<String, JTextField> {
     }
 
     public StringSettingItem(String currentValue, String defaultValue,
-            JTextField guiComponent, boolean replaceBlankWithDefaultValue) {
+            JTextField guiComponent,
+            SettingItemChangeEventListener<String> listener) {
         this(currentValue, defaultValue, guiComponent);
-        this.replaceBlankWithDefaultValue = replaceBlankWithDefaultValue;
+        this.listeners.add(listener);
     }
 
     @Override
-    void onChange(String newValue) {
+    public void onChange(String newValue) {
         if (newValue.equals(currentValue))
             return;
-        if (replaceBlankWithDefaultValue && currentValue.isEmpty())
-            currentValue = defaultValue;
-        else
-            currentValue = newValue;
-        System.out.println(newValue);
-    }
-
-    @Override
-    void onLeave() {
-        if (replaceBlankWithDefaultValue && guiComponent.getText().isEmpty())
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    guiComponent.setText(defaultValue);
-                }
-            });
-
+        currentValue = newValue;
+        for (SettingItemChangeEventListener<String> listener : listeners)
+            if (listener != null)
+                listener.changed(newValue);
     }
 
     @Override

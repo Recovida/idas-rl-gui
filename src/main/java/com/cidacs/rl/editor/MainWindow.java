@@ -5,20 +5,25 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
-import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -37,11 +42,13 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
+import com.cidacs.rl.editor.gui.JTextFieldWithPlaceholder;
 import com.cidacs.rl.editor.gui.LinkageColumnPanel;
 import com.cidacs.rl.editor.undo.UndoHistory;
 
@@ -54,16 +61,25 @@ import com.cidacs.rl.editor.undo.UndoHistory;
  */
 public class MainWindow {
 
+    /* Non-GUI attributes */
+    UndoHistory history = new UndoHistory();
+    ConfigurationFile cf = new ConfigurationFile();
+    String currentFileName = null;
+    private JLabel currentFileLbl;
+    boolean dirty = true;
+    boolean skipValidation = false; // while filling in values read from file
+
+    /* Non-GUI components */
     private JFrame frame;
-    private JTextField firstDatasetSuffixField;
-    private JTextField secondDatasetSuffixField;
-    private JTextField firstDatasetRowNumColField;
-    private JTextField secondDatasetRowNumColField;
+    private JTextFieldWithPlaceholder firstDatasetSuffixField;
+    private JTextFieldWithPlaceholder secondDatasetSuffixField;
+    private JTextFieldWithPlaceholder firstDatasetRowNumColField;
+    private JTextFieldWithPlaceholder secondDatasetRowNumColField;
     private JTextField firstDatasetField;
     private JTextField secondDatasetField;
     private JTable linkageColsTable;
-    private JTextField linkageDirField;
-    private JTextField indexDirField;
+    private JTextFieldWithPlaceholder linkageDirField;
+    private JTextFieldWithPlaceholder indexDirField;
     private JSpinner minScoreField;
     private JSpinner maxRowsField;
     private JMenuItem exitMenuItem;
@@ -71,13 +87,10 @@ public class MainWindow {
     private JMenuItem openFileMenuItem;
     private JMenuItem saveFileMenuItem;
     private JMenuItem saveAsFileMenuItem;
-
-    /* Non-GUI items */
-    UndoHistory history = new UndoHistory();
-    ConfigurationFile cf = new ConfigurationFile();
-    String currentFileName = null;
-    private JLabel currentFileLbl;
-    boolean dirty = true;
+    private JLabel firstDatasetSuffixWarningLbl;
+    private JLabel secondDatasetSuffixWarningLbl;
+    private JLabel secondDatasetRowNumColWarningLbl;
+    private JLabel firstDatasetRowNumColWarningLbl;
 
     /**
      * Launch the application.
@@ -111,22 +124,39 @@ public class MainWindow {
         }
         initialize();
 
-        cf.addSettingItem("db_a",
-                new StringSettingItem("", "", firstDatasetField));
-        cf.addSettingItem("db_b",
-                new StringSettingItem("", "", secondDatasetField));
-        cf.addSettingItem("suffix_a", new StringSettingItem("", "dsa",
-                firstDatasetSuffixField, true));
-        cf.addSettingItem("suffix_b", new StringSettingItem("", "dsb",
-                secondDatasetSuffixField, true));
+        // Tab: DATASETS
+        SettingItemChangeEventListener<String> datasetsTabEventListener = new SettingItemChangeEventListener<String>() {
+
+            @Override
+            public void changed(String newValue) {
+                validateDatasetsTab();
+            }
+        };
+        cf.addSettingItem("db_a", new StringSettingItem("", "",
+                firstDatasetField, datasetsTabEventListener));
+        cf.addSettingItem("db_b", new StringSettingItem("", "",
+                secondDatasetField, datasetsTabEventListener));
+        cf.addSettingItem("suffix_a", new StringSettingItem("", "_dsa",
+                firstDatasetSuffixField, datasetsTabEventListener));
+        cf.addSettingItem("suffix_b", new StringSettingItem("", "_dsb",
+                secondDatasetSuffixField, datasetsTabEventListener));
         cf.addSettingItem("row_num_col_a", new StringSettingItem("", "#A",
-                firstDatasetRowNumColField, true));
+                firstDatasetRowNumColField, datasetsTabEventListener));
         cf.addSettingItem("row_num_col_b", new StringSettingItem("", "#B",
-                secondDatasetRowNumColField, true));
-        cf.addSettingItem("db_index", new StringSettingItem("",
-                File.separator + "index_dir", indexDirField, true));
-        cf.addSettingItem("linkage_folder", new StringSettingItem("",
-                "assets" + File.separator + "linkage", linkageDirField, true));
+                secondDatasetRowNumColField, datasetsTabEventListener));
+
+        // Tab: OPTIONS
+        SettingItemChangeEventListener<String> optionsTabEventListener = new SettingItemChangeEventListener<String>() {
+
+            @Override
+            public void changed(String newValue) {
+                validateOptionsTab();
+            }
+        };
+        cf.addSettingItem("db_index", new StringSettingItem("", "",
+                indexDirField, optionsTabEventListener));
+        cf.addSettingItem("linkage_folder", new StringSettingItem("", "",
+                linkageDirField, optionsTabEventListener));
 
         exitMenuItem.addActionListener(new ActionListener() {
             @Override
@@ -143,6 +173,8 @@ public class MainWindow {
                                 : Paths.get(currentFileName).toAbsolutePath()
                                         .toString());
                 if (newConfigFileName != null) {
+                    skipValidation = true;
+                    clearAllFields();
                     try {
                         cf.load(newConfigFileName);
                         currentFileName = newConfigFileName;
@@ -150,11 +182,81 @@ public class MainWindow {
                         updateConfigFileLabel();
                     } catch (IOException e1) {
                         System.err.println("ERROR");
+                    } finally {
+                        skipValidation = false;
+                        validateAllTabs();
                     }
                 }
             }
         });
 
+    }
+
+    public void validateDatasetsTab() {
+        if (skipValidation)
+            return;
+        int errorCount = 0;
+        @SuppressWarnings("rawtypes")
+        Map<String, SettingItem> items = cf.getSettingItems();
+        String s1, s2;
+
+        // Prefixes
+        s1 = (String) items.get("suffix_a").getCurrentValue();
+        s2 = (String) items.get("suffix_b").getCurrentValue();
+        if (s1 == null || s1.isEmpty())
+            s1 = (String) items.get("suffix_a").getDefaultValue();
+        if (s2 == null || s2.isEmpty())
+            s2 = (String) items.get("suffix_b").getDefaultValue();
+        if (s1.equals(s2)) {
+            String msg = "The prefixes should be different.";
+            firstDatasetSuffixWarningLbl.setToolTipText(msg);
+            secondDatasetSuffixWarningLbl.setToolTipText(msg);
+            firstDatasetSuffixWarningLbl.setVisible(true);
+            secondDatasetSuffixWarningLbl.setVisible(true);
+            errorCount++;
+        } else {
+            firstDatasetSuffixWarningLbl.setVisible(false);
+            secondDatasetSuffixWarningLbl.setVisible(false);
+        }
+
+        // Row number column names
+        s1 = (String) items.get("row_num_col_a").getCurrentValue();
+        s2 = (String) items.get("row_num_col_b").getCurrentValue();
+        if (s1 == null || s1.isEmpty())
+            s1 = (String) items.get("row_num_col_a").getDefaultValue();
+        if (s2 == null || s2.isEmpty())
+            s2 = (String) items.get("row_num_col_b").getDefaultValue();
+        if (s1.equals(s2)) {
+            String msg = "The row number column names should be different.";
+            firstDatasetRowNumColWarningLbl.setToolTipText(msg);
+            secondDatasetRowNumColWarningLbl.setToolTipText(msg);
+            firstDatasetRowNumColWarningLbl.setVisible(true);
+            secondDatasetRowNumColWarningLbl.setVisible(true);
+            errorCount++;
+        } else {
+            firstDatasetRowNumColWarningLbl.setVisible(false);
+            secondDatasetRowNumColWarningLbl.setVisible(false);
+        }
+
+        // Dataset file names
+
+    }
+
+    public void validateOptionsTab() {
+        if (skipValidation)
+            return;
+    }
+
+    public void validateAllTabs() {
+        validateDatasetsTab();
+        validateOptionsTab();
+    }
+
+    public void clearAllFields() {
+        for (SettingItem<?, ?> item : cf.getSettingItems().values()) {
+            if (item.getGuiComponent() instanceof JTextField)
+                ((JTextField) item.guiComponent).setText("");
+        }
     }
 
     /**
@@ -218,6 +320,9 @@ public class MainWindow {
         firstDatasetContainer.setLayout(
                 new BoxLayout(firstDatasetContainer, BoxLayout.X_AXIS));
 
+        JLabel firstDatasetWarningLbl = new JLabel(" ");
+        firstDatasetContainer.add(firstDatasetWarningLbl);
+
         firstDatasetField = new JTextField();
         firstDatasetField.setHorizontalAlignment(SwingConstants.TRAILING);
         firstDatasetContainer.add(firstDatasetField);
@@ -272,14 +377,25 @@ public class MainWindow {
         secondDatasetContainer.add(secondDatasetField);
         secondDatasetField.setColumns(10);
 
-        firstDatasetSuffixField = new JTextField();
-        GridBagConstraints gbc_firstDatasetSuffixField = new GridBagConstraints();
-        gbc_firstDatasetSuffixField.insets = new Insets(0, 0, 5, 5);
-        gbc_firstDatasetSuffixField.fill = GridBagConstraints.HORIZONTAL;
-        gbc_firstDatasetSuffixField.gridx = 0;
-        gbc_firstDatasetSuffixField.gridy = 3;
-        datasetsTabPanel.add(firstDatasetSuffixField,
-                gbc_firstDatasetSuffixField);
+        JLabel secondDatasetWarningLbl = new JLabel(" ");
+        secondDatasetContainer.add(secondDatasetWarningLbl);
+
+        JPanel firstDatasetSuffixContainer = new JPanel();
+        GridBagConstraints gbc_firstDatasetSuffixContainer = new GridBagConstraints();
+        gbc_firstDatasetSuffixContainer.fill = GridBagConstraints.BOTH;
+        gbc_firstDatasetSuffixContainer.insets = new Insets(0, 0, 5, 5);
+        gbc_firstDatasetSuffixContainer.gridx = 0;
+        gbc_firstDatasetSuffixContainer.gridy = 3;
+        datasetsTabPanel.add(firstDatasetSuffixContainer,
+                gbc_firstDatasetSuffixContainer);
+        firstDatasetSuffixContainer.setLayout(
+                new BoxLayout(firstDatasetSuffixContainer, BoxLayout.X_AXIS));
+
+        firstDatasetSuffixWarningLbl = new JLabel(" ");
+        firstDatasetSuffixContainer.add(firstDatasetSuffixWarningLbl);
+
+        firstDatasetSuffixField = new JTextFieldWithPlaceholder();
+        firstDatasetSuffixContainer.add(firstDatasetSuffixField);
         firstDatasetSuffixField.setColumns(10);
 
         JLabel suffixLbl = new JLabel("Suffix");
@@ -289,24 +405,40 @@ public class MainWindow {
         gbc_suffixLbl.gridy = 3;
         datasetsTabPanel.add(suffixLbl, gbc_suffixLbl);
 
-        secondDatasetSuffixField = new JTextField();
-        GridBagConstraints gbc_secondDatasetSuffixField = new GridBagConstraints();
-        gbc_secondDatasetSuffixField.insets = new Insets(0, 0, 5, 0);
-        gbc_secondDatasetSuffixField.fill = GridBagConstraints.HORIZONTAL;
-        gbc_secondDatasetSuffixField.gridx = 2;
-        gbc_secondDatasetSuffixField.gridy = 3;
-        datasetsTabPanel.add(secondDatasetSuffixField,
-                gbc_secondDatasetSuffixField);
+        JPanel secondDatasetSuffixContainer = new JPanel();
+        GridBagConstraints gbc_secondDatasetSuffixContainer = new GridBagConstraints();
+        gbc_secondDatasetSuffixContainer.fill = GridBagConstraints.BOTH;
+        gbc_secondDatasetSuffixContainer.insets = new Insets(0, 0, 5, 0);
+        gbc_secondDatasetSuffixContainer.gridx = 2;
+        gbc_secondDatasetSuffixContainer.gridy = 3;
+        datasetsTabPanel.add(secondDatasetSuffixContainer,
+                gbc_secondDatasetSuffixContainer);
+        secondDatasetSuffixContainer.setLayout(
+                new BoxLayout(secondDatasetSuffixContainer, BoxLayout.X_AXIS));
+
+        secondDatasetSuffixField = new JTextFieldWithPlaceholder();
+        secondDatasetSuffixContainer.add(secondDatasetSuffixField);
         secondDatasetSuffixField.setColumns(10);
 
-        firstDatasetRowNumColField = new JTextField();
-        GridBagConstraints gbc_firstDatasetRowNumColField = new GridBagConstraints();
-        gbc_firstDatasetRowNumColField.insets = new Insets(0, 0, 5, 5);
-        gbc_firstDatasetRowNumColField.fill = GridBagConstraints.HORIZONTAL;
-        gbc_firstDatasetRowNumColField.gridx = 0;
-        gbc_firstDatasetRowNumColField.gridy = 4;
-        datasetsTabPanel.add(firstDatasetRowNumColField,
-                gbc_firstDatasetRowNumColField);
+        secondDatasetSuffixWarningLbl = new JLabel(" ");
+        secondDatasetSuffixContainer.add(secondDatasetSuffixWarningLbl);
+
+        JPanel firstDatasetRowNumColContainer = new JPanel();
+        GridBagConstraints gbc_firstDatasetRowNumColContainer = new GridBagConstraints();
+        gbc_firstDatasetRowNumColContainer.fill = GridBagConstraints.BOTH;
+        gbc_firstDatasetRowNumColContainer.insets = new Insets(0, 0, 5, 5);
+        gbc_firstDatasetRowNumColContainer.gridx = 0;
+        gbc_firstDatasetRowNumColContainer.gridy = 4;
+        datasetsTabPanel.add(firstDatasetRowNumColContainer,
+                gbc_firstDatasetRowNumColContainer);
+        firstDatasetRowNumColContainer.setLayout(new BoxLayout(
+                firstDatasetRowNumColContainer, BoxLayout.X_AXIS));
+
+        firstDatasetRowNumColWarningLbl = new JLabel(" ");
+        firstDatasetRowNumColContainer.add(firstDatasetRowNumColWarningLbl);
+
+        firstDatasetRowNumColField = new JTextFieldWithPlaceholder();
+        firstDatasetRowNumColContainer.add(firstDatasetRowNumColField);
         firstDatasetRowNumColField.setColumns(10);
 
         JLabel rowNumColLbl = new JLabel("Row number column name");
@@ -317,15 +449,23 @@ public class MainWindow {
         gbc_rowNumColLbl.gridy = 4;
         datasetsTabPanel.add(rowNumColLbl, gbc_rowNumColLbl);
 
-        secondDatasetRowNumColField = new JTextField();
-        GridBagConstraints gbc_secondDatasetRowNumColField = new GridBagConstraints();
-        gbc_secondDatasetRowNumColField.insets = new Insets(0, 0, 5, 0);
-        gbc_secondDatasetRowNumColField.fill = GridBagConstraints.HORIZONTAL;
-        gbc_secondDatasetRowNumColField.gridx = 2;
-        gbc_secondDatasetRowNumColField.gridy = 4;
-        datasetsTabPanel.add(secondDatasetRowNumColField,
-                gbc_secondDatasetRowNumColField);
+        JPanel secondDatasetRowNumColContainer = new JPanel();
+        GridBagConstraints gbc_secondDatasetRowNumColContainer = new GridBagConstraints();
+        gbc_secondDatasetRowNumColContainer.fill = GridBagConstraints.BOTH;
+        gbc_secondDatasetRowNumColContainer.insets = new Insets(0, 0, 5, 0);
+        gbc_secondDatasetRowNumColContainer.gridx = 2;
+        gbc_secondDatasetRowNumColContainer.gridy = 4;
+        datasetsTabPanel.add(secondDatasetRowNumColContainer,
+                gbc_secondDatasetRowNumColContainer);
+        secondDatasetRowNumColContainer.setLayout(new BoxLayout(
+                secondDatasetRowNumColContainer, BoxLayout.X_AXIS));
+
+        secondDatasetRowNumColField = new JTextFieldWithPlaceholder();
+        secondDatasetRowNumColContainer.add(secondDatasetRowNumColField);
         secondDatasetRowNumColField.setColumns(10);
+
+        secondDatasetRowNumColWarningLbl = new JLabel(" ");
+        secondDatasetRowNumColContainer.add(secondDatasetRowNumColWarningLbl);
 
         Component datasetsTabBottomMargin = Box.createVerticalGlue();
         GridBagConstraints gbc_datasetsTabBottomMargin = new GridBagConstraints();
@@ -374,7 +514,10 @@ public class MainWindow {
         linkageDirContainer.setLayout(
                 new BoxLayout(linkageDirContainer, BoxLayout.X_AXIS));
 
-        linkageDirField = new JTextField();
+        JLabel linkageDirWarningLbl = new JLabel(" ");
+        linkageDirContainer.add(linkageDirWarningLbl);
+
+        linkageDirField = new JTextFieldWithPlaceholder();
         linkageDirField.setHorizontalAlignment(SwingConstants.TRAILING);
         linkageDirContainer.add(linkageDirField);
         linkageDirField.setColumns(10);
@@ -387,8 +530,8 @@ public class MainWindow {
         });
         linkageDirContainer.add(linkageDirBtn);
 
-        SpinnerNumberModel minScoreModel = new SpinnerNumberModel(1.0, 0.0,
-                Double.MAX_VALUE, 0.01);
+        SpinnerNumberModel minScoreModel = new SpinnerNumberModel(80, 0.0, 100,
+                0.001);
 
         SpinnerNumberModel maxRowsModel = new SpinnerNumberModel(2000000000, 0,
                 2000000000, 1);
@@ -412,7 +555,10 @@ public class MainWindow {
         indexDirContainer
                 .setLayout(new BoxLayout(indexDirContainer, BoxLayout.X_AXIS));
 
-        indexDirField = new JTextField();
+        JLabel indexDirWarningLbl = new JLabel(" ");
+        indexDirContainer.add(indexDirWarningLbl);
+
+        indexDirField = new JTextFieldWithPlaceholder();
         indexDirField.setHorizontalAlignment(SwingConstants.TRAILING);
         indexDirContainer.add(indexDirField);
         indexDirField.setColumns(10);
@@ -442,7 +588,7 @@ public class MainWindow {
         optionsTabPanel.add(minScoreField, gbc_minScoreField);
 
         JSpinner.NumberEditor ne_minScoreField = new JSpinner.NumberEditor(
-                minScoreField, "0.0000000");
+                minScoreField, "0.000");
         ne_minScoreField.setPreferredSize(new Dimension(122, 29));
         ne_minScoreField.setRequestFocusEnabled(false);
         minScoreField.setEditor(ne_minScoreField);
@@ -577,6 +723,18 @@ public class MainWindow {
                 .createRigidArea(new Dimension(20, 20));
         menuBar.add(currentFileSpacer);
 
+        ToolTipManager.sharedInstance().setInitialDelay(100);
+
+        frame.pack();
+
+        JLabel[] warningLabels = { firstDatasetWarningLbl,
+                secondDatasetWarningLbl, firstDatasetSuffixWarningLbl,
+                secondDatasetSuffixWarningLbl, firstDatasetRowNumColWarningLbl,
+                secondDatasetRowNumColWarningLbl, indexDirWarningLbl,
+                linkageDirWarningLbl };
+        Icon warningIcon = UIManager.getIcon("OptionPane.errorIcon");
+        for (JLabel label : warningLabels)
+            setLabelIcon(label, warningIcon, false);
     }
 
     private String selectDatasetFile(String currentFileName) {
@@ -614,18 +772,20 @@ public class MainWindow {
         return null;
     }
 
-    private void updateConfigFileLabel() {
-        currentFileLbl.setText((dirty ? "[*] " : "") + currentFileName);
+    private void setLabelIcon(JLabel label, Icon icon, boolean visible) {
+        BufferedImage bufferedImage = new BufferedImage(icon.getIconWidth(),
+                icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = bufferedImage.createGraphics();
+        icon.paintIcon(null, g, 0, 0);
+        g.dispose();
+        int d = label.getSize().height; // square
+        label.setIcon(new ImageIcon(
+                bufferedImage.getScaledInstance(d, d, Image.SCALE_SMOOTH)));
+        label.setText("");
+        label.setVisible(visible);
     }
 
-    private class SwingAction extends AbstractAction {
-        public SwingAction() {
-            putValue(NAME, "SwingAction");
-            putValue(SHORT_DESCRIPTION, "Some short description");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-        }
+    private void updateConfigFileLabel() {
+        currentFileLbl.setText((dirty ? "[*] " : "") + currentFileName);
     }
 }

@@ -2,6 +2,7 @@ package com.cidacs.rl.editor;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -28,6 +29,10 @@ public class ConfigurationFile {
                 settingItems.get(key)
                         .setValueFromString(props.getProperty(key));
         in.close();
+    }
+
+    public Map<String, SettingItem> getSettingItems() {
+        return Collections.unmodifiableMap(settingItems);
     }
 
 }
