@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -17,6 +19,7 @@ public class DatasetPeek {
     }
 
     private String fileName;
+    Set<String> columnNames;
 
     public DatasetPeek(String fileName) {
         this.fileName = fileName;
@@ -26,6 +29,11 @@ public class DatasetPeek {
         File f = new File(fileName);
         if (!f.isFile())
             return DatasetPeekResult.FILE_NOT_FOUND;
+        String nameLower = fileName.toLowerCase();
+        if (nameLower.endsWith(".csv"))
+            return peekCSV();
+        if (nameLower.endsWith(".dbf"))
+            return peekDBF();
         return null;
     }
 
@@ -40,7 +48,7 @@ public class DatasetPeek {
     private DatasetPeekResult peekCSV() {
         String header;
         char delimiter = ',';
-        Set<String> columnNames = new LinkedHashSet<>();
+        columnNames = new LinkedHashSet<>();
 
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(new FileInputStream(fileName)))) {
@@ -62,7 +70,7 @@ public class DatasetPeek {
                 switch (state) {
                 case START:
                     if (type == CsvChar.COMMA)
-                        ; // empty field - ignore
+                        columnNames.add(""); // empty field
                     else if (type == CsvChar.NEWLINE)
                         state = CsvLineParseState.FINAL;
                     else if (type == CsvChar.QUOTE)
@@ -116,6 +124,55 @@ public class DatasetPeek {
             return DatasetPeekResult.IO_ERROR;
         }
         return null;
+    }
+
+    private DatasetPeekResult peekDBF() {
+        columnNames = new LinkedHashSet<>();
+        try {
+            FileInputStream is = new FileInputStream(fileName);
+            int firstByte = is.read();
+            if (firstByte == -1)
+                return DatasetPeekResult.UNSUPPORTED_CONTENTS;
+            int bytesInHeaderBeforeColNames, bytesInHeaderPerColumn,
+                    maxColNameLength;
+            if ((firstByte & 0x07) == 0x04) {
+                bytesInHeaderBeforeColNames = 68;
+                bytesInHeaderPerColumn = 48;
+                maxColNameLength = 32;
+            } else {
+                bytesInHeaderBeforeColNames = 32;
+                bytesInHeaderPerColumn = 32;
+                maxColNameLength = 11;
+            }
+            byte[] bytes = new byte[bytesInHeaderBeforeColNames - 1];
+            if (is.read(bytes) != bytes.length)
+                return DatasetPeekResult.UNSUPPORTED_CONTENTS;
+            bytes = new byte[bytesInHeaderPerColumn];
+            while (is.read(bytes) == bytes.length) {
+                if (bytes[0] == 0x0D)
+                    break;
+                String colName = new String(bytes, 0, maxColNameLength)
+                        .replaceAll("\\x00", "");
+                columnNames.add(colName);
+            }
+        } catch (FileNotFoundException e) {
+            return DatasetPeekResult.FILE_NOT_FOUND;
+        } catch (IOException e) {
+            return DatasetPeekResult.IO_ERROR;
+        }
+        return null;
+    }
+
+    public Set<String> getColumnNames() {
+        return Collections.unmodifiableSet(columnNames);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Charset.forName("utf8").name());
+        DatasetPeek p = new DatasetPeek("/tmp/test.dbf");
+        p.peek();
+        for (String c : p.getColumnNames())
+            System.out.println("«" + c + "»");
     }
 
 }
