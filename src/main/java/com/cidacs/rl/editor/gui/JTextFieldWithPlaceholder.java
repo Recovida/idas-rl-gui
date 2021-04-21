@@ -6,16 +6,19 @@ import java.awt.RenderingHints;
 
 import javax.swing.JTextField;
 
-public class JTextFieldWithPlaceholder extends JTextField {
+public class JTextFieldWithPlaceholder extends JTextField
+        implements FieldWithPlaceholder {
 
     private static final long serialVersionUID = 6919614017717410064L;
 
     protected String placeholder = "";
 
+    @Override
     public String getPlaceholder() {
         return placeholder;
     }
 
+    @Override
     public void setPlaceholder(String placeholder) {
         this.placeholder = placeholder;
     }

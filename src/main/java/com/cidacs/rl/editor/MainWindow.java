@@ -15,9 +15,17 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -92,6 +100,8 @@ public class MainWindow {
     private JLabel secondDatasetSuffixWarningLbl;
     private JLabel secondDatasetRowNumColWarningLbl;
     private JLabel firstDatasetRowNumColWarningLbl;
+    private JComboBoxWithPlaceholder firstEncodingField;
+    private JComboBoxWithPlaceholder secondEncodingField;
 
     /**
      * Launch the application.
@@ -126,6 +136,9 @@ public class MainWindow {
         initialize();
 
         // Tab: DATASETS
+        JComboBoxWithPlaceholder[] encodingCboxes = { firstEncodingField,
+                secondEncodingField };
+        fillEncodings(encodingCboxes);
         SettingItemChangeEventListener<String> datasetsTabEventListener = new SettingItemChangeEventListener<String>() {
 
             @Override
@@ -145,6 +158,10 @@ public class MainWindow {
                 firstDatasetRowNumColField, datasetsTabEventListener));
         cf.addSettingItem("row_num_col_b", new StringSettingItem("", "#B",
                 secondDatasetRowNumColField, datasetsTabEventListener));
+        cf.addSettingItem("encoding_a", new StringSettingItemWithList("",
+                "UTF-8", firstEncodingField, datasetsTabEventListener));
+        cf.addSettingItem("encoding_b", new StringSettingItemWithList("",
+                "UTF-8", secondEncodingField, datasetsTabEventListener));
 
         // Tab: OPTIONS
         SettingItemChangeEventListener<String> optionsTabEventListener = new SettingItemChangeEventListener<String>() {
@@ -241,6 +258,8 @@ public class MainWindow {
 
         // Dataset file names
 
+        // Encodings
+
     }
 
     public void validateOptionsTab() {
@@ -265,7 +284,8 @@ public class MainWindow {
      */
     private void initialize() {
         frame = new JFrame();
-        frame.setMinimumSize(new Dimension(700, 400));
+        frame.setPreferredSize(new Dimension(900, 500));
+        frame.setMinimumSize(new Dimension(800, 400));
         frame.setBounds(100, 100, 586, 377);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout(0, 0));
@@ -396,9 +416,8 @@ public class MainWindow {
         JLabel firstEncodingWarningLbl = new JLabel(" ");
         firstEncodingContainer.add(firstEncodingWarningLbl);
 
-        JComboBoxWithPlaceholder firstEncodingField = new JComboBoxWithPlaceholder();
+        firstEncodingField = new JComboBoxWithPlaceholder();
         firstEncodingField.setEditable(true);
-        firstEncodingField.setPlaceholder("UTF-8");
         firstEncodingContainer.add(firstEncodingField);
 
         JLabel encodingLbl = new JLabel("Encoding");
@@ -417,9 +436,8 @@ public class MainWindow {
         secondEncodingContainer.setLayout(
                 new BoxLayout(secondEncodingContainer, BoxLayout.X_AXIS));
 
-        JComboBoxWithPlaceholder secondEncodingField = new JComboBoxWithPlaceholder();
+        secondEncodingField = new JComboBoxWithPlaceholder();
         secondEncodingField.setEditable(true);
-        secondEncodingField.setPlaceholder("UTF-8");
         secondEncodingContainer.add(secondEncodingField);
 
         JLabel secondEncodingWarningLbl = new JLabel(" ");
@@ -832,5 +850,31 @@ public class MainWindow {
 
     private void updateConfigFileLabel() {
         currentFileLbl.setText((dirty ? "[*] " : "") + currentFileName);
+    }
+
+    private void fillEncodings(JComboBox[] comboboxes) {
+        Set<String> allEncodings = new HashSet<>();
+        for (Entry<String, Charset> entry : Charset.availableCharsets()
+                .entrySet()) {
+            allEncodings.add(entry.getKey());
+            allEncodings.addAll(entry.getValue().aliases());
+        }
+        List<String> sortedEncodings = new ArrayList<>(allEncodings);
+        Collections.sort(sortedEncodings, new Comparator<String>() {
+
+            @Override
+            public int compare(String o1, String o2) {
+                if (Character.isDigit(o1.charAt(0)) == Character
+                        .isDigit(o2.charAt(0)))
+                    return o1.compareToIgnoreCase(o2);
+                return Character.isDigit(o1.charAt(0)) ? 1 : -1;
+            }
+        });
+        sortedEncodings.add(0, "ANSI");
+        sortedEncodings.add(0, "UTF-8"); // add again to the beginning
+        for (JComboBox<String> cb : comboboxes)
+            for (String enc : sortedEncodings)
+                cb.addItem(enc);
+
     }
 }

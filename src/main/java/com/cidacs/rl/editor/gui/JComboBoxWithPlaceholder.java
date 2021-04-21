@@ -6,7 +6,8 @@ import java.awt.event.ActionListener;
 import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
 
-public class JComboBoxWithPlaceholder extends JComboBox<String> {
+public class JComboBoxWithPlaceholder extends JComboBox<String>
+        implements FieldWithPlaceholder {
 
     private static final long serialVersionUID = 6919614017717410064L;
 
@@ -60,10 +61,12 @@ public class JComboBoxWithPlaceholder extends JComboBox<String> {
         setEditor(new ComboBoxEditorWithPlaceholder());
     }
 
+    @Override
     public String getPlaceholder() {
         return placeholder;
     }
 
+    @Override
     public void setPlaceholder(String placeholder) {
         this.placeholder = placeholder;
         ((JTextFieldWithPlaceholder) getEditor().getEditorComponent())

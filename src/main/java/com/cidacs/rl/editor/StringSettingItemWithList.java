@@ -3,19 +3,21 @@ package com.cidacs.rl.editor;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-import javax.swing.JTextField;
+import javax.swing.JComboBox;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
 
 import com.cidacs.rl.editor.gui.FieldWithPlaceholder;
 
-public class StringSettingItem extends SettingItem<String, JTextField> {
+public class StringSettingItemWithList
+        extends SettingItem<String, JComboBox<String>> {
 
-    public StringSettingItem(String currentValue, String defaultValue,
-            JTextField guiComponent) {
+    public StringSettingItemWithList(String currentValue, String defaultValue,
+            JComboBox<String> guiComponent) {
         super(currentValue, defaultValue, guiComponent);
-        guiComponent.setText(currentValue);
+        guiComponent.setSelectedItem(currentValue);
         if (defaultValue != null && defaultValue.length() > 0
                 && guiComponent instanceof FieldWithPlaceholder) {
             ((FieldWithPlaceholder) guiComponent).setPlaceholder(defaultValue);
@@ -32,33 +34,33 @@ public class StringSettingItem extends SettingItem<String, JTextField> {
             }
 
         });
-        guiComponent.getDocument().addDocumentListener(new DocumentListener() {
+        ((JTextComponent) guiComponent.getEditor().getEditorComponent())
+                .getDocument().addDocumentListener(new DocumentListener() {
 
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                changedUpdate(e);
-            }
+                    @Override
+                    public void removeUpdate(DocumentEvent e) {
+                        changedUpdate(e);
+                    }
 
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                changedUpdate(e);
-            }
+                    @Override
+                    public void insertUpdate(DocumentEvent e) {
+                        changedUpdate(e);
+                    }
 
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                try {
-                    String value = e.getDocument().getText(0,
-                            e.getDocument().getLength());
-                    onChange(value);
-                } catch (BadLocationException e1) {
-                }
-
-            }
-        });
+                    @Override
+                    public void changedUpdate(DocumentEvent e) {
+                        try {
+                            String value = e.getDocument().getText(0,
+                                    e.getDocument().getLength());
+                            onChange(value);
+                        } catch (BadLocationException e1) {
+                        }
+                    }
+                });
     }
 
-    public StringSettingItem(String currentValue, String defaultValue,
-            JTextField guiComponent,
+    public StringSettingItemWithList(String currentValue, String defaultValue,
+            JComboBox<String> guiComponent,
             SettingItemChangeEventListener<String> listener) {
         this(currentValue, defaultValue, guiComponent);
         this.listeners.add(listener);
@@ -76,7 +78,7 @@ public class StringSettingItem extends SettingItem<String, JTextField> {
 
     @Override
     public void setValue(String newValue) {
-        guiComponent.setText(newValue);
+        guiComponent.setSelectedItem(newValue);
     }
 
     @Override
