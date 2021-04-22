@@ -43,6 +43,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -53,16 +54,17 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.JTextComponent;
 
 import com.cidacs.rl.editor.gui.JComboBoxWithPlaceholder;
 import com.cidacs.rl.editor.gui.JTextFieldWithPlaceholder;
 import com.cidacs.rl.editor.gui.LinkageColumnPanel;
+import com.cidacs.rl.editor.undo.HistoryPropertyChangeEventListener;
 import com.cidacs.rl.editor.undo.UndoHistory;
 
 /**
@@ -112,7 +114,10 @@ public class MainWindow {
     private JMenuItem redoMenuItem;
     private JMenu helpMenu;
     private JMenuItem aboutMenuItem;
-    private JComboBox languageCbox;
+    private JComboBox<String> languageCbox;
+    private JTabbedPane tabbedPane;
+    private JPanel datasetsTabPanel;
+    private JPanel optionsTabPanel;
 
     /**
      * Launch the application.
@@ -154,6 +159,7 @@ public class MainWindow {
 
             @Override
             public void changed(String newValue) {
+                tabbedPane.setSelectedComponent(datasetsTabPanel);
                 validateDatasetsTab();
             }
         };
@@ -179,6 +185,7 @@ public class MainWindow {
 
             @Override
             public void changed(String newValue) {
+                tabbedPane.setSelectedComponent(optionsTabPanel);
                 validateOptionsTab();
             }
         };
@@ -189,61 +196,41 @@ public class MainWindow {
 
         // Menus
 
-        exitMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                frame.dispose();
-            }
-        });
+        exitMenuItem.addActionListener(e -> doExit());
+        openFileMenuItem.addActionListener(e -> doOpen());
+        saveFileMenuItem.addActionListener(e -> doSave());
+        saveAsFileMenuItem.addActionListener(e -> doSaveAs());
+        redoMenuItem.addActionListener(e -> doRedo());
+        undoMenuItem.addActionListener(e -> doUndo());
 
-        openFileMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String newConfigFileName = selectConfigFile(
-                        currentFileName == null ? null
-                                : Paths.get(currentFileName).toAbsolutePath()
-                                        .toString());
-                if (newConfigFileName != null) {
-                    skipValidation = true;
-                    clearAllFields();
-                    try {
-                        cf.load(newConfigFileName);
-                        currentFileName = newConfigFileName;
-                        dirty = false;
+        // Undo - changed state
+
+        history.addPropertyChangeListener(
+                new HistoryPropertyChangeEventListener() {
+
+                    @Override
+                    public void cleanChanged(boolean isClean) {
+                        dirty = !isClean;
                         updateConfigFileLabel();
-                    } catch (IOException e1) {
-                        System.err.println("ERROR");
-                    } finally {
-                        skipValidation = false;
-                        validateAllTabs();
                     }
-                }
-            }
-        });
 
-        redoMenuItem.addActionListener(new ActionListener() {
+                    @Override
+                    public void canUndoChanged(boolean canUndo) {
+                        undoMenuItem.setEnabled(canUndo);
+                    }
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (history.canRedo())
-                    history.redo();
-            }
-        });
-
-        undoMenuItem.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (history.canUndo())
-                    history.undo();
-            }
-        });
+                    @Override
+                    public void canRedoChanged(boolean canRedo) {
+                        redoMenuItem.setEnabled(canRedo);
+                    }
+                });
 
     }
 
     public void validateDatasetsTab() {
         if (skipValidation)
             return;
+        @SuppressWarnings("unused")
         int errorCount = 0;
         @SuppressWarnings("rawtypes")
         Map<String, SettingItem> items = cf.getSettingItems();
@@ -319,14 +306,15 @@ public class MainWindow {
         validateOptionsTab();
     }
 
+    @SuppressWarnings("unchecked")
     public void clearAllFields() {
         for (SettingItem<?, ?> item : cf.getSettingItems().values()) {
             JComponent component = item.getGuiComponent();
             if (component instanceof JTextField)
                 ((JTextField) component).setText("");
             else if (component instanceof JComboBox<?>
-                    && ((JTextComponent) component).isEditable())
-                ((JTextField) item.guiComponent).setText("");
+                    && ((JComboBox<String>) component).isEditable())
+                ((JComboBox<String>) item.guiComponent).setSelectedItem("");
         }
     }
 
@@ -342,15 +330,51 @@ public class MainWindow {
     }
 
     protected void doUndo() {
-
+        if (history.canUndo())
+            history.undo();
     }
 
     protected void doRedo() {
-
+        if (history.canRedo())
+            history.redo();
     }
 
     protected void doOpen() {
+        if (dirty) {
+            String msg = (currentFileName == null
+                    ? "Save the contents of this currently unsaved file?"
+                    : String.format("Save the changes made to the file “%s”?",
+                            currentFileName));
+            JOptionPane.showOptionDialog(this.frame, msg, "Save changes?",
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, null, null);
+        }
+        String newConfigFileName = selectConfigFile(currentFileName == null
+                ? null
+                : Paths.get(currentFileName).toAbsolutePath().toString());
+        if (newConfigFileName != null) {
+            skipValidation = true;
+            clearAllFields();
+            try {
+                cf.load(newConfigFileName);
+                SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
+                    public void run() {
+                        tabbedPane.setSelectedComponent(datasetsTabPanel);
+                    }
+
+                });
+                currentFileName = newConfigFileName;
+                dirty = false;
+                updateConfigFileLabel();
+            } catch (IOException e1) {
+                System.err.println("ERROR");
+            } finally {
+                skipValidation = false;
+                validateAllTabs();
+            }
+        }
     }
 
     protected void doSave() {
@@ -365,6 +389,10 @@ public class MainWindow {
 
     }
 
+    protected void doExit() {
+        frame.dispose();
+    }
+
     /**
      * Initialize the contents of the frame.
      */
@@ -376,10 +404,10 @@ public class MainWindow {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout(0, 0));
 
-        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
-        JPanel datasetsTabPanel = new JPanel();
+        datasetsTabPanel = new JPanel();
         tabbedPane.addTab("Datasets", null, datasetsTabPanel, null);
         GridBagLayout gbl_datasetsTabPanel = new GridBagLayout();
         gbl_datasetsTabPanel.columnWidths = new int[] { 200, 100, 200 };
@@ -625,7 +653,7 @@ public class MainWindow {
         datasetsTabPanel.add(datasetsTabBottomMargin,
                 gbc_datasetsTabBottomMargin);
 
-        JPanel optionsTabPanel = new JPanel();
+        optionsTabPanel = new JPanel();
         tabbedPane.addTab("Options", null, optionsTabPanel, null);
         GridBagLayout gbl_optionsTabPanel = new GridBagLayout();
         gbl_optionsTabPanel.columnWidths = new int[] { 0, 0, 0 };
@@ -842,9 +870,11 @@ public class MainWindow {
         menuBar.add(editMenu);
 
         undoMenuItem = new JMenuItem("Undo");
+        undoMenuItem.setEnabled(false);
         editMenu.add(undoMenuItem);
 
         redoMenuItem = new JMenuItem("Redo");
+        redoMenuItem.setEnabled(false);
         editMenu.add(redoMenuItem);
 
         helpMenu = new JMenu("Help");
@@ -853,10 +883,10 @@ public class MainWindow {
         aboutMenuItem = new JMenuItem("About");
         helpMenu.add(aboutMenuItem);
 
-        languageCbox = new JComboBox();
+        languageCbox = new JComboBox<>();
         languageCbox.setMaximumSize(new Dimension(1000, 32767));
-        languageCbox
-                .setModel(new DefaultComboBoxModel(new String[] { "English" }));
+        languageCbox.setModel(
+                new DefaultComboBoxModel<>(new String[] { "English" }));
         menuBar.add(languageCbox);
 
         Component menuGlue = Box.createGlue();
@@ -936,10 +966,12 @@ public class MainWindow {
     }
 
     private void updateConfigFileLabel() {
-        currentFileLbl.setText((dirty ? "[*] " : "") + currentFileName);
+        currentFileLbl.setText((dirty ? "[*] " : "")
+                + (currentFileName == null ? "[Unsaved file]"
+                        : currentFileName));
     }
 
-    private void fillEncodings(JComboBox[] comboboxes) {
+    private void fillEncodings(JComboBox<String>[] comboboxes) {
         Set<String> allEncodings = new HashSet<>();
         for (Entry<String, Charset> entry : Charset.availableCharsets()
                 .entrySet()) {

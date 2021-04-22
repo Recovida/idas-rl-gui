@@ -10,4 +10,14 @@ public abstract class Command {
         return false;
     }
 
+    protected boolean merged = false;
+
+    void markAsMerged() {
+        merged = true;
+    }
+
+    public boolean wasMerged() {
+        return merged;
+    }
+
 }
