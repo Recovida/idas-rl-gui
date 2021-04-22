@@ -9,12 +9,15 @@ public class SetOptionCommand<T> extends Command {
     private T oldValue;
     private T newValue;
     private SettingItem<T, JComponent> settingItem;
+    private boolean skip;
 
-    public SetOptionCommand(SettingItem<T, JComponent> settingItem, T oldValue,
-            T newValue) {
-        this.settingItem = settingItem;
+    @SuppressWarnings("unchecked")
+    public SetOptionCommand(SettingItem<T, ?> settingItem, T oldValue,
+            T newValue, boolean skipFirst) {
+        this.settingItem = (SettingItem<T, JComponent>) settingItem;
         this.oldValue = oldValue;
         this.newValue = newValue;
+        this.skip = skipFirst;
     }
 
     @Override
@@ -24,7 +27,10 @@ public class SetOptionCommand<T> extends Command {
 
     @Override
     public void redo() {
-        settingItem.setValue(newValue);
+        if (skip)
+            skip = false;
+        else
+            settingItem.setValue(newValue);
     }
 
     @SuppressWarnings("unchecked")

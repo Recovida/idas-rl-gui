@@ -44,7 +44,7 @@ public class UndoHistory {
     public void push(Command command) {
         if (cleanIndex > commandListIterator.nextIndex())
             cleanIndex = -1;
-        else if (isClean() && commandListIterator.hasPrevious()
+        else if (!isClean() && commandListIterator.hasPrevious()
                 && !commandListIterator.hasNext()) {
             Command previousCommand = commandListIterator.previous();
             commandListIterator.next();

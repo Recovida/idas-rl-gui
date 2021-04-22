@@ -3,6 +3,7 @@ package com.cidacs.rl.editor.gui;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
 
@@ -19,6 +20,8 @@ public class JComboBoxWithPlaceholder extends JComboBox<String>
 
         public ComboBoxEditorWithPlaceholder() {
             component = new JTextFieldWithPlaceholder();
+            component.setVerticalPlaceholderOffset(3);
+            component.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         }
 
         @Override

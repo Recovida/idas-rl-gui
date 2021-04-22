@@ -13,6 +13,16 @@ public class JTextFieldWithPlaceholder extends JTextField
 
     protected String placeholder = "";
 
+    protected int verticalPlaceholderOffset = 0;
+
+    public int getVerticalPlaceholderOffset() {
+        return verticalPlaceholderOffset;
+    }
+
+    public void setVerticalPlaceholderOffset(int verticalPlaceholderOffset) {
+        this.verticalPlaceholderOffset = verticalPlaceholderOffset;
+    }
+
     @Override
     public String getPlaceholder() {
         return placeholder;
@@ -26,13 +36,15 @@ public class JTextFieldWithPlaceholder extends JTextField
     @Override
     protected void paintComponent(final Graphics pG) {
         super.paintComponent(pG);
+
         if (placeholder != null && placeholder.length() > 0
                 && getText().length() == 0) {
             ((Graphics2D) pG).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
             ((Graphics2D) pG).setColor(getDisabledTextColor());
             ((Graphics2D) pG).drawString(placeholder, getInsets().left,
-                    pG.getFontMetrics().getMaxAscent() + getInsets().top);
+                    pG.getFontMetrics().getMaxAscent() + getInsets().top
+                            + verticalPlaceholderOffset);
         }
     }
 

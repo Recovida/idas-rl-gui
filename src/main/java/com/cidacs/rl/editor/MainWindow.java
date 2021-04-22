@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -34,6 +36,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -55,6 +58,7 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.JTextComponent;
 
 import com.cidacs.rl.editor.gui.JComboBoxWithPlaceholder;
 import com.cidacs.rl.editor.gui.JTextFieldWithPlaceholder;
@@ -102,6 +106,13 @@ public class MainWindow {
     private JLabel firstDatasetRowNumColWarningLbl;
     private JComboBoxWithPlaceholder firstEncodingField;
     private JComboBoxWithPlaceholder secondEncodingField;
+    private JLabel firstEncodingWarningLbl;
+    private JLabel secondEncodingWarningLbl;
+    private JMenuItem undoMenuItem;
+    private JMenuItem redoMenuItem;
+    private JMenu helpMenu;
+    private JMenuItem aboutMenuItem;
+    private JComboBox languageCbox;
 
     /**
      * Launch the application.
@@ -146,22 +157,22 @@ public class MainWindow {
                 validateDatasetsTab();
             }
         };
-        cf.addSettingItem("db_a", new StringSettingItem("", "",
+        cf.addSettingItem("db_a", new StringSettingItem(history, "", "",
                 firstDatasetField, datasetsTabEventListener));
-        cf.addSettingItem("db_b", new StringSettingItem("", "",
+        cf.addSettingItem("db_b", new StringSettingItem(history, "", "",
                 secondDatasetField, datasetsTabEventListener));
-        cf.addSettingItem("suffix_a", new StringSettingItem("", "_dsa",
+        cf.addSettingItem("suffix_a", new StringSettingItem(history, "", "_dsa",
                 firstDatasetSuffixField, datasetsTabEventListener));
-        cf.addSettingItem("suffix_b", new StringSettingItem("", "_dsb",
+        cf.addSettingItem("suffix_b", new StringSettingItem(history, "", "_dsb",
                 secondDatasetSuffixField, datasetsTabEventListener));
-        cf.addSettingItem("row_num_col_a", new StringSettingItem("", "#A",
-                firstDatasetRowNumColField, datasetsTabEventListener));
-        cf.addSettingItem("row_num_col_b", new StringSettingItem("", "#B",
-                secondDatasetRowNumColField, datasetsTabEventListener));
-        cf.addSettingItem("encoding_a", new StringSettingItemWithList("",
-                "UTF-8", firstEncodingField, datasetsTabEventListener));
-        cf.addSettingItem("encoding_b", new StringSettingItemWithList("",
-                "UTF-8", secondEncodingField, datasetsTabEventListener));
+        cf.addSettingItem("row_num_col_a", new StringSettingItem(history, "",
+                "#A", firstDatasetRowNumColField, datasetsTabEventListener));
+        cf.addSettingItem("row_num_col_b", new StringSettingItem(history, "",
+                "#B", secondDatasetRowNumColField, datasetsTabEventListener));
+        cf.addSettingItem("encoding_a", new StringSettingItemWithList(history,
+                "", "UTF-8", firstEncodingField, datasetsTabEventListener));
+        cf.addSettingItem("encoding_b", new StringSettingItemWithList(history,
+                "", "UTF-8", secondEncodingField, datasetsTabEventListener));
 
         // Tab: OPTIONS
         SettingItemChangeEventListener<String> optionsTabEventListener = new SettingItemChangeEventListener<String>() {
@@ -171,10 +182,12 @@ public class MainWindow {
                 validateOptionsTab();
             }
         };
-        cf.addSettingItem("db_index", new StringSettingItem("", "",
+        cf.addSettingItem("db_index", new StringSettingItem(history, "", "",
                 indexDirField, optionsTabEventListener));
-        cf.addSettingItem("linkage_folder", new StringSettingItem("", "",
-                linkageDirField, optionsTabEventListener));
+        cf.addSettingItem("linkage_folder", new StringSettingItem(history, "",
+                "", linkageDirField, optionsTabEventListener));
+
+        // Menus
 
         exitMenuItem.addActionListener(new ActionListener() {
             @Override
@@ -205,6 +218,24 @@ public class MainWindow {
                         validateAllTabs();
                     }
                 }
+            }
+        });
+
+        redoMenuItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (history.canRedo())
+                    history.redo();
+            }
+        });
+
+        undoMenuItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (history.canUndo())
+                    history.undo();
             }
         });
 
@@ -256,9 +287,25 @@ public class MainWindow {
             secondDatasetRowNumColWarningLbl.setVisible(false);
         }
 
-        // Dataset file names
-
         // Encodings
+        s1 = (String) items.get("encoding_a").getCurrentValue();
+        s2 = (String) items.get("encoding_b").getCurrentValue();
+        if (s1 == null || s1.isEmpty())
+            s1 = (String) items.get("encoding_a").getDefaultValue();
+        if (s2 == null || s2.isEmpty())
+            s2 = (String) items.get("encoding_a").getDefaultValue();
+        if (!isValidEncoding(s1)) {
+            firstEncodingWarningLbl.setToolTipText("Unsupported encoding.");
+            firstEncodingWarningLbl.setVisible(true);
+        } else {
+            firstEncodingWarningLbl.setVisible(false);
+        }
+        if (!isValidEncoding(s2)) {
+            secondEncodingWarningLbl.setToolTipText("Unsupported encoding.");
+            secondEncodingWarningLbl.setVisible(true);
+        } else {
+            secondEncodingWarningLbl.setVisible(false);
+        }
 
     }
 
@@ -274,9 +321,48 @@ public class MainWindow {
 
     public void clearAllFields() {
         for (SettingItem<?, ?> item : cf.getSettingItems().values()) {
-            if (item.getGuiComponent() instanceof JTextField)
+            JComponent component = item.getGuiComponent();
+            if (component instanceof JTextField)
+                ((JTextField) component).setText("");
+            else if (component instanceof JComboBox<?>
+                    && ((JTextComponent) component).isEditable())
                 ((JTextField) item.guiComponent).setText("");
         }
+    }
+
+    protected static boolean isValidEncoding(String enc) {
+        if (enc == null)
+            return false;
+        try {
+            return enc.toUpperCase().replaceAll("[^A-Z0-9]", "").equals("ANSI")
+                    || Charset.isSupported(enc);
+        } catch (IllegalCharsetNameException e) {
+            return false;
+        }
+    }
+
+    protected void doUndo() {
+
+    }
+
+    protected void doRedo() {
+
+    }
+
+    protected void doOpen() {
+
+    }
+
+    protected void doSave() {
+        if (currentFileName == null) {
+            doSaveAs();
+        } else {
+
+        }
+    }
+
+    protected void doSaveAs() {
+
     }
 
     /**
@@ -285,7 +371,7 @@ public class MainWindow {
     private void initialize() {
         frame = new JFrame();
         frame.setPreferredSize(new Dimension(900, 500));
-        frame.setMinimumSize(new Dimension(800, 400));
+        frame.setMinimumSize(new Dimension(900, 400));
         frame.setBounds(100, 100, 586, 377);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout(0, 0));
@@ -299,7 +385,7 @@ public class MainWindow {
         gbl_datasetsTabPanel.columnWidths = new int[] { 200, 100, 200 };
         gbl_datasetsTabPanel.rowHeights = new int[] { 10, 20, 30, 0, 30, 30,
                 30 };
-        gbl_datasetsTabPanel.columnWeights = new double[] { 1.0, 0.0, 1.0 };
+        gbl_datasetsTabPanel.columnWeights = new double[] { 0.0, 0.0, 0.0 };
         gbl_datasetsTabPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 1.0 };
         datasetsTabPanel.setLayout(gbl_datasetsTabPanel);
@@ -404,8 +490,8 @@ public class MainWindow {
 
         JPanel firstEncodingContainer = new JPanel();
         GridBagConstraints gbc_firstEncodingContainer = new GridBagConstraints();
-        gbc_firstEncodingContainer.insets = new Insets(0, 0, 5, 5);
         gbc_firstEncodingContainer.fill = GridBagConstraints.HORIZONTAL;
+        gbc_firstEncodingContainer.insets = new Insets(0, 0, 5, 5);
         gbc_firstEncodingContainer.gridx = 0;
         gbc_firstEncodingContainer.gridy = 3;
         datasetsTabPanel.add(firstEncodingContainer,
@@ -413,7 +499,7 @@ public class MainWindow {
         firstEncodingContainer.setLayout(
                 new BoxLayout(firstEncodingContainer, BoxLayout.X_AXIS));
 
-        JLabel firstEncodingWarningLbl = new JLabel(" ");
+        firstEncodingWarningLbl = new JLabel(" ");
         firstEncodingContainer.add(firstEncodingWarningLbl);
 
         firstEncodingField = new JComboBoxWithPlaceholder();
@@ -440,7 +526,7 @@ public class MainWindow {
         secondEncodingField.setEditable(true);
         secondEncodingContainer.add(secondEncodingField);
 
-        JLabel secondEncodingWarningLbl = new JLabel(" ");
+        secondEncodingWarningLbl = new JLabel(" ");
         secondEncodingContainer.add(secondEncodingWarningLbl);
 
         JPanel firstDatasetSuffixContainer = new JPanel();
@@ -755,19 +841,19 @@ public class MainWindow {
         JMenu editMenu = new JMenu("Edit");
         menuBar.add(editMenu);
 
-        JMenuItem undoMenuItem = new JMenuItem("Undo");
+        undoMenuItem = new JMenuItem("Undo");
         editMenu.add(undoMenuItem);
 
-        JMenuItem redoMenuItem = new JMenuItem("Redo");
+        redoMenuItem = new JMenuItem("Redo");
         editMenu.add(redoMenuItem);
 
-        JMenu helpMenu = new JMenu("Help");
+        helpMenu = new JMenu("Help");
         menuBar.add(helpMenu);
 
-        JMenuItem aboutMenuItem = new JMenuItem("About");
+        aboutMenuItem = new JMenuItem("About");
         helpMenu.add(aboutMenuItem);
 
-        JComboBox languageCbox = new JComboBox();
+        languageCbox = new JComboBox();
         languageCbox.setMaximumSize(new Dimension(1000, 32767));
         languageCbox
                 .setModel(new DefaultComboBoxModel(new String[] { "English" }));
@@ -794,7 +880,8 @@ public class MainWindow {
                 secondDatasetWarningLbl, firstDatasetSuffixWarningLbl,
                 secondDatasetSuffixWarningLbl, firstDatasetRowNumColWarningLbl,
                 secondDatasetRowNumColWarningLbl, indexDirWarningLbl,
-                linkageDirWarningLbl };
+                linkageDirWarningLbl, firstEncodingWarningLbl,
+                secondEncodingWarningLbl };
         Icon warningIcon = UIManager.getIcon("OptionPane.errorIcon");
         for (JLabel label : warningLabels)
             setLabelIcon(label, warningIcon, false);
@@ -857,7 +944,9 @@ public class MainWindow {
         for (Entry<String, Charset> entry : Charset.availableCharsets()
                 .entrySet()) {
             allEncodings.add(entry.getKey());
-            allEncodings.addAll(entry.getValue().aliases());
+            allEncodings.addAll(entry.getValue().aliases().stream()
+                    .filter(enc -> enc.length() <= 10)
+                    .collect(Collectors.toList()));
         }
         List<String> sortedEncodings = new ArrayList<>(allEncodings);
         Collections.sort(sortedEncodings, new Comparator<String>() {

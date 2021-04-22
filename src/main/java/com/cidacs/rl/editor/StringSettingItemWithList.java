@@ -4,19 +4,24 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 import javax.swing.JComboBox;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
 import com.cidacs.rl.editor.gui.FieldWithPlaceholder;
+import com.cidacs.rl.editor.undo.SetOptionCommand;
+import com.cidacs.rl.editor.undo.UndoHistory;
 
 public class StringSettingItemWithList
         extends SettingItem<String, JComboBox<String>> {
 
-    public StringSettingItemWithList(String currentValue, String defaultValue,
-            JComboBox<String> guiComponent) {
-        super(currentValue, defaultValue, guiComponent);
+    protected boolean supressDocumentListener = false;
+
+    public StringSettingItemWithList(UndoHistory history, String currentValue,
+            String defaultValue, JComboBox<String> guiComponent) {
+        super(history, currentValue, defaultValue, guiComponent);
         guiComponent.setSelectedItem(currentValue);
         if (defaultValue != null && defaultValue.length() > 0
                 && guiComponent instanceof FieldWithPlaceholder) {
@@ -34,6 +39,7 @@ public class StringSettingItemWithList
             }
 
         });
+        SettingItem<String, ?> settingItem = this;
         ((JTextComponent) guiComponent.getEditor().getEditorComponent())
                 .getDocument().addDocumentListener(new DocumentListener() {
 
@@ -52,6 +58,9 @@ public class StringSettingItemWithList
                         try {
                             String value = e.getDocument().getText(0,
                                     e.getDocument().getLength());
+                            if (!supressDocumentListener)
+                                history.push(new SetOptionCommand<>(settingItem,
+                                        getCurrentValue(), value, true));
                             onChange(value);
                         } catch (BadLocationException e1) {
                         }
@@ -59,10 +68,10 @@ public class StringSettingItemWithList
                 });
     }
 
-    public StringSettingItemWithList(String currentValue, String defaultValue,
-            JComboBox<String> guiComponent,
+    public StringSettingItemWithList(UndoHistory history, String currentValue,
+            String defaultValue, JComboBox<String> guiComponent,
             SettingItemChangeEventListener<String> listener) {
-        this(currentValue, defaultValue, guiComponent);
+        this(history, currentValue, defaultValue, guiComponent);
         this.listeners.add(listener);
     }
 
@@ -78,7 +87,15 @@ public class StringSettingItemWithList
 
     @Override
     public void setValue(String newValue) {
-        guiComponent.setSelectedItem(newValue);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                supressDocumentListener = true;
+                guiComponent.setSelectedItem(newValue);
+                guiComponent.grabFocus();
+                supressDocumentListener = false;
+            }
+        });
     }
 
     @Override
