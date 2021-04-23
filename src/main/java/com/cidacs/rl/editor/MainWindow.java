@@ -352,13 +352,7 @@ public class MainWindow {
 
     protected void doOpen() {
         if (dirty) {
-            String msg = (currentFileName == null
-                    ? "Save the contents of this currently unsaved file?"
-                    : String.format("Save the changes made to the file “%s”?",
-                            currentFileName));
-            JOptionPane.showOptionDialog(this.frame, msg, "Save changes?",
-                    JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, null, null, null);
+            promptToSave();
         }
         String newConfigFileName = selectConfigFile(currentFileName == null
                 ? null
@@ -401,7 +395,20 @@ public class MainWindow {
     }
 
     protected void doExit() {
+        if (dirty) {
+            promptToSave();
+        }
         frame.dispose();
+    }
+
+    protected int promptToSave() {
+        String msg = (currentFileName == null
+                ? "Save the contents of this currently unsaved file?"
+                : String.format("Save the changes made to the file “%s”?",
+                        currentFileName));
+        return JOptionPane.showOptionDialog(this.frame, msg, "Save changes?",
+                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, null, null);
     }
 
     /**
