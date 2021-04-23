@@ -62,8 +62,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 import com.cidacs.rl.editor.gui.JComboBoxWithPlaceholder;
+import com.cidacs.rl.editor.gui.JSpinnerWithBlankValue;
 import com.cidacs.rl.editor.gui.JTextFieldWithPlaceholder;
 import com.cidacs.rl.editor.gui.LinkageColumnPanel;
+import com.cidacs.rl.editor.settingitem.NumberSettingItem;
+import com.cidacs.rl.editor.settingitem.SettingItem;
+import com.cidacs.rl.editor.settingitem.SettingItemChangeEventListener;
+import com.cidacs.rl.editor.settingitem.StringSettingItem;
+import com.cidacs.rl.editor.settingitem.StringSettingItemWithList;
 import com.cidacs.rl.editor.undo.HistoryPropertyChangeEventListener;
 import com.cidacs.rl.editor.undo.UndoHistory;
 
@@ -193,6 +199,10 @@ public class MainWindow {
                 indexDirField, optionsTabEventListener));
         cf.addSettingItem("linkage_folder", new StringSettingItem(history, "",
                 "", linkageDirField, optionsTabEventListener));
+        cf.addSettingItem("max_rows", new NumberSettingItem(history,
+                Integer.MAX_VALUE, Integer.MAX_VALUE, maxRowsField));
+        cf.addSettingItem("min_score",
+                new NumberSettingItem(history, 0.0, 0.0, minScoreField));
 
         // Menus
 
@@ -314,7 +324,8 @@ public class MainWindow {
                 ((JTextField) component).setText("");
             else if (component instanceof JComboBox<?>
                     && ((JComboBox<String>) component).isEditable())
-                ((JComboBox<String>) item.guiComponent).setSelectedItem("");
+                ((JComboBox<String>) item.getGuiComponent())
+                        .setSelectedItem("");
         }
     }
 
@@ -707,11 +718,11 @@ public class MainWindow {
         });
         linkageDirContainer.add(linkageDirBtn);
 
-        SpinnerNumberModel minScoreModel = new SpinnerNumberModel(80, 0.0, 100,
+        SpinnerNumberModel minScoreModel = new SpinnerNumberModel(0.0, 0.0, 100,
                 0.001);
 
-        SpinnerNumberModel maxRowsModel = new SpinnerNumberModel(2000000000, 0,
-                2000000000, 1);
+        SpinnerNumberModel maxRowsModel = new SpinnerNumberModel(
+                Integer.MAX_VALUE, 0, Integer.MAX_VALUE, 1);
 
         JLabel indexDirLbl = new JLabel("Index location");
         indexDirLbl.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -756,7 +767,9 @@ public class MainWindow {
         gbc_minScoreLbl.gridx = 0;
         gbc_minScoreLbl.gridy = 3;
         optionsTabPanel.add(minScoreLbl, gbc_minScoreLbl);
-        minScoreField = new JSpinner(minScoreModel);
+        minScoreField = new JSpinnerWithBlankValue(minScoreModel);
+        ((JSpinnerWithBlankValue) minScoreField)
+                .setBlankValue(Double.valueOf(0.0));
         GridBagConstraints gbc_minScoreField = new GridBagConstraints();
         gbc_minScoreField.anchor = GridBagConstraints.WEST;
         gbc_minScoreField.insets = new Insets(0, 0, 5, 0);
@@ -778,7 +791,9 @@ public class MainWindow {
         gbc_maxRowsLbl.gridx = 0;
         gbc_maxRowsLbl.gridy = 4;
         optionsTabPanel.add(maxRowsLbl, gbc_maxRowsLbl);
-        maxRowsField = new JSpinner(maxRowsModel);
+        maxRowsField = new JSpinnerWithBlankValue(maxRowsModel);
+        ((JSpinnerWithBlankValue) maxRowsField)
+                .setBlankValue(Integer.MAX_VALUE);
         GridBagConstraints gbc_maxRowsField = new GridBagConstraints();
         gbc_maxRowsField.anchor = GridBagConstraints.WEST;
         gbc_maxRowsField.gridx = 1;

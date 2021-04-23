@@ -2,7 +2,7 @@ package com.cidacs.rl.editor.undo;
 
 import javax.swing.JComponent;
 
-import com.cidacs.rl.editor.SettingItem;
+import com.cidacs.rl.editor.settingitem.SettingItem;
 
 public class SetOptionCommand<T> extends Command {
 

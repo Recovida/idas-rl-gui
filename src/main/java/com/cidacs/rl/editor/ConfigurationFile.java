@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import com.cidacs.rl.editor.settingitem.SettingItem;
+
 @SuppressWarnings("rawtypes")
 public class ConfigurationFile {
 
