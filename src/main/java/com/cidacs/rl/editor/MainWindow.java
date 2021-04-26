@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -835,21 +836,37 @@ public class MainWindow {
         model.addColumn("Column (A)");
         model.addColumn("Renamed (A)");
         model.addColumn("Column (B)");
-        model.addColumn("Renamed (B)", new Object[] { "item1", "item2", "item3",
-                "item4", "item5", "item6", "item7", "item8", "item9", "item10",
-                "item11", "item12", "item13", "item14", "item15", "item16",
-                "item17", "item18", "item19", "item20", "item1", "item2",
-                "item3", "item4", "item5", "item6", "item7", "item8", "item9",
-                "item10", "item11", "item12", "item13", "item14", "item15",
-                "item16", "item17", "item18", "item19", "item20", "item1",
-                "item2", "item3", "item4", "item5", "item6", "item7", "item8",
-                "item9", "item10", "item11", "item12", "item13", "item14",
-                "item15", "item16", "item17", "item18", "item19", "item20" });
+        model.addColumn("Renamed (B)");
         linkageColsTabPanel.setLayout(new BorderLayout(0, 0));
         linkageColsTable.setModel(model);
 
         JScrollPane linkageColsScrollPane = new JScrollPane(linkageColsTable);
         linkageColsTabPanel.add(linkageColsScrollPane);
+
+        JPanel panel = new JPanel();
+        linkageColsScrollPane.setRowHeaderView(panel);
+        panel.setLayout(new GridLayout(0, 1, 0, 0));
+
+        JButton btnNewButton = new JButton("New column pair (above)");
+        panel.add(btnNewButton);
+
+        JButton btnNewButton_1 = new JButton("New column pair (below)");
+        panel.add(btnNewButton_1);
+
+        Component verticalStrut_1 = Box.createVerticalStrut(20);
+        panel.add(verticalStrut_1);
+
+        JButton btnNewButton_2 = new JButton("Delete column pair");
+        panel.add(btnNewButton_2);
+
+        Component verticalStrut = Box.createVerticalStrut(20);
+        panel.add(verticalStrut);
+
+        Component verticalStrut_2 = Box.createVerticalStrut(20);
+        panel.add(verticalStrut_2);
+
+        Component verticalStrut_3 = Box.createVerticalStrut(20);
+        panel.add(verticalStrut_3);
 
         LinkageColumnPanel linkageColsEditingPanel = new LinkageColumnPanel();
         linkageColsTabPanel.add(linkageColsEditingPanel, BorderLayout.SOUTH);
