@@ -8,7 +8,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -62,9 +61,11 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
+import com.cidacs.rl.editor.gui.ColumnPairTableModel;
 import com.cidacs.rl.editor.gui.JComboBoxWithPlaceholder;
 import com.cidacs.rl.editor.gui.JSpinnerWithBlankValue;
 import com.cidacs.rl.editor.gui.JTextFieldWithPlaceholder;
+import com.cidacs.rl.editor.gui.LinkageColumnButtonPanel;
 import com.cidacs.rl.editor.gui.LinkageColumnPanel;
 import com.cidacs.rl.editor.settingitem.NumberSettingItem;
 import com.cidacs.rl.editor.settingitem.SettingItem;
@@ -818,58 +819,19 @@ public class MainWindow {
         linkageColsTable = new JTable();
         linkageColsTable.setShowVerticalLines(true);
         linkageColsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        DefaultTableModel model = new DefaultTableModel() {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-
-        };
-        model.addColumn("Number");
-        model.addColumn("ID");
-        model.addColumn("Type");
-        model.addColumn("Weight");
-        model.addColumn("Phon. weight");
-        model.addColumn("Column (A)");
-        model.addColumn("Renamed (A)");
-        model.addColumn("Column (B)");
-        model.addColumn("Renamed (B)");
+        DefaultTableModel model = new ColumnPairTableModel();
         linkageColsTabPanel.setLayout(new BorderLayout(0, 0));
         linkageColsTable.setModel(model);
 
         JScrollPane linkageColsScrollPane = new JScrollPane(linkageColsTable);
         linkageColsTabPanel.add(linkageColsScrollPane);
 
-        JPanel panel = new JPanel();
-        linkageColsScrollPane.setRowHeaderView(panel);
-        panel.setLayout(new GridLayout(0, 1, 0, 0));
-
-        JButton btnNewButton = new JButton("New column pair (above)");
-        panel.add(btnNewButton);
-
-        JButton btnNewButton_1 = new JButton("New column pair (below)");
-        panel.add(btnNewButton_1);
-
-        Component verticalStrut_1 = Box.createVerticalStrut(20);
-        panel.add(verticalStrut_1);
-
-        JButton btnNewButton_2 = new JButton("Delete column pair");
-        panel.add(btnNewButton_2);
-
-        Component verticalStrut = Box.createVerticalStrut(20);
-        panel.add(verticalStrut);
-
-        Component verticalStrut_2 = Box.createVerticalStrut(20);
-        panel.add(verticalStrut_2);
-
-        Component verticalStrut_3 = Box.createVerticalStrut(20);
-        panel.add(verticalStrut_3);
-
         LinkageColumnPanel linkageColsEditingPanel = new LinkageColumnPanel();
         linkageColsTabPanel.add(linkageColsEditingPanel, BorderLayout.SOUTH);
+
+        LinkageColumnButtonPanel panel = new LinkageColumnButtonPanel();
+        linkageColsTabPanel.add(panel, BorderLayout.NORTH);
+        linkageColsEditingPanel.setVisible(false);
 
         JPanel extraColsTabPanel = new JPanel();
         tabbedPane.addTab("Extra columns", null, extraColsTabPanel, null);
