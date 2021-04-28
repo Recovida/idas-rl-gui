@@ -1,4 +1,4 @@
-package com.cidacs.rl.editor;
+package com.cidacs.rl.editor.pair;
 
 public class ColumnPair {
 

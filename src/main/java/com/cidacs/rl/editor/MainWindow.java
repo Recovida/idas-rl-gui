@@ -59,7 +59,6 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.DefaultTableModel;
 
 import com.cidacs.rl.editor.gui.ColumnPairTableModel;
 import com.cidacs.rl.editor.gui.JComboBoxWithPlaceholder;
@@ -67,6 +66,7 @@ import com.cidacs.rl.editor.gui.JSpinnerWithBlankValue;
 import com.cidacs.rl.editor.gui.JTextFieldWithPlaceholder;
 import com.cidacs.rl.editor.gui.LinkageColumnButtonPanel;
 import com.cidacs.rl.editor.gui.LinkageColumnPanel;
+import com.cidacs.rl.editor.pair.ColumnPairManager;
 import com.cidacs.rl.editor.settingitem.NumberSettingItem;
 import com.cidacs.rl.editor.settingitem.SettingItem;
 import com.cidacs.rl.editor.settingitem.SettingItemChangeEventListener;
@@ -126,6 +126,9 @@ public class MainWindow {
     private JTabbedPane tabbedPane;
     private JPanel datasetsTabPanel;
     private JPanel optionsTabPanel;
+    private LinkageColumnPanel linkageColsEditingPanel;
+    private LinkageColumnButtonPanel linkageColsButtonPanel;
+    private ColumnPairTableModel columnPairTableModel;
 
     /**
      * Launch the application.
@@ -205,6 +208,11 @@ public class MainWindow {
                 Integer.MAX_VALUE, Integer.MAX_VALUE, maxRowsField));
         cf.addSettingItem("min_score",
                 new NumberSettingItem(history, 0.0, 0.0, minScoreField));
+
+        // Tab: COLUMNS
+        cf.setPairPanager(new ColumnPairManager(history, linkageColsButtonPanel,
+                linkageColsEditingPanel, columnPairTableModel,
+                linkageColsTable.getSelectionModel()));
 
         // Menus
 
@@ -819,18 +827,18 @@ public class MainWindow {
         linkageColsTable = new JTable();
         linkageColsTable.setShowVerticalLines(true);
         linkageColsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        DefaultTableModel model = new ColumnPairTableModel();
+        columnPairTableModel = new ColumnPairTableModel();
         linkageColsTabPanel.setLayout(new BorderLayout(0, 0));
-        linkageColsTable.setModel(model);
+        linkageColsTable.setModel(columnPairTableModel);
 
         JScrollPane linkageColsScrollPane = new JScrollPane(linkageColsTable);
         linkageColsTabPanel.add(linkageColsScrollPane);
 
-        LinkageColumnPanel linkageColsEditingPanel = new LinkageColumnPanel();
+        linkageColsEditingPanel = new LinkageColumnPanel();
         linkageColsTabPanel.add(linkageColsEditingPanel, BorderLayout.SOUTH);
 
-        LinkageColumnButtonPanel panel = new LinkageColumnButtonPanel();
-        linkageColsTabPanel.add(panel, BorderLayout.NORTH);
+        linkageColsButtonPanel = new LinkageColumnButtonPanel();
+        linkageColsTabPanel.add(linkageColsButtonPanel, BorderLayout.NORTH);
         linkageColsEditingPanel.setVisible(false);
 
         JPanel extraColsTabPanel = new JPanel();
