@@ -5,27 +5,70 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
-public class LinkageColumnPanel extends JPanel {
+public class LinkageColumnEditingPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
     private JTextField firstRenameField;
     private JTextField secondRenameField;
     private final Component horizontalGlue_1 = Box.createHorizontalGlue();
+    private JSpinnerWithBlankValue weightField;
+    private JSpinnerWithBlankValue phonWeightField;
+    private JComboBox<String> typeField;
+    private JComboBox<String> firstNameField;
+    private JSpinner numberField;
+    private JComboBox<String> secondNameField;
+
+    public JTextField getFirstRenameField() {
+        return firstRenameField;
+    }
+
+    public JTextField getSecondRenameField() {
+        return secondRenameField;
+    }
+
+    public JSpinner getPhonWeightField() {
+        return phonWeightField;
+    }
+
+    public JSpinner getWeightField() {
+        return weightField;
+    }
+
+    public JComboBox<String> getTypeField() {
+        return typeField;
+    }
+
+    public JComboBox<String> getFirstNameField() {
+        return firstNameField;
+    }
+
+    public JSpinner getNumberField() {
+        return numberField;
+    }
+
+    public JComboBox<String> getSecondNameField() {
+        return secondNameField;
+    }
 
     /**
      * Create the panel.
      */
-    public LinkageColumnPanel() {
+    public LinkageColumnEditingPanel() {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         JPanel panel = new JPanel();
@@ -69,7 +112,7 @@ public class LinkageColumnPanel extends JPanel {
         gbc_nameFirstLbl.gridy = 1;
         panel.add(nameFirstLbl, gbc_nameFirstLbl);
 
-        JComboBox<String> firstNameField = new JComboBox<>();
+        firstNameField = new JComboBox<>();
         firstNameField.setEditable(true);
         GridBagConstraints gbc_firstNameField = new GridBagConstraints();
         gbc_firstNameField.gridwidth = 2;
@@ -98,7 +141,7 @@ public class LinkageColumnPanel extends JPanel {
         panel.add(firstRenameField, gbc_firstRenameField);
         firstRenameField.setColumns(10);
 
-        JSpinner numberField = new JSpinner();
+        numberField = new JSpinner();
         numberField.setPreferredSize(new Dimension(40, 30));
         GridBagConstraints gbc_numberField = new GridBagConstraints();
         gbc_numberField.fill = GridBagConstraints.BOTH;
@@ -117,7 +160,7 @@ public class LinkageColumnPanel extends JPanel {
         gbc_nameSecondLbl.gridy = 2;
         panel.add(nameSecondLbl, gbc_nameSecondLbl);
 
-        JComboBox<String> secondNameField = new JComboBox<>();
+        secondNameField = new JComboBox<>();
         secondNameField.setEditable(true);
         GridBagConstraints gbc_secondNameField = new GridBagConstraints();
         gbc_secondNameField.gridwidth = 2;
@@ -191,7 +234,7 @@ public class LinkageColumnPanel extends JPanel {
         gbc_horizontalGlue.gridy = 4;
         panel.add(horizontalGlue, gbc_horizontalGlue);
 
-        JComboBox<String> typeField = new JComboBox<>();
+        typeField = new JComboBox<>();
         typeField.setEditable(true);
         GridBagConstraints gbc_typeField = new GridBagConstraints();
         gbc_typeField.insets = new Insets(0, 0, 5, 5);
@@ -200,7 +243,11 @@ public class LinkageColumnPanel extends JPanel {
         gbc_typeField.gridy = 4;
         panel.add(typeField, gbc_typeField);
 
-        JSpinner weightField = new JSpinner();
+        Double zero = 0.0;
+        weightField = new JSpinnerWithBlankValue(
+                new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1));
+        weightField.setBlankValue(zero);
+        weightField.setEditor(new JSpinner.NumberEditor(weightField, "0.0000"));
         weightField.setPreferredSize(new Dimension(65, 30));
         weightField.setMinimumSize(new Dimension(50, 30));
         GridBagConstraints gbc_weightField = new GridBagConstraints();
@@ -210,7 +257,13 @@ public class LinkageColumnPanel extends JPanel {
         gbc_weightField.gridy = 4;
         panel.add(weightField, gbc_weightField);
 
-        JSpinner phonWeightField = new JSpinner();
+        phonWeightField = new JSpinnerWithBlankValue(
+                new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1));
+        phonWeightField.setBlankValue(zero);
+        phonWeightField.setEditor(
+                new JSpinner.NumberEditor(phonWeightField, "0.0000"));
+        phonWeightField.setPreferredSize(new Dimension(65, 30));
+        phonWeightField.setMinimumSize(new Dimension(50, 30));
         GridBagConstraints gbc_phonWeightField = new GridBagConstraints();
         gbc_phonWeightField.fill = GridBagConstraints.BOTH;
         gbc_phonWeightField.insets = new Insets(0, 0, 5, 5);
@@ -230,6 +283,18 @@ public class LinkageColumnPanel extends JPanel {
         gbc_verticalGlue.gridy = 5;
         panel.add(verticalGlue, gbc_verticalGlue);
 
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        Queue<Component> q = new LinkedList<>(Arrays.asList(getComponents()));
+        while (!q.isEmpty()) {
+            JComponent c = (JComponent) q.remove();
+            c.setEnabled(enabled);
+            if (c instanceof JPanel)
+                q.addAll(Arrays.asList(c.getComponents()));
+        }
     }
 
 }

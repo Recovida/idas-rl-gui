@@ -42,6 +42,7 @@ public class LinkageColumnButtonPanel extends JPanel {
         add(horizontalGlue_1);
 
         deletePairBtn = new JButton("Delete selected pair");
+        deletePairBtn.setEnabled(false);
         add(deletePairBtn);
 
         Component rigidArea_2 = Box.createRigidArea(new Dimension(20, 20));

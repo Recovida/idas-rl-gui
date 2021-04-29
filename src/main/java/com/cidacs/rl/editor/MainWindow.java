@@ -65,7 +65,7 @@ import com.cidacs.rl.editor.gui.JComboBoxWithPlaceholder;
 import com.cidacs.rl.editor.gui.JSpinnerWithBlankValue;
 import com.cidacs.rl.editor.gui.JTextFieldWithPlaceholder;
 import com.cidacs.rl.editor.gui.LinkageColumnButtonPanel;
-import com.cidacs.rl.editor.gui.LinkageColumnPanel;
+import com.cidacs.rl.editor.gui.LinkageColumnEditingPanel;
 import com.cidacs.rl.editor.pair.ColumnPairManager;
 import com.cidacs.rl.editor.settingitem.NumberSettingItem;
 import com.cidacs.rl.editor.settingitem.SettingItem;
@@ -126,7 +126,7 @@ public class MainWindow {
     private JTabbedPane tabbedPane;
     private JPanel datasetsTabPanel;
     private JPanel optionsTabPanel;
-    private LinkageColumnPanel linkageColsEditingPanel;
+    private LinkageColumnEditingPanel linkageColsEditingPanel;
     private LinkageColumnButtonPanel linkageColsButtonPanel;
     private ColumnPairTableModel columnPairTableModel;
 
@@ -211,8 +211,7 @@ public class MainWindow {
 
         // Tab: COLUMNS
         cf.setPairPanager(new ColumnPairManager(history, linkageColsButtonPanel,
-                linkageColsEditingPanel, columnPairTableModel,
-                linkageColsTable.getSelectionModel()));
+                linkageColsEditingPanel, linkageColsTable));
 
         // Menus
 
@@ -825,6 +824,7 @@ public class MainWindow {
         tabbedPane.addTab("Linkage columns", null, linkageColsTabPanel, null);
 
         linkageColsTable = new JTable();
+        linkageColsTable.getTableHeader().setReorderingAllowed(false);
         linkageColsTable.setShowVerticalLines(true);
         linkageColsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         columnPairTableModel = new ColumnPairTableModel();
@@ -834,12 +834,12 @@ public class MainWindow {
         JScrollPane linkageColsScrollPane = new JScrollPane(linkageColsTable);
         linkageColsTabPanel.add(linkageColsScrollPane);
 
-        linkageColsEditingPanel = new LinkageColumnPanel();
+        linkageColsEditingPanel = new LinkageColumnEditingPanel();
         linkageColsTabPanel.add(linkageColsEditingPanel, BorderLayout.SOUTH);
 
         linkageColsButtonPanel = new LinkageColumnButtonPanel();
         linkageColsTabPanel.add(linkageColsButtonPanel, BorderLayout.NORTH);
-        linkageColsEditingPanel.setVisible(false);
+        linkageColsEditingPanel.setEnabled(false);
 
         JPanel extraColsTabPanel = new JPanel();
         tabbedPane.addTab("Extra columns", null, extraColsTabPanel, null);

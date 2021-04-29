@@ -15,6 +15,11 @@ public class JSpinnerWithBlankValue extends JSpinner {
 
     private Object blankValue = new Object();
 
+    public JSpinnerWithBlankValue() {
+        super();
+        setEditor(getEditor());
+    }
+
     public JSpinnerWithBlankValue(SpinnerModel model) {
         super(model);
         setEditor(getEditor());
