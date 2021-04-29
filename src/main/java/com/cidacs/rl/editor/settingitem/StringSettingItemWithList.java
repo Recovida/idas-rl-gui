@@ -1,8 +1,5 @@
 package com.cidacs.rl.editor.settingitem;
 
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-
 import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -27,18 +24,6 @@ public class StringSettingItemWithList
                 && guiComponent instanceof FieldWithPlaceholder) {
             ((FieldWithPlaceholder) guiComponent).setPlaceholder(defaultValue);
         }
-        guiComponent.addFocusListener(new FocusListener() {
-
-            @Override
-            public void focusGained(FocusEvent e) {
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                onLeave();
-            }
-
-        });
         SettingItem<String, ?> settingItem = this;
         ((JTextComponent) guiComponent.getEditor().getEditorComponent())
                 .getDocument().addDocumentListener(new DocumentListener() {

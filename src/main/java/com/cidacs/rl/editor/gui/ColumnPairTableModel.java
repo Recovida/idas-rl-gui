@@ -45,6 +45,10 @@ public class ColumnPairTableModel extends DefaultTableModel {
         return (Double) getValue(rowIndex, key);
     }
 
+    public void setValue(int rowIndex, String key, Object value) {
+        setValueAt(value, rowIndex, indexFromKey.get(key));
+    }
+
     public Object[] getRowAsArray(int rowIndex) {
         Object[] r = new Object[getColumnCount()];
         for (int i = 0; i < getColumnCount(); i++)

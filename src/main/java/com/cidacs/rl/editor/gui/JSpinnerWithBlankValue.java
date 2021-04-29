@@ -8,6 +8,7 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
+import javax.swing.text.DefaultFormatter;
 
 public class JSpinnerWithBlankValue extends JSpinner {
 
@@ -34,7 +35,7 @@ public class JSpinnerWithBlankValue extends JSpinner {
         tf.setFormatterFactory(new AbstractFormatterFactory() {
             @Override
             public AbstractFormatter getFormatter(JFormattedTextField tf) {
-                return new AbstractFormatter() {
+                return new DefaultFormatter() {
 
                     private static final long serialVersionUID = 6825473100581603557L;
 
