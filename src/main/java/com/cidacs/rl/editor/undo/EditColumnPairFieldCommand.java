@@ -19,12 +19,10 @@ public class EditColumnPairFieldCommand<T> extends Command {
         this.oldValue = oldValue;
         this.newValue = newValue;
         this.skipField = skipFieldOnFirstTime;
-        System.out.println(oldValue + " -> " + newValue);
     }
 
     @Override
     public void undo() {
-        System.out.println("BACK TO " + oldValue);
         manager.setValue(index, key, oldValue);
     }
 

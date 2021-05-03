@@ -15,6 +15,7 @@ public class JSpinnerWithBlankValue extends JSpinner {
     private static final long serialVersionUID = -2440181440569958718L;
 
     private Object blankValue = new Object();
+    private String blankText = "\u200b";
 
     public JSpinnerWithBlankValue() {
         super();
@@ -42,14 +43,14 @@ public class JSpinnerWithBlankValue extends JSpinner {
                     @Override
                     public String valueToString(Object value)
                             throws ParseException {
-                        return blankValue.equals(value) ? ""
+                        return blankValue.equals(value) ? blankText
                                 : oldFormatter.valueToString(value);
                     }
 
                     @Override
                     public Object stringToValue(String text)
                             throws ParseException {
-                        if ("".equals(text))
+                        if (blankText.equals(text))
                             return blankValue;
                         return oldFormatter.stringToValue(text);
                     }
@@ -64,6 +65,11 @@ public class JSpinnerWithBlankValue extends JSpinner {
 
     public void setBlankValue(Object blankValue) {
         this.blankValue = blankValue;
+    }
+
+    @Override
+    public void requestFocus() {
+        ((DefaultEditor) getEditor()).getTextField().requestFocus();
     }
 
 }

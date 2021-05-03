@@ -177,16 +177,16 @@ public class ColumnPairManager {
 
             @Override
             public void changedUpdate(DocumentEvent e) {
+                Number newValue;
+                try {
+                    String txt = e.getDocument().getText(0,
+                            e.getDocument().getLength());
+                    newValue = (Number) ((DefaultFormatter) tf.getFormatter())
+                            .stringToValue(txt);
+                } catch (ParseException | BadLocationException e1) {
+                    return;
+                }
                 if (!completelyIgnoreListener) {
-                    Number newValue;
-                    try {
-                        String txt = e.getDocument().getText(0,
-                                e.getDocument().getLength());
-                        newValue = (Number) ((DefaultFormatter) tf
-                                .getFormatter()).stringToValue(txt);
-                    } catch (ParseException | BadLocationException e1) {
-                        return;
-                    }
                     if (newValue != null && newValue.equals(oldValue))
                         return;
 
@@ -196,8 +196,8 @@ public class ColumnPairManager {
                         history.push(new EditColumnPairFieldCommand<>(manager,
                                 rowIndex, key, oldValue, newValue, true));
                     onChange(rowIndex, key, newValue);
-                    oldValue = newValue;
                 }
+                oldValue = newValue;
             }
         });
     }
@@ -266,9 +266,14 @@ public class ColumnPairManager {
                         ((JTextField) field).setText((String) newValue);
                     } else if (field instanceof JComboBox) {
                         ((JComboBox<?>) field).setSelectedItem(newValue);
-                    } else if (field instanceof JSpinner)
+                    } else if (field instanceof JSpinner) {
+                        try {
+                            ((JSpinner) field).commitEdit();
+                        } catch (ParseException e) {
+                        }
                         ((JSpinner) field).setValue(newValue);
-                    field.grabFocus();
+                    }
+                    field.requestFocus();
                     ignoreListener = false;
                 }
             }
