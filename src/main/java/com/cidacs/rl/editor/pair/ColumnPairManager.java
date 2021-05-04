@@ -63,8 +63,9 @@ public class ColumnPairManager {
 
         buttonPanel.getAddPairBtn().addActionListener(
                 e -> history.push(new AddColumnPairCommand(this)));
-        buttonPanel.getDeletePairBtn().addActionListener(e -> history.push(
-                new DeleteColumnPairCommand(this, table.getSelectedRow())));
+        buttonPanel.getDeletePairBtn().addActionListener(
+                e -> history.push(new DeleteColumnPairCommand(this,
+                        table.convertRowIndexToModel(table.getSelectedRow()))));
 
         selectionModel.addListSelectionListener(new ListSelectionListener() {
 
