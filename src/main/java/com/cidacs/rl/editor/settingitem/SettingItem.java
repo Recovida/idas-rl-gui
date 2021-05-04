@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
+import com.cidacs.rl.editor.listener.SettingItemChangeListener;
 import com.cidacs.rl.editor.undo.UndoHistory;
 
 public abstract class SettingItem<T1, T2 extends JComponent> {
@@ -36,7 +37,7 @@ public abstract class SettingItem<T1, T2 extends JComponent> {
     protected T1 currentValue;
     protected T1 defaultValue;
     protected T2 guiComponent;
-    protected List<SettingItemChangeEventListener<T1>> listeners;
+    protected List<SettingItemChangeListener> listeners;
     protected UndoHistory history;
 
     public SettingItem(UndoHistory history, T1 currentValue, T1 defaultValue,
@@ -49,7 +50,7 @@ public abstract class SettingItem<T1, T2 extends JComponent> {
     }
 
     public SettingItem(UndoHistory history, T1 currentValue, T1 defaultValue,
-            T2 guiComponent, SettingItemChangeEventListener<T1> listener) {
+            T2 guiComponent, SettingItemChangeListener listener) {
         this(history, currentValue, defaultValue, guiComponent);
         this.listeners.add(listener);
     }
@@ -60,7 +61,7 @@ public abstract class SettingItem<T1, T2 extends JComponent> {
 
     public abstract void onChange(T1 newValue);
 
-    public void addChangeListener(SettingItemChangeEventListener<T1> listener) {
+    public void addChangeListener(SettingItemChangeListener listener) {
         listeners.add(listener);
     }
 

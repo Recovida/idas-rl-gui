@@ -3,8 +3,11 @@ package com.cidacs.rl.editor.pair;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,6 +32,9 @@ import javax.swing.text.JTextComponent;
 import com.cidacs.rl.editor.gui.ColumnPairTableModel;
 import com.cidacs.rl.editor.gui.LinkageColumnButtonPanel;
 import com.cidacs.rl.editor.gui.LinkageColumnEditingPanel;
+import com.cidacs.rl.editor.listener.ColumnPairInclusionExclusionListener;
+import com.cidacs.rl.editor.listener.ColumnPairSelectionListener;
+import com.cidacs.rl.editor.listener.ColumnPairValueChangeListener;
 import com.cidacs.rl.editor.undo.AddColumnPairCommand;
 import com.cidacs.rl.editor.undo.DeleteColumnPairCommand;
 import com.cidacs.rl.editor.undo.EditColumnPairFieldCommand;
@@ -43,13 +49,20 @@ public class ColumnPairManager {
     protected ColumnPairTableModel model;
     protected ListSelectionModel selectionModel;
 
-    public AtomicInteger nextNumber = new AtomicInteger(1);
+    protected AtomicInteger nextNumber = new AtomicInteger(1);
 
-    private boolean ignoreSelectionListener = false;
-    private boolean ignoreListener = false;
-    private boolean completelyIgnoreListener = false; // don't even call
-                                                      // onChange()
+    protected boolean ignoreSelectionEvent = false;
+    protected boolean ignoreChangeEvent = false;
+    protected boolean completelyIgnoreChangeEvent = false; // don't even call
+                                                           // onChange()
     protected Map<String, JComponent> fieldFromKey = new HashMap<>();
+
+    protected Collection<String> firstDatasetColumnNames = null;
+    protected Collection<String> secondDatasetColumnNames = null;
+
+    protected List<ColumnPairSelectionListener> selectionListeners = new LinkedList<>();
+    protected List<ColumnPairInclusionExclusionListener> rowInclusionExclusionListeners = new LinkedList<>();
+    protected List<ColumnPairValueChangeListener> valueChangeListeners = new LinkedList<>();
 
     public ColumnPairManager(UndoHistory history,
             LinkageColumnButtonPanel buttonPanel,
@@ -79,9 +92,9 @@ public class ColumnPairManager {
 
             @Override
             public synchronized void valueChanged(ListSelectionEvent e) {
-                if (ignoreSelectionListener)
+                if (ignoreSelectionEvent)
                     return;
-                completelyIgnoreListener = true;
+                completelyIgnoreChangeEvent = true;
                 if (e.getValueIsAdjusting())
                     return;
                 editingPanel.setEnabled(false);
@@ -105,9 +118,12 @@ public class ColumnPairManager {
                     editingPanel.getSecondRenameField()
                             .setText(model.getStringValue(index, "rename_b"));
                     editingPanel.setEnabled(true);
-                    completelyIgnoreListener = false;
+                    completelyIgnoreChangeEvent = false;
                 }
                 buttonPanel.getDeletePairBtn().setEnabled(index != -1);
+                for (ColumnPairSelectionListener listener : selectionListeners)
+                    if (listener != null)
+                        listener.selected(index);
             }
         });
 
@@ -159,6 +175,9 @@ public class ColumnPairManager {
     public int addColumnPair(int index, Object[] contents) {
         model.insertRow(index, contents);
         table.setRowSelectionInterval(index, index);
+        for (ColumnPairInclusionExclusionListener listener : rowInclusionExclusionListeners)
+            if (listener != null)
+                listener.insertedColumnPair(index, contents);
         return index;
     }
 
@@ -181,16 +200,20 @@ public class ColumnPairManager {
             table.setRowSelectionInterval(index, index);
         else if (n > 0)
             table.setRowSelectionInterval(n - 1, n - 1);
+        for (ColumnPairInclusionExclusionListener listener : rowInclusionExclusionListeners)
+            if (listener != null)
+                listener.deletedColumnPair(index, r);
         return r;
     }
 
     public void onChange(int rowIndex, String key, Object newValue) {
         System.out.format("%d_%s = “%s”%n", rowIndex, key, newValue);
-        ignoreSelectionListener = true;
+        ignoreSelectionEvent = true;
         model.setValue(rowIndex, key, newValue);
-//        if (key.equals("number"))
-//            ((DefaultRowSorter<?, ?>) table.getRowSorter()).sort();
-        ignoreSelectionListener = false;
+        ignoreSelectionEvent = false;
+        for (ColumnPairValueChangeListener listener : valueChangeListeners)
+            if (listener != null)
+                listener.changed(rowIndex, key, newValue);
     }
 
     protected void associateKeyWithField(String key, JSpinner field) {
@@ -222,7 +245,7 @@ public class ColumnPairManager {
                 } catch (ParseException | BadLocationException e1) {
                     return;
                 }
-                if (!completelyIgnoreListener) {
+                if (!completelyIgnoreChangeEvent) {
                     if (newValue != null && newValue.equals(oldValue))
                         return;
 
@@ -230,7 +253,7 @@ public class ColumnPairManager {
                     if (rowIndex >= 0)
                         rowIndex = table.convertRowIndexToModel(rowIndex);
 
-                    if (!ignoreListener && rowIndex >= 0)
+                    if (!ignoreChangeEvent && rowIndex >= 0)
                         history.push(new EditColumnPairFieldCommand<>(
                                 ColumnPairManager.this, rowIndex, key, oldValue,
                                 newValue, true));
@@ -274,8 +297,8 @@ public class ColumnPairManager {
                     int rowIndex = table.getSelectedRow();
                     if (rowIndex >= 0)
                         rowIndex = table.convertRowIndexToModel(rowIndex);
-                    if (!completelyIgnoreListener) {
-                        if (!ignoreListener && rowIndex >= 0) {
+                    if (!completelyIgnoreChangeEvent) {
+                        if (!ignoreChangeEvent && rowIndex >= 0) {
                             String oldValue = (String) model.getValue(rowIndex,
                                     key);
                             history.push(new EditColumnPairFieldCommand<>(
@@ -293,35 +316,75 @@ public class ColumnPairManager {
 
     public synchronized void setValue(int rowIndex, String key, Object newValue,
             boolean skipField) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                if (!skipField) {
-                    ignoreListener = true;
-                    if (table.getSelectedRow() != rowIndex)
-                        table.setRowSelectionInterval(rowIndex, rowIndex);
-                    JComponent field = fieldFromKey.get(key);
-                    if (field instanceof JTextField) {
-                        ((JTextField) field).setText((String) newValue);
-                    } else if (field instanceof JComboBox) {
-                        ((JComboBox<?>) field).setSelectedItem(newValue);
-                    } else if (field instanceof JSpinner) {
-                        try {
-                            ((JSpinner) field).commitEdit();
-                        } catch (ParseException e) {
-                        }
-                        ((JSpinner) field).setValue(newValue);
+        SwingUtilities.invokeLater(() -> {
+            if (!skipField) {
+                ignoreChangeEvent = true;
+                if (table.getSelectedRow() != rowIndex)
+                    table.setRowSelectionInterval(rowIndex, rowIndex);
+                JComponent field = fieldFromKey.get(key);
+                if (field instanceof JTextField) {
+                    ((JTextField) field).setText((String) newValue);
+                } else if (field instanceof JComboBox) {
+                    ((JComboBox<?>) field).setSelectedItem(newValue);
+                } else if (field instanceof JSpinner) {
+                    try {
+                        ((JSpinner) field).commitEdit();
+                    } catch (ParseException e) {
                     }
-                    field.requestFocus();
-                    ignoreListener = false;
+                    ((JSpinner) field).setValue(newValue);
                 }
+                field.requestFocus();
+                ignoreChangeEvent = false;
             }
         });
     }
 
     public void setValue(int rowIndex, String key, Object newValue) {
         setValue(rowIndex, key, newValue, false);
+    }
+
+    public Collection<String> getFirstDatasetColumnNames() {
+        return firstDatasetColumnNames;
+    }
+
+    public void setFirstDatasetColumnNames(
+            Collection<String> firstDatasetColumnNames) {
+        this.firstDatasetColumnNames = firstDatasetColumnNames;
+        setComboBoxItems(getEditingPanel().getFirstNameField(),
+                firstDatasetColumnNames);
+    }
+
+    public Collection<String> getSecondDatasetColumnNames() {
+        return secondDatasetColumnNames;
+    }
+
+    public void setSecondDatasetColumnNames(
+            Collection<String> secondDatasetColumnNames) {
+        this.secondDatasetColumnNames = secondDatasetColumnNames;
+        setComboBoxItems(getEditingPanel().getSecondNameField(),
+                secondDatasetColumnNames);
+    }
+
+    public void setComboBoxItems(JComboBox<String> field,
+            Collection<String> items) {
+        field.removeAllItems();
+        if (items != null)
+            for (String item : items)
+                field.addItem(item);
+    }
+
+    public void addSelectionListener(ColumnPairSelectionListener listener) {
+        selectionListeners.add(listener);
+    }
+
+    public void addInclusionExclusionListener(
+            ColumnPairInclusionExclusionListener listener) {
+        rowInclusionExclusionListeners.add(listener);
+    }
+
+    public void addValueChangeSelectionListener(
+            ColumnPairValueChangeListener listener) {
+        valueChangeListeners.add(listener);
     }
 
 }

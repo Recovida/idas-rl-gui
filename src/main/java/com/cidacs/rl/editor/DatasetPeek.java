@@ -46,7 +46,6 @@ public class DatasetPeek {
     }
 
     private DatasetPeekResult peekCSV() {
-        String header;
         char delimiter = ',';
         columnNames = new LinkedHashSet<>();
 
@@ -128,8 +127,7 @@ public class DatasetPeek {
 
     private DatasetPeekResult peekDBF() {
         columnNames = new LinkedHashSet<>();
-        try {
-            FileInputStream is = new FileInputStream(fileName);
+        try (FileInputStream is = new FileInputStream(fileName)) {
             int firstByte = is.read();
             if (firstByte == -1)
                 return DatasetPeekResult.UNSUPPORTED_CONTENTS;

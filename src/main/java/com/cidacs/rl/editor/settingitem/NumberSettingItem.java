@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.cidacs.rl.editor.listener.SettingItemChangeListener;
 import com.cidacs.rl.editor.undo.SetOptionCommand;
 import com.cidacs.rl.editor.undo.UndoHistory;
 
@@ -50,7 +51,7 @@ public class NumberSettingItem extends SettingItem<Number, JSpinner> {
 
     public NumberSettingItem(UndoHistory history, Number currentValue,
             Number defaultValue, JSpinner guiComponent,
-            SettingItemChangeEventListener<Number> listener) {
+            SettingItemChangeListener listener) {
         this(history, currentValue, defaultValue, guiComponent);
         this.listeners.add(listener);
     }
@@ -60,7 +61,7 @@ public class NumberSettingItem extends SettingItem<Number, JSpinner> {
         if (newValue.equals(currentValue))
             return;
         currentValue = newValue;
-        for (SettingItemChangeEventListener<Number> listener : listeners)
+        for (SettingItemChangeListener listener : listeners)
             if (listener != null)
                 listener.changed(newValue);
     }

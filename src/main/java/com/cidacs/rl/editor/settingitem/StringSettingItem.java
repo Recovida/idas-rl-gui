@@ -7,6 +7,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 
 import com.cidacs.rl.editor.gui.FieldWithPlaceholder;
+import com.cidacs.rl.editor.listener.SettingItemChangeListener;
 import com.cidacs.rl.editor.undo.SetOptionCommand;
 import com.cidacs.rl.editor.undo.UndoHistory;
 
@@ -53,7 +54,7 @@ public class StringSettingItem extends SettingItem<String, JTextField> {
 
     public StringSettingItem(UndoHistory history, String currentValue,
             String defaultValue, JTextField guiComponent,
-            SettingItemChangeEventListener<String> listener) {
+            SettingItemChangeListener listener) {
         this(history, currentValue, defaultValue, guiComponent);
         this.listeners.add(listener);
     }
@@ -63,7 +64,7 @@ public class StringSettingItem extends SettingItem<String, JTextField> {
         if (newValue.equals(currentValue))
             return;
         currentValue = newValue;
-        for (SettingItemChangeEventListener<String> listener : listeners)
+        for (SettingItemChangeListener listener : listeners)
             if (listener != null)
                 listener.changed(newValue);
     }

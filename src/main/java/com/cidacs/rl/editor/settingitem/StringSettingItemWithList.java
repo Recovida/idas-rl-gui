@@ -8,6 +8,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
 import com.cidacs.rl.editor.gui.FieldWithPlaceholder;
+import com.cidacs.rl.editor.listener.SettingItemChangeListener;
 import com.cidacs.rl.editor.undo.SetOptionCommand;
 import com.cidacs.rl.editor.undo.UndoHistory;
 
@@ -55,7 +56,7 @@ public class StringSettingItemWithList
 
     public StringSettingItemWithList(UndoHistory history, String currentValue,
             String defaultValue, JComboBox<String> guiComponent,
-            SettingItemChangeEventListener<String> listener) {
+            SettingItemChangeListener listener) {
         this(history, currentValue, defaultValue, guiComponent);
         this.listeners.add(listener);
     }
@@ -65,7 +66,7 @@ public class StringSettingItemWithList
         if (newValue.equals(currentValue))
             return;
         currentValue = newValue;
-        for (SettingItemChangeEventListener<String> listener : listeners)
+        for (SettingItemChangeListener listener : listeners)
             if (listener != null)
                 listener.changed(newValue);
     }

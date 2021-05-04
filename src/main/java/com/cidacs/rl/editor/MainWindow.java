@@ -64,15 +64,19 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableRowSorter;
 
 import com.cidacs.rl.editor.gui.ColumnPairTableModel;
+import com.cidacs.rl.editor.gui.JComboBoxSuggestionProvider;
 import com.cidacs.rl.editor.gui.JComboBoxWithPlaceholder;
 import com.cidacs.rl.editor.gui.JSpinnerWithBlankValue;
 import com.cidacs.rl.editor.gui.JTextFieldWithPlaceholder;
 import com.cidacs.rl.editor.gui.LinkageColumnButtonPanel;
 import com.cidacs.rl.editor.gui.LinkageColumnEditingPanel;
+import com.cidacs.rl.editor.listener.ColumnPairInclusionExclusionListener;
+import com.cidacs.rl.editor.listener.ColumnPairSelectionListener;
+import com.cidacs.rl.editor.listener.ColumnPairValueChangeListener;
+import com.cidacs.rl.editor.listener.SettingItemChangeListener;
 import com.cidacs.rl.editor.pair.ColumnPairManager;
 import com.cidacs.rl.editor.settingitem.NumberSettingItem;
 import com.cidacs.rl.editor.settingitem.SettingItem;
-import com.cidacs.rl.editor.settingitem.SettingItemChangeEventListener;
 import com.cidacs.rl.editor.settingitem.StringSettingItem;
 import com.cidacs.rl.editor.settingitem.StringSettingItemWithList;
 import com.cidacs.rl.editor.undo.HistoryPropertyChangeEventListener;
@@ -132,6 +136,7 @@ public class MainWindow {
     private LinkageColumnEditingPanel linkageColsEditingPanel;
     private LinkageColumnButtonPanel linkageColsButtonPanel;
     private ColumnPairTableModel columnPairTableModel;
+    private JPanel linkageColsTabPanel;
 
     /**
      * Launch the application.
@@ -169,13 +174,9 @@ public class MainWindow {
         JComboBoxWithPlaceholder[] encodingCboxes = { firstEncodingField,
                 secondEncodingField };
         fillEncodings(encodingCboxes);
-        SettingItemChangeEventListener<String> datasetsTabEventListener = new SettingItemChangeEventListener<String>() {
-
-            @Override
-            public void changed(String newValue) {
-                tabbedPane.setSelectedComponent(datasetsTabPanel);
-                validateDatasetsTab();
-            }
+        SettingItemChangeListener datasetsTabEventListener = (o) -> {
+            tabbedPane.setSelectedComponent(datasetsTabPanel);
+            validateDatasetsTab();
         };
         cf.addSettingItem("db_a", new StringSettingItem(history, "", "",
                 firstDatasetField, datasetsTabEventListener));
@@ -195,26 +196,54 @@ public class MainWindow {
                 "", "UTF-8", secondEncodingField, datasetsTabEventListener));
 
         // Tab: OPTIONS
-        SettingItemChangeEventListener<String> optionsTabEventListener = new SettingItemChangeEventListener<String>() {
-
-            @Override
-            public void changed(String newValue) {
-                tabbedPane.setSelectedComponent(optionsTabPanel);
-                validateOptionsTab();
-            }
+        SettingItemChangeListener optionsTabEventListener = (o) -> {
+            tabbedPane.setSelectedComponent(optionsTabPanel);
+            validateOptionsTab();
         };
         cf.addSettingItem("db_index", new StringSettingItem(history, "", "",
                 indexDirField, optionsTabEventListener));
         cf.addSettingItem("linkage_folder", new StringSettingItem(history, "",
                 "", linkageDirField, optionsTabEventListener));
-        cf.addSettingItem("max_rows", new NumberSettingItem(history,
-                Integer.MAX_VALUE, Integer.MAX_VALUE, maxRowsField));
-        cf.addSettingItem("min_score",
-                new NumberSettingItem(history, 0.0, 0.0, minScoreField));
+        cf.addSettingItem("max_rows",
+                new NumberSettingItem(history, Integer.MAX_VALUE,
+                        Integer.MAX_VALUE, maxRowsField,
+                        optionsTabEventListener));
+        cf.addSettingItem("min_score", new NumberSettingItem(history, 0.0, 0.0,
+                minScoreField, optionsTabEventListener));
 
         // Tab: COLUMNS
-        cf.setPairPanager(new ColumnPairManager(history, linkageColsButtonPanel,
-                linkageColsEditingPanel, linkageColsTable));
+        ColumnPairValueChangeListener linkageColsTabAddDelEventListener = (
+                int index, String key, Object newValue) -> {
+            System.out
+                    .println("CHANGE: " + key + "=" + newValue + " @" + index);
+            tabbedPane.setSelectedComponent(linkageColsTabPanel);
+            validateLinkageColsTab();
+        };
+        ColumnPairInclusionExclusionListener linkageColsTabValueChangeEventListener = new ColumnPairInclusionExclusionListener() {
+
+            @Override
+            public void insertedColumnPair(int index, Object[] columnPairData) {
+                System.out.println("INSERT: " + columnPairData + " @" + index);
+            }
+
+            @Override
+            public void deletedColumnPair(int index, Object[] columnPairData) {
+                System.out.println("DELETE: " + columnPairData + " @" + index);
+            }
+        };
+        ColumnPairSelectionListener linkageColsTabSelChangeEventListener = (
+                int index) -> {
+            System.out.println("SELECT: " + index);
+        };
+        ColumnPairManager manager = new ColumnPairManager(history,
+                linkageColsButtonPanel, linkageColsEditingPanel,
+                linkageColsTable);
+        manager.addInclusionExclusionListener(
+                linkageColsTabValueChangeEventListener);
+        manager.addSelectionListener(linkageColsTabSelChangeEventListener);
+        manager.addValueChangeSelectionListener(
+                linkageColsTabAddDelEventListener);
+        cf.setPairPanager(manager);
 
         // Menus
 
@@ -319,6 +348,11 @@ public class MainWindow {
     }
 
     public void validateOptionsTab() {
+        if (skipValidation)
+            return;
+    }
+
+    public void validateLinkageColsTab() {
         if (skipValidation)
             return;
     }
@@ -562,6 +596,7 @@ public class MainWindow {
 
         firstEncodingField = new JComboBoxWithPlaceholder();
         firstEncodingField.setEditable(true);
+        new JComboBoxSuggestionProvider(firstEncodingField);
         firstEncodingContainer.add(firstEncodingField);
 
         JLabel encodingLbl = new JLabel("Encoding");
@@ -582,6 +617,7 @@ public class MainWindow {
 
         secondEncodingField = new JComboBoxWithPlaceholder();
         secondEncodingField.setEditable(true);
+        new JComboBoxSuggestionProvider(secondEncodingField);
         secondEncodingContainer.add(secondEncodingField);
 
         secondEncodingWarningLbl = new JLabel(" ");
@@ -823,7 +859,7 @@ public class MainWindow {
                 maxRowsField, "0");
         maxRowsField.setEditor(ne_maxRowsField);
 
-        JPanel linkageColsTabPanel = new JPanel();
+        linkageColsTabPanel = new JPanel();
         tabbedPane.addTab("Linkage columns", null, linkageColsTabPanel, null);
 
         linkageColsTable = new JTable();
