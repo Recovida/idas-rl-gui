@@ -141,7 +141,10 @@ public class LinkageColumnEditingPanel extends JPanel {
         panel.add(firstRenameField, gbc_firstRenameField);
         firstRenameField.setColumns(10);
 
-        numberField = new JSpinner();
+        numberField = new JSpinnerWithBlankValue(
+                new SpinnerNumberModel(0, -1, Integer.MAX_VALUE, 1));
+        ((JSpinnerWithBlankValue) numberField)
+                .setBlankValue(Integer.valueOf(-1));
         numberField.setPreferredSize(new Dimension(40, 30));
         GridBagConstraints gbc_numberField = new GridBagConstraints();
         gbc_numberField.fill = GridBagConstraints.BOTH;

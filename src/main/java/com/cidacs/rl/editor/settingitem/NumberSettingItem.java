@@ -32,7 +32,6 @@ public class NumberSettingItem extends SettingItem<Number, JSpinner> {
             }
 
         });
-        SettingItem<Number, ?> settingItem = this;
         guiComponent.addChangeListener(new ChangeListener() {
 
             Number oldValue = (Number) guiComponent.getValue();
@@ -41,8 +40,8 @@ public class NumberSettingItem extends SettingItem<Number, JSpinner> {
             public void stateChanged(ChangeEvent e) {
                 Number newValue = (Number) guiComponent.getValue();
                 if (!supressDocumentListener && !newValue.equals(oldValue))
-                    history.push(new SetOptionCommand<>(settingItem, oldValue,
-                            newValue, true));
+                    history.push(new SetOptionCommand<>(NumberSettingItem.this,
+                            oldValue, newValue, true));
                 onChange(newValue);
                 oldValue = newValue;
             }

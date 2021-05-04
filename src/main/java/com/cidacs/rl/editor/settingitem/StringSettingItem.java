@@ -22,7 +22,6 @@ public class StringSettingItem extends SettingItem<String, JTextField> {
                 && guiComponent instanceof FieldWithPlaceholder) {
             ((FieldWithPlaceholder) guiComponent).setPlaceholder(defaultValue);
         }
-        SettingItem<String, ?> settingItem = this;
         guiComponent.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
@@ -41,8 +40,9 @@ public class StringSettingItem extends SettingItem<String, JTextField> {
                     String value = e.getDocument().getText(0,
                             e.getDocument().getLength());
                     if (!supressDocumentListener)
-                        history.push(new SetOptionCommand<>(settingItem,
-                                getCurrentValue(), value, true));
+                        history.push(
+                                new SetOptionCommand<>(StringSettingItem.this,
+                                        getCurrentValue(), value, true));
                     onChange(value);
                 } catch (BadLocationException e1) {
                 }

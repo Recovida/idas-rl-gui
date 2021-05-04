@@ -11,6 +11,9 @@ public class ColumnPairTableModel extends DefaultTableModel {
 
     private final String[] keys = { "number", "type", "weight", "phon_weight",
             "index_a", "rename_a", "index_b", "rename_b" };
+    private final Class<?>[] types = { Integer.class, String.class,
+            Double.class, Double.class, String.class, String.class,
+            String.class, String.class };
     private Map<String, Integer> indexFromKey = new HashMap<>();
 
     // TODO: i18n
@@ -54,6 +57,15 @@ public class ColumnPairTableModel extends DefaultTableModel {
         for (int i = 0; i < getColumnCount(); i++)
             r[i] = getValueAt(rowIndex, i);
         return r;
+    }
+
+    @Override
+    public Class<?> getColumnClass(int column) {
+        return types[column];
+    }
+
+    public String getColumnKey(int columnIndex) {
+        return keys[columnIndex];
     }
 
 }

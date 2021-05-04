@@ -52,6 +52,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -59,6 +61,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.TableRowSorter;
 
 import com.cidacs.rl.editor.gui.ColumnPairTableModel;
 import com.cidacs.rl.editor.gui.JComboBoxWithPlaceholder;
@@ -830,6 +833,13 @@ public class MainWindow {
         columnPairTableModel = new ColumnPairTableModel();
         linkageColsTabPanel.setLayout(new BorderLayout(0, 0));
         linkageColsTable.setModel(columnPairTableModel);
+        TableRowSorter<ColumnPairTableModel> sorter = new TableRowSorter<>(
+                columnPairTableModel);
+        sorter.setSortKeys(Collections
+                .singletonList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
+        linkageColsTable.setRowSorter(sorter);
+        linkageColsTable.setUpdateSelectionOnSort(true);
+        sorter.setSortsOnUpdates(true);
 
         JScrollPane linkageColsScrollPane = new JScrollPane(linkageColsTable);
         linkageColsTabPanel.add(linkageColsScrollPane);

@@ -24,7 +24,6 @@ public class StringSettingItemWithList
                 && guiComponent instanceof FieldWithPlaceholder) {
             ((FieldWithPlaceholder) guiComponent).setPlaceholder(defaultValue);
         }
-        SettingItem<String, ?> settingItem = this;
         ((JTextComponent) guiComponent.getEditor().getEditorComponent())
                 .getDocument().addDocumentListener(new DocumentListener() {
 
@@ -44,7 +43,8 @@ public class StringSettingItemWithList
                             String value = e.getDocument().getText(0,
                                     e.getDocument().getLength());
                             if (!supressDocumentListener)
-                                history.push(new SetOptionCommand<>(settingItem,
+                                history.push(new SetOptionCommand<>(
+                                        StringSettingItemWithList.this,
                                         getCurrentValue(), value, true));
                             onChange(value);
                         } catch (BadLocationException e1) {

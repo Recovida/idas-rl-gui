@@ -1,8 +1,13 @@
 package com.cidacs.rl.editor.pair;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -38,6 +43,9 @@ public class ColumnPairManager {
     protected ColumnPairTableModel model;
     protected ListSelectionModel selectionModel;
 
+    public AtomicInteger nextNumber = new AtomicInteger(1);
+
+    private boolean ignoreSelectionListener = false;
     private boolean ignoreListener = false;
     private boolean completelyIgnoreListener = false; // don't even call
                                                       // onChange()
@@ -53,12 +61,10 @@ public class ColumnPairManager {
         this.model = (ColumnPairTableModel) table.getModel();
         this.selectionModel = table.getSelectionModel();
 
-        ColumnPairManager manager = this;
-
         buttonPanel.getAddPairBtn().addActionListener(
-                e -> history.push(new AddColumnPairCommand(manager)));
+                e -> history.push(new AddColumnPairCommand(this)));
         buttonPanel.getDeletePairBtn().addActionListener(e -> history.push(
-                new DeleteColumnPairCommand(manager, table.getSelectedRow())));
+                new DeleteColumnPairCommand(this, table.getSelectedRow())));
 
         selectionModel.addListSelectionListener(new ListSelectionListener() {
 
@@ -72,12 +78,15 @@ public class ColumnPairManager {
 
             @Override
             public synchronized void valueChanged(ListSelectionEvent e) {
+                if (ignoreSelectionListener)
+                    return;
                 completelyIgnoreListener = true;
                 if (e.getValueIsAdjusting())
                     return;
                 editingPanel.setEnabled(false);
                 int index = table.getSelectedRow();
                 if (index != -1) {
+                    index = table.convertRowIndexToModel(index);
                     editingPanel.getNumberField().setValue(
                             zeroIfNull(model.getIntegerValue(index, "number")));
                     editingPanel.getTypeField().setSelectedItem(
@@ -108,6 +117,22 @@ public class ColumnPairManager {
         associateKeyWithField("type", editingPanel.getTypeField());
         associateKeyWithField("weight", editingPanel.getWeightField());
         associateKeyWithField("phon_weight", editingPanel.getPhonWeightField());
+        associateKeyWithField("number", editingPanel.getNumberField());
+
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                int colIndex = table.getSelectedColumn();
+                if (colIndex >= 0) {
+                    colIndex = table.convertColumnIndexToModel(colIndex);
+                    JComponent field = fieldFromKey
+                            .get(model.getColumnKey(colIndex));
+                    if (field != null)
+                        field.requestFocus();
+                }
+            }
+        });
+
     }
 
     public UndoHistory getHistory() {
@@ -137,7 +162,14 @@ public class ColumnPairManager {
     }
 
     public int addColumnPair() {
-        return addColumnPair(model.getRowCount(), new Object[0]);
+        Set<Integer> used = new HashSet<>();
+        for (int i = 0; i < model.getRowCount(); i++)
+            used.add(model.getIntegerValue(i, "number"));
+        int n;
+        do {
+            n = nextNumber.getAndIncrement();
+        } while (used.contains(n));
+        return addColumnPair(model.getRowCount(), new Integer[] { n });
     }
 
     public Object[] deleteColumnPair(int index) {
@@ -153,12 +185,15 @@ public class ColumnPairManager {
 
     public void onChange(int rowIndex, String key, Object newValue) {
         System.out.format("%d_%s = “%s”%n", rowIndex, key, newValue);
+        ignoreSelectionListener = true;
         model.setValue(rowIndex, key, newValue);
+//        if (key.equals("number"))
+//            ((DefaultRowSorter<?, ?>) table.getRowSorter()).sort();
+        ignoreSelectionListener = false;
     }
 
     protected void associateKeyWithField(String key, JSpinner field) {
         fieldFromKey.put(key, field);
-        ColumnPairManager manager = this;
         JFormattedTextField tf = ((JSpinner.DefaultEditor) field.getEditor())
                 .getTextField();
         tf.getDocument().addDocumentListener(new DocumentListener() {
@@ -191,10 +226,13 @@ public class ColumnPairManager {
                         return;
 
                     int rowIndex = table.getSelectedRow();
+                    if (rowIndex >= 0)
+                        rowIndex = table.convertRowIndexToModel(rowIndex);
 
                     if (!ignoreListener && rowIndex >= 0)
-                        history.push(new EditColumnPairFieldCommand<>(manager,
-                                rowIndex, key, oldValue, newValue, true));
+                        history.push(new EditColumnPairFieldCommand<>(
+                                ColumnPairManager.this, rowIndex, key, oldValue,
+                                newValue, true));
                     onChange(rowIndex, key, newValue);
                 }
                 oldValue = newValue;
@@ -215,7 +253,6 @@ public class ColumnPairManager {
     }
 
     protected void addListenerToComponent(String key, Document doc) {
-        ColumnPairManager manager = this;
         doc.addDocumentListener(new DocumentListener() {
 
             @Override
@@ -234,13 +271,15 @@ public class ColumnPairManager {
                     String newValue = e.getDocument().getText(0,
                             e.getDocument().getLength());
                     int rowIndex = table.getSelectedRow();
+                    if (rowIndex >= 0)
+                        rowIndex = table.convertRowIndexToModel(rowIndex);
                     if (!completelyIgnoreListener) {
                         if (!ignoreListener && rowIndex >= 0) {
                             String oldValue = (String) model.getValue(rowIndex,
                                     key);
                             history.push(new EditColumnPairFieldCommand<>(
-                                    manager, rowIndex, key, oldValue, newValue,
-                                    true));
+                                    ColumnPairManager.this, rowIndex, key,
+                                    oldValue, newValue, true));
                         }
                         onChange(rowIndex, key, newValue);
                     }
