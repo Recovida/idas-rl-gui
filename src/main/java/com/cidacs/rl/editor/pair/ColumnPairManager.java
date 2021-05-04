@@ -110,9 +110,9 @@ public class ColumnPairManager {
                     editingPanel.getPhonWeightField().setValue(zeroIfNull(
                             model.getDoubleValue(index, "phon_weight")));
                     editingPanel.getFirstNameField().setSelectedItem(
-                            model.getStringValue(index, "index_a"));
+                            model.getStringValue(index, "db_a"));
                     editingPanel.getSecondNameField().setSelectedItem(
-                            model.getStringValue(index, "index_b"));
+                            model.getStringValue(index, "db_b"));
                     editingPanel.getFirstRenameField()
                             .setText(model.getStringValue(index, "rename_a"));
                     editingPanel.getSecondRenameField()
@@ -129,8 +129,8 @@ public class ColumnPairManager {
 
         associateKeyWithField("rename_a", editingPanel.getFirstRenameField());
         associateKeyWithField("rename_b", editingPanel.getSecondRenameField());
-        associateKeyWithField("index_a", editingPanel.getFirstNameField());
-        associateKeyWithField("index_b", editingPanel.getSecondNameField());
+        associateKeyWithField("db_a", editingPanel.getFirstNameField());
+        associateKeyWithField("db_b", editingPanel.getSecondNameField());
         associateKeyWithField("type", editingPanel.getTypeField());
         associateKeyWithField("weight", editingPanel.getWeightField());
         associateKeyWithField("phon_weight", editingPanel.getPhonWeightField());
@@ -350,8 +350,13 @@ public class ColumnPairManager {
     public void setFirstDatasetColumnNames(
             Collection<String> firstDatasetColumnNames) {
         this.firstDatasetColumnNames = firstDatasetColumnNames;
-        setComboBoxItems(getEditingPanel().getFirstNameField(),
-                firstDatasetColumnNames);
+        completelyIgnoreChangeEvent = true;
+        JComboBox<String> field = getEditingPanel().getFirstNameField();
+        setComboBoxItems(field, firstDatasetColumnNames);
+        int idx = table.getSelectedRow();
+        field.setSelectedItem(idx == -1 ? ""
+                : model.getValue(table.convertRowIndexToModel(idx), "db_a"));
+        completelyIgnoreChangeEvent = false;
     }
 
     public Collection<String> getSecondDatasetColumnNames() {
@@ -361,8 +366,13 @@ public class ColumnPairManager {
     public void setSecondDatasetColumnNames(
             Collection<String> secondDatasetColumnNames) {
         this.secondDatasetColumnNames = secondDatasetColumnNames;
-        setComboBoxItems(getEditingPanel().getSecondNameField(),
-                secondDatasetColumnNames);
+        completelyIgnoreChangeEvent = true;
+        JComboBox<String> field = getEditingPanel().getSecondNameField();
+        setComboBoxItems(field, secondDatasetColumnNames);
+        int idx = table.getSelectedRow();
+        field.setSelectedItem(idx == -1 ? ""
+                : model.getValue(table.convertRowIndexToModel(idx), "db_b"));
+        completelyIgnoreChangeEvent = false;
     }
 
     public void setComboBoxItems(JComboBox<String> field,

@@ -121,6 +121,7 @@ public class LinkageColumnEditingPanel extends JPanel {
         gbc_firstNameField.gridx = 3;
         gbc_firstNameField.gridy = 1;
         panel.add(firstNameField, gbc_firstNameField);
+        new JComboBoxSuggestionProvider(firstNameField);
 
         JLabel renameFirstLbl = new JLabel("rename to");
         renameFirstLbl.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -172,6 +173,7 @@ public class LinkageColumnEditingPanel extends JPanel {
         gbc_secondNameField.gridx = 3;
         gbc_secondNameField.gridy = 2;
         panel.add(secondNameField, gbc_secondNameField);
+        new JComboBoxSuggestionProvider(secondNameField);
 
         JLabel renameSecondLbl = new JLabel("rename to");
         renameSecondLbl.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -239,12 +241,17 @@ public class LinkageColumnEditingPanel extends JPanel {
 
         typeField = new JComboBox<>();
         typeField.setEditable(true);
+        String[] types = { "copy", "name", "date", "ibge", "gender",
+                "numerical_id", "categorical" };
+        for (String type : types)
+            typeField.addItem(type);
         GridBagConstraints gbc_typeField = new GridBagConstraints();
         gbc_typeField.insets = new Insets(0, 0, 5, 5);
         gbc_typeField.fill = GridBagConstraints.BOTH;
         gbc_typeField.gridx = 2;
         gbc_typeField.gridy = 4;
         panel.add(typeField, gbc_typeField);
+        new JComboBoxSuggestionProvider(typeField);
 
         Double zero = 0.0;
         weightField = new JSpinnerWithBlankValue(

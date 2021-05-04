@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.Normalizer;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.swing.JComboBox;
@@ -40,7 +42,6 @@ public class JComboBoxSuggestionProvider {
                     e.consume();
                     int idx = (menu.getSelectionModel().getSelectedIndex() + 1)
                             % menu.getComponentCount();
-                    System.out.println(idx);
                     menu.setSelected(menu.getComponent(idx));
                 }
             }
@@ -87,16 +88,31 @@ public class JComboBoxSuggestionProvider {
 
     protected void fillMenu(String value) {
         menu.removeAll();
-        for (int i = 0; menu.getComponentCount() < getLimit()
+        List<String> list1 = new LinkedList<>();
+        List<String> list2 = new LinkedList<>();
+        for (int i = 0; list1.size() < getLimit() && list2.size() < getLimit()
                 && i < field.getItemCount(); i++) {
             String v = field.getItemAt(i);
-            if (clean(v).contains(clean(value))) {
-                JMenuItem item = new JMenuItem(v);
-                item.addActionListener(e -> {
-                    field.setSelectedItem(v);
-                });
-                menu.add(item);
+            String cleanV = clean(v);
+            String cleanValue = clean(value);
+            if (cleanV.contains(cleanValue)) {
+                if (cleanV.startsWith(cleanValue))
+                    list1.add(v);
+                else
+                    list2.add(v);
             }
+        }
+        list1.addAll(list2);
+        for (String v : list1) {
+            JMenuItem item = new JMenuItem(v);
+            item.addActionListener(e -> {
+                System.out.println("CLICOU " + v);
+                field.setSelectedIndex(-1);
+                field.setSelectedItem(v);
+            });
+            menu.add(item);
+            if (menu.getComponentCount() > getLimit())
+                break;
         }
     }
 

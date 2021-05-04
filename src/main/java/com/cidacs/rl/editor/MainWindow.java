@@ -63,6 +63,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableRowSorter;
 
+import com.cidacs.rl.editor.DatasetPeek.DatasetPeekResult;
 import com.cidacs.rl.editor.gui.ColumnPairTableModel;
 import com.cidacs.rl.editor.gui.JComboBoxSuggestionProvider;
 import com.cidacs.rl.editor.gui.JComboBoxWithPlaceholder;
@@ -137,6 +138,10 @@ public class MainWindow {
     private LinkageColumnButtonPanel linkageColsButtonPanel;
     private ColumnPairTableModel columnPairTableModel;
     private JPanel linkageColsTabPanel;
+    private JLabel firstDatasetWarningLbl;
+    private JLabel secondDatasetWarningLbl;
+
+    private ColumnPairManager manager;
 
     /**
      * Launch the application.
@@ -174,26 +179,34 @@ public class MainWindow {
         JComboBoxWithPlaceholder[] encodingCboxes = { firstEncodingField,
                 secondEncodingField };
         fillEncodings(encodingCboxes);
-        SettingItemChangeListener datasetsTabEventListener = (o) -> {
+        SettingItemChangeListener datasetsTabEventListenerTop = (o) -> {
             tabbedPane.setSelectedComponent(datasetsTabPanel);
-            validateDatasetsTab();
+            validateDatasetsTabTopPart();
+        };
+        SettingItemChangeListener datasetsTabEventListenerBottom = (o) -> {
+            tabbedPane.setSelectedComponent(datasetsTabPanel);
+            validateDatasetsTabBottomPart();
         };
         cf.addSettingItem("db_a", new StringSettingItem(history, "", "",
-                firstDatasetField, datasetsTabEventListener));
+                firstDatasetField, datasetsTabEventListenerTop));
         cf.addSettingItem("db_b", new StringSettingItem(history, "", "",
-                secondDatasetField, datasetsTabEventListener));
+                secondDatasetField, datasetsTabEventListenerTop));
         cf.addSettingItem("suffix_a", new StringSettingItem(history, "", "_dsa",
-                firstDatasetSuffixField, datasetsTabEventListener));
+                firstDatasetSuffixField, datasetsTabEventListenerBottom));
         cf.addSettingItem("suffix_b", new StringSettingItem(history, "", "_dsb",
-                secondDatasetSuffixField, datasetsTabEventListener));
-        cf.addSettingItem("row_num_col_a", new StringSettingItem(history, "",
-                "#A", firstDatasetRowNumColField, datasetsTabEventListener));
-        cf.addSettingItem("row_num_col_b", new StringSettingItem(history, "",
-                "#B", secondDatasetRowNumColField, datasetsTabEventListener));
+                secondDatasetSuffixField, datasetsTabEventListenerBottom));
+        cf.addSettingItem("row_num_col_a",
+                new StringSettingItem(history, "", "#A",
+                        firstDatasetRowNumColField,
+                        datasetsTabEventListenerBottom));
+        cf.addSettingItem("row_num_col_b",
+                new StringSettingItem(history, "", "#B",
+                        secondDatasetRowNumColField,
+                        datasetsTabEventListenerBottom));
         cf.addSettingItem("encoding_a", new StringSettingItemWithList(history,
-                "", "UTF-8", firstEncodingField, datasetsTabEventListener));
+                "", "UTF-8", firstEncodingField, datasetsTabEventListenerTop));
         cf.addSettingItem("encoding_b", new StringSettingItemWithList(history,
-                "", "UTF-8", secondEncodingField, datasetsTabEventListener));
+                "", "UTF-8", secondEncodingField, datasetsTabEventListenerTop));
 
         // Tab: OPTIONS
         SettingItemChangeListener optionsTabEventListener = (o) -> {
@@ -235,9 +248,8 @@ public class MainWindow {
                 int index) -> {
             System.out.println("SELECT: " + index);
         };
-        ColumnPairManager manager = new ColumnPairManager(history,
-                linkageColsButtonPanel, linkageColsEditingPanel,
-                linkageColsTable);
+        manager = new ColumnPairManager(history, linkageColsButtonPanel,
+                linkageColsEditingPanel, linkageColsTable);
         manager.addInclusionExclusionListener(
                 linkageColsTabValueChangeEventListener);
         manager.addSelectionListener(linkageColsTabSelChangeEventListener);
@@ -276,11 +288,72 @@ public class MainWindow {
                     }
                 });
 
+        // Initial validation
+        validateAllTabs();
+
     }
 
-    public void validateDatasetsTab() {
+    public void validateDatasetsTabTopPart() {
         if (skipValidation)
             return;
+
+        @SuppressWarnings("unused")
+        int errorCount = 0;
+
+        @SuppressWarnings("rawtypes")
+        Map<String, SettingItem> items = cf.getSettingItems();
+
+        // Encodings
+        String enc1 = (String) items.get("encoding_a").getCurrentValue();
+        String enc2 = (String) items.get("encoding_b").getCurrentValue();
+        if (enc1 == null || enc1.isEmpty())
+            enc1 = (String) items.get("encoding_a").getDefaultValue();
+        if (enc2 == null || enc2.isEmpty())
+            enc2 = (String) items.get("encoding_b").getDefaultValue();
+        if (!isValidEncoding(enc1)) {
+            firstEncodingWarningLbl.setToolTipText("Unsupported encoding.");
+            firstEncodingWarningLbl.setVisible(true);
+            errorCount++;
+        } else {
+            firstEncodingWarningLbl.setVisible(false);
+        }
+        if (!isValidEncoding(enc2)) {
+            secondEncodingWarningLbl.setToolTipText("Unsupported encoding.");
+            secondEncodingWarningLbl.setVisible(true);
+            errorCount++;
+        } else {
+            secondEncodingWarningLbl.setVisible(false);
+        }
+
+        // File names
+        String fn1 = (String) items.get("db_a").getCurrentValue();
+        String fn2 = (String) items.get("db_b").getCurrentValue();
+        DatasetPeek p = new DatasetPeek(fn1, enc1);
+        DatasetPeekResult result = p.peek();
+        if (result != DatasetPeekResult.SUCCESS) {
+            errorCount++;
+            firstDatasetWarningLbl
+                    .setToolTipText(getDatasetHeaderErrorMessage(result, fn1));
+            firstDatasetWarningLbl.setVisible(true);
+        } else
+            firstDatasetWarningLbl.setVisible(false);
+        manager.setFirstDatasetColumnNames(p.getColumnNames());
+        p = new DatasetPeek(fn2, enc2);
+        result = p.peek();
+        if (result != DatasetPeekResult.SUCCESS) {
+            errorCount++;
+            secondDatasetWarningLbl
+                    .setToolTipText(getDatasetHeaderErrorMessage(result, fn2));
+            secondDatasetWarningLbl.setVisible(true);
+        } else
+            secondDatasetWarningLbl.setVisible(false);
+        manager.setSecondDatasetColumnNames(p.getColumnNames());
+    }
+
+    public void validateDatasetsTabBottomPart() {
+        if (skipValidation)
+            return;
+
         @SuppressWarnings("unused")
         int errorCount = 0;
         @SuppressWarnings("rawtypes")
@@ -324,27 +397,6 @@ public class MainWindow {
             firstDatasetRowNumColWarningLbl.setVisible(false);
             secondDatasetRowNumColWarningLbl.setVisible(false);
         }
-
-        // Encodings
-        s1 = (String) items.get("encoding_a").getCurrentValue();
-        s2 = (String) items.get("encoding_b").getCurrentValue();
-        if (s1 == null || s1.isEmpty())
-            s1 = (String) items.get("encoding_a").getDefaultValue();
-        if (s2 == null || s2.isEmpty())
-            s2 = (String) items.get("encoding_a").getDefaultValue();
-        if (!isValidEncoding(s1)) {
-            firstEncodingWarningLbl.setToolTipText("Unsupported encoding.");
-            firstEncodingWarningLbl.setVisible(true);
-        } else {
-            firstEncodingWarningLbl.setVisible(false);
-        }
-        if (!isValidEncoding(s2)) {
-            secondEncodingWarningLbl.setToolTipText("Unsupported encoding.");
-            secondEncodingWarningLbl.setVisible(true);
-        } else {
-            secondEncodingWarningLbl.setVisible(false);
-        }
-
     }
 
     public void validateOptionsTab() {
@@ -358,8 +410,31 @@ public class MainWindow {
     }
 
     public void validateAllTabs() {
-        validateDatasetsTab();
+        validateDatasetsTabTopPart();
+        validateDatasetsTabBottomPart();
         validateOptionsTab();
+        validateLinkageColsTab();
+    }
+
+    public static String getDatasetHeaderErrorMessage(DatasetPeekResult result,
+            String fileName) {
+        switch (result) {
+        case BLANK_NAME:
+            return String.format("File name should not be blank.", fileName);
+        case FILE_NOT_FOUND:
+            return String.format("File “%s” does not exist.", fileName);
+        case IO_ERROR:
+            return String.format("File “%s” could not be read.", fileName);
+        case UNSUPPORTED_CONTENTS:
+            return String.format(
+                    "The contents of the file “%s” are not supported.",
+                    fileName);
+        case UNSUPPORTED_FORMAT:
+            return String.format(
+                    "The format of the file “%s” is not supported.", fileName);
+        default:
+            return null;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -520,7 +595,7 @@ public class MainWindow {
         firstDatasetContainer.setLayout(
                 new BoxLayout(firstDatasetContainer, BoxLayout.X_AXIS));
 
-        JLabel firstDatasetWarningLbl = new JLabel(" ");
+        firstDatasetWarningLbl = new JLabel(" ");
         firstDatasetContainer.add(firstDatasetWarningLbl);
 
         firstDatasetField = new JTextField();
@@ -577,7 +652,7 @@ public class MainWindow {
         secondDatasetContainer.add(secondDatasetField);
         secondDatasetField.setColumns(10);
 
-        JLabel secondDatasetWarningLbl = new JLabel(" ");
+        secondDatasetWarningLbl = new JLabel(" ");
         secondDatasetContainer.add(secondDatasetWarningLbl);
 
         JPanel firstEncodingContainer = new JPanel();
