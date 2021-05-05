@@ -1,5 +1,7 @@
 package com.cidacs.rl.editor.undo;
 
+import java.util.Objects;
+
 import javax.swing.JComponent;
 
 import com.cidacs.rl.editor.settingitem.SettingItem;
@@ -42,6 +44,12 @@ public class SetOptionCommand<T> extends Command {
             return false;
         this.newValue = ((SetOptionCommand<T>) that).newValue;
         return true;
+    }
+
+    @Override
+    public String getSummary() {
+        return "“" + Objects.toString(oldValue, "") + "” -> “"
+                + Objects.toString(newValue, "") + "”";
     }
 
 }

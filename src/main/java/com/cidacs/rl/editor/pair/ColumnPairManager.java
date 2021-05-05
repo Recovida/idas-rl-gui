@@ -1,5 +1,6 @@
 package com.cidacs.rl.editor.pair;
 
+import java.awt.Frame;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.ParseException;
@@ -29,6 +30,7 @@ import javax.swing.text.DefaultFormatter;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
+import com.cidacs.rl.editor.gui.BulkCopyColumnInclusionDialogue;
 import com.cidacs.rl.editor.gui.ColumnPairTableModel;
 import com.cidacs.rl.editor.gui.LinkageColumnButtonPanel;
 import com.cidacs.rl.editor.gui.LinkageColumnEditingPanel;
@@ -36,6 +38,8 @@ import com.cidacs.rl.editor.listener.ColumnPairInclusionExclusionListener;
 import com.cidacs.rl.editor.listener.ColumnPairSelectionListener;
 import com.cidacs.rl.editor.listener.ColumnPairValueChangeListener;
 import com.cidacs.rl.editor.undo.AddColumnPairCommand;
+import com.cidacs.rl.editor.undo.Command;
+import com.cidacs.rl.editor.undo.CompositeCommand;
 import com.cidacs.rl.editor.undo.DeleteColumnPairCommand;
 import com.cidacs.rl.editor.undo.EditColumnPairFieldCommand;
 import com.cidacs.rl.editor.undo.UndoHistory;
@@ -50,6 +54,7 @@ public class ColumnPairManager {
     protected ListSelectionModel selectionModel;
 
     protected AtomicInteger nextNumber = new AtomicInteger(1);
+    protected AtomicInteger nextCopyNumber = new AtomicInteger(201);
 
     protected boolean ignoreSelectionEvent = false;
     protected boolean ignoreChangeEvent = false;
@@ -79,6 +84,47 @@ public class ColumnPairManager {
         buttonPanel.getDeletePairBtn().addActionListener(
                 e -> history.push(new DeleteColumnPairCommand(this,
                         table.convertRowIndexToModel(table.getSelectedRow()))));
+        buttonPanel.getAddCopyColsBtn().addActionListener(e -> {
+            if (firstDatasetColumnNames != null
+                    || secondDatasetColumnNames != null) {
+                Set<String> alreadyIncludedLeft = new HashSet<>();
+                Set<String> alreadyIncludedRight = new HashSet<>();
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    String left = model.getStringValue(i, "db_a");
+                    String right = model.getStringValue(i, "db_b");
+                    if (left != null && !left.isEmpty())
+                        alreadyIncludedLeft.add(left);
+                    if (right != null && !right.isEmpty())
+                        alreadyIncludedRight.add(right);
+                }
+                BulkCopyColumnInclusionDialogue dialogue = new BulkCopyColumnInclusionDialogue(
+                        (Frame) SwingUtilities.getRoot(table));
+                if (firstDatasetColumnNames != null)
+                    for (String col : firstDatasetColumnNames)
+                        dialogue.addItemToLeftPanel(col,
+                                alreadyIncludedLeft.contains(col));
+                if (secondDatasetColumnNames != null)
+                    for (String col : secondDatasetColumnNames)
+                        dialogue.addItemToRightPanel(col,
+                                alreadyIncludedRight.contains(col));
+                List<String>[] result = dialogue.run();
+                List<Command> cmd = new LinkedList<>();
+                for (String c : result[0])
+                    cmd.add(new AddColumnPairCommand(ColumnPairManager.this,
+                            "copy", c, null));
+                for (String c : result[1])
+                    cmd.add(new AddColumnPairCommand(ColumnPairManager.this,
+                            "copy", null, c));
+                if (!cmd.isEmpty())
+                    history.push(new CompositeCommand(cmd) {
+
+                        @Override
+                        public String getSummary() {
+                            return "add columns to be copied";
+                        }
+                    });
+            }
+        });
 
         selectionModel.addListSelectionListener(new ListSelectionListener() {
 
@@ -174,22 +220,37 @@ public class ColumnPairManager {
 
     public int addColumnPair(int index, Object[] contents) {
         model.insertRow(index, contents);
-        table.setRowSelectionInterval(index, index);
+        int viewIndex = table.convertRowIndexToView(index);
+        table.setRowSelectionInterval(viewIndex, viewIndex);
         for (ColumnPairInclusionExclusionListener listener : rowInclusionExclusionListeners)
             if (listener != null)
                 listener.insertedColumnPair(index, contents);
         return index;
     }
 
-    public int addColumnPair() {
+    public int addColumnPair(String type, String firstDatasetColumn,
+            String secondDatasetColumn) {
+        Object[] contents = new Object[model.getColumnCount()];
+        contents[model.getColumnIndex("number")] = getNextNumber(
+                "copy".equals(type) ? nextCopyNumber : nextNumber);
+        if (firstDatasetColumn != null)
+            contents[model.getColumnIndex("db_a")] = firstDatasetColumn;
+        if (secondDatasetColumn != null)
+            contents[model.getColumnIndex("db_b")] = secondDatasetColumn;
+        if (type != null)
+            contents[model.getColumnIndex("type")] = type;
+        return addColumnPair(model.getRowCount(), contents);
+    }
+
+    protected int getNextNumber(AtomicInteger counter) {
         Set<Integer> used = new HashSet<>();
         for (int i = 0; i < model.getRowCount(); i++)
             used.add(model.getIntegerValue(i, "number"));
         int n;
         do {
-            n = nextNumber.getAndIncrement();
+            n = counter.getAndIncrement();
         } while (used.contains(n));
-        return addColumnPair(model.getRowCount(), new Integer[] { n });
+        return n;
     }
 
     public Object[] deleteColumnPair(int index) {
@@ -325,6 +386,7 @@ public class ColumnPairManager {
                 if (field instanceof JTextField) {
                     ((JTextField) field).setText((String) newValue);
                 } else if (field instanceof JComboBox) {
+                    ((JComboBox<?>) field).setSelectedIndex(-1);
                     ((JComboBox<?>) field).setSelectedItem(newValue);
                 } else if (field instanceof JSpinner) {
                     try {
@@ -357,6 +419,9 @@ public class ColumnPairManager {
         field.setSelectedItem(idx == -1 ? ""
                 : model.getValue(table.convertRowIndexToModel(idx), "db_a"));
         completelyIgnoreChangeEvent = false;
+        buttonPanel.getAddCopyColsBtn()
+                .setEnabled(firstDatasetColumnNames != null
+                        || secondDatasetColumnNames != null);
     }
 
     public Collection<String> getSecondDatasetColumnNames() {
@@ -373,6 +438,9 @@ public class ColumnPairManager {
         field.setSelectedItem(idx == -1 ? ""
                 : model.getValue(table.convertRowIndexToModel(idx), "db_b"));
         completelyIgnoreChangeEvent = false;
+        buttonPanel.getAddCopyColsBtn()
+                .setEnabled(firstDatasetColumnNames != null
+                        || secondDatasetColumnNames != null);
     }
 
     public void setComboBoxItems(JComboBox<String> field,

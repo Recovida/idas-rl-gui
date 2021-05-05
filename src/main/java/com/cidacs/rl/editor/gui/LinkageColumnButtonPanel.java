@@ -13,6 +13,8 @@ public class LinkageColumnButtonPanel extends JPanel {
 
     private static final long serialVersionUID = 3447357352169636148L;
     private JButton addPairBtn;
+    private JButton deletePairBtn;
+    private JButton addCopyColsBtn;
 
     public JButton getAddPairBtn() {
         return addPairBtn;
@@ -22,24 +24,29 @@ public class LinkageColumnButtonPanel extends JPanel {
         return deletePairBtn;
     }
 
-    private JButton deletePairBtn;
+    public JButton getAddCopyColsBtn() {
+        return addCopyColsBtn;
+    }
 
     public LinkageColumnButtonPanel() {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-        Component horizontalGlue = Box.createHorizontalGlue();
-        add(horizontalGlue);
+        addCopyColsBtn = new JButton("Add columns to be copied");
+        addCopyColsBtn.setEnabled(false);
+        add(addCopyColsBtn);
 
-        addPairBtn = new JButton("Add pair");
+        Component horizontalGlue_2 = Box.createHorizontalGlue();
+        add(horizontalGlue_2);
+
+        addPairBtn = new JButton("Add column pair");
         add(addPairBtn);
-
-        Component rigidArea_1 = Box.createRigidArea(new Dimension(20, 20));
-        rigidArea_1.setPreferredSize(new Dimension(8, 20));
-        add(rigidArea_1);
 
         Component horizontalGlue_1 = Box.createHorizontalGlue();
         horizontalGlue_1.setMaximumSize(new Dimension(50, 0));
         add(horizontalGlue_1);
+
+        Component horizontalGlue = Box.createHorizontalGlue();
+        add(horizontalGlue);
 
         deletePairBtn = new JButton("Delete selected pair");
         deletePairBtn.setEnabled(false);

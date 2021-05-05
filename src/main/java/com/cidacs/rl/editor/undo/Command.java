@@ -20,4 +20,6 @@ public abstract class Command {
         return merged;
     }
 
+    public abstract String getSummary();
+
 }

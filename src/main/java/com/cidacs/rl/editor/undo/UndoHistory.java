@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 
 public class UndoHistory {
 
@@ -16,12 +17,16 @@ public class UndoHistory {
         boolean canRedo = false;
         boolean canUndo = false;
         boolean isClean = true;
+        String undoSummary = null;
+        String redoSummary = null;
 
         public static HistoryPropertyState get(UndoHistory h) {
             HistoryPropertyState s = new HistoryPropertyState();
             s.canRedo = h.canRedo();
             s.canUndo = h.canUndo();
             s.isClean = h.isClean();
+            s.undoSummary = h.getUndoSummary();
+            s.redoSummary = h.getRedoSummary();
             return s;
         }
 
@@ -34,6 +39,10 @@ public class UndoHistory {
                     listener.canUndoChanged(this.canUndo);
                 if (this.isClean != that.isClean)
                     listener.cleanChanged(this.isClean);
+                if (!Objects.equals(this.undoSummary, that.undoSummary))
+                    listener.undoSummaryChanged(this.undoSummary);
+                if (!Objects.equals(this.redoSummary, that.redoSummary))
+                    listener.redoSummaryChanged(this.redoSummary);
             }
         }
     }
@@ -112,6 +121,22 @@ public class UndoHistory {
     public void addPropertyChangeListener(
             HistoryPropertyChangeEventListener listener) {
         listeners.add(listener);
+    }
+
+    public String getUndoSummary() {
+        if (!canUndo())
+            return null;
+        String summary = commandListIterator.previous().getSummary();
+        commandListIterator.next();
+        return summary;
+    }
+
+    public String getRedoSummary() {
+        if (!canRedo())
+            return null;
+        String summary = commandListIterator.next().getSummary();
+        commandListIterator.previous();
+        return summary;
     }
 
 }

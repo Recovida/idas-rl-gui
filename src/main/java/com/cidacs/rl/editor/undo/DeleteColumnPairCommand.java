@@ -11,7 +11,6 @@ public class DeleteColumnPairCommand extends Command {
     public DeleteColumnPairCommand(ColumnPairManager manager, int index) {
         this.manager = manager;
         this.index = index;
-        System.out.println(index);
     }
 
     @Override
@@ -22,6 +21,11 @@ public class DeleteColumnPairCommand extends Command {
     @Override
     public void redo() {
         contents = manager.deleteColumnPair(index);
+    }
+
+    @Override
+    public String getSummary() {
+        return "delete column";
     }
 
 }

@@ -77,6 +77,7 @@ public class StringSettingItemWithList
             @Override
             public void run() {
                 supressDocumentListener = true;
+                guiComponent.setSelectedIndex(-1);
                 guiComponent.setSelectedItem(newValue);
                 guiComponent.grabFocus();
                 supressDocumentListener = false;

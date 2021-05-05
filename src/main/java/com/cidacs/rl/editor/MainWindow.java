@@ -286,6 +286,20 @@ public class MainWindow {
                     public void canRedoChanged(boolean canRedo) {
                         redoMenuItem.setEnabled(canRedo);
                     }
+
+                    @Override
+                    public void undoSummaryChanged(String summary) {
+                        undoMenuItem.setText("Undo" + (summary != null
+                                ? String.format(" (%s)", summary)
+                                : ""));
+                    }
+
+                    @Override
+                    public void redoSummaryChanged(String summary) {
+                        redoMenuItem.setText("Redo" + (summary != null
+                                ? String.format(" (%s)", summary)
+                                : ""));
+                    }
                 });
 
         // Initial validation
@@ -935,7 +949,7 @@ public class MainWindow {
         maxRowsField.setEditor(ne_maxRowsField);
 
         linkageColsTabPanel = new JPanel();
-        tabbedPane.addTab("Linkage columns", null, linkageColsTabPanel, null);
+        tabbedPane.addTab("Columns", null, linkageColsTabPanel, null);
 
         linkageColsTable = new JTable();
         linkageColsTable.getTableHeader().setReorderingAllowed(false);
@@ -962,8 +976,6 @@ public class MainWindow {
         linkageColsTabPanel.add(linkageColsButtonPanel, BorderLayout.NORTH);
         linkageColsEditingPanel.setEnabled(false);
 
-        JPanel extraColsTabPanel = new JPanel();
-        tabbedPane.addTab("Extra columns", null, extraColsTabPanel, null);
         frame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
         JMenuBar menuBar = new JMenuBar();

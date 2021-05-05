@@ -68,4 +68,8 @@ public class ColumnPairTableModel extends DefaultTableModel {
         return keys[columnIndex];
     }
 
+    public int getColumnIndex(String key) {
+        return indexFromKey.get(key);
+    }
+
 }

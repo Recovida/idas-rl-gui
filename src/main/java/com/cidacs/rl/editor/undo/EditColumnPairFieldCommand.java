@@ -1,5 +1,7 @@
 package com.cidacs.rl.editor.undo;
 
+import java.util.Objects;
+
 import com.cidacs.rl.editor.pair.ColumnPairManager;
 
 public class EditColumnPairFieldCommand<T> extends Command {
@@ -43,6 +45,12 @@ public class EditColumnPairFieldCommand<T> extends Command {
             return false;
         this.newValue = ((EditColumnPairFieldCommand<T>) that).newValue;
         return true;
+    }
+
+    @Override
+    public String getSummary() {
+        return key + ": “" + Objects.toString(oldValue, "") + "” -> “"
+                + Objects.toString(newValue, "") + "”";
     }
 
 }

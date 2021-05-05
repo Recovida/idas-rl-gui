@@ -10,4 +10,8 @@ public interface HistoryPropertyChangeEventListener extends EventListener {
 
     void cleanChanged(boolean isClean);
 
+    void undoSummaryChanged(String summary);
+
+    void redoSummaryChanged(String summary);
+
 }
