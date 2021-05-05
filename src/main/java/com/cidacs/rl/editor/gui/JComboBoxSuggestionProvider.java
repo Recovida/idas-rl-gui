@@ -77,12 +77,15 @@ public class JComboBoxSuggestionProvider {
             menu.setVisible(false);
         } else {
             fillMenu(text);
-            if (menu.isVisible()) {
-                SwingUtilities.convertPointToScreen(p, field);
-                menu.setLocation(p.x + dx, p.y + dy);
-            } else {
-                menu.show(field, p.x + dx, p.y + dy);
-            }
+            if (menu.getComponentCount() > 0) {
+                if (menu.isVisible()) {
+                    SwingUtilities.convertPointToScreen(p, field);
+                    menu.setLocation(p.x + dx, p.y + dy);
+                } else {
+                    menu.show(field, p.x + dx, p.y + dy);
+                }
+            } else
+                menu.setVisible(false);
         }
     }
 

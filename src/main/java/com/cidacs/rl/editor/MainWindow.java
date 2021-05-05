@@ -373,7 +373,7 @@ public class MainWindow {
         Map<String, SettingItem> items = cf.getSettingItems();
         String s1, s2;
 
-        // Prefixes
+        // Suffixes
         s1 = (String) items.get("suffix_a").getCurrentValue();
         s2 = (String) items.get("suffix_b").getCurrentValue();
         if (s1 == null || s1.isEmpty())
@@ -391,6 +391,8 @@ public class MainWindow {
             firstDatasetSuffixWarningLbl.setVisible(false);
             secondDatasetSuffixWarningLbl.setVisible(false);
         }
+        manager.setFirstRenameSuffix(s1);
+        manager.setSecondRenameSuffix(s2);
 
         // Row number column names
         s1 = (String) items.get("row_num_col_a").getCurrentValue();
@@ -410,6 +412,7 @@ public class MainWindow {
             firstDatasetRowNumColWarningLbl.setVisible(false);
             secondDatasetRowNumColWarningLbl.setVisible(false);
         }
+
     }
 
     public void validateOptionsTab() {

@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 public class JTextFieldWithPlaceholder extends JTextField
         implements FieldWithPlaceholder {
@@ -31,6 +32,7 @@ public class JTextFieldWithPlaceholder extends JTextField
     @Override
     public void setPlaceholder(String placeholder) {
         this.placeholder = placeholder;
+        SwingUtilities.invokeLater(() -> repaint());
     }
 
     @Override

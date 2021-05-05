@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -53,6 +54,9 @@ public class ColumnPairManager {
     protected JTable table;
     protected ColumnPairTableModel model;
     protected ListSelectionModel selectionModel;
+
+    protected String firstRenameSuffix = "";
+    protected String secondRenameSuffix = "";
 
     protected AtomicInteger nextNumber = new AtomicInteger(1);
     protected AtomicInteger nextCopyNumber = new AtomicInteger(201);
@@ -171,6 +175,7 @@ public class ColumnPairManager {
                 for (ColumnPairSelectionListener listener : selectionListeners)
                     if (listener != null)
                         listener.selected(index);
+                updateRenameFieldPlaceholder();
             }
         });
 
@@ -282,7 +287,30 @@ public class ColumnPairManager {
             boolean phon = "name".equals(newValue);
             editingPanel.getPhonWeightLbl().setVisible(phon);
             editingPanel.getPhonWeightField().setVisible(phon);
+        } else if ("index_a".equals(key) || "index_b".equals(key)) {
+            updateRenameFieldPlaceholder();
         }
+    }
+
+    protected void updateRenameFieldPlaceholder() {
+        int index = table.getSelectedRow();
+        if (index == -1) {
+            editingPanel.getFirstRenameField().setPlaceholder("");
+            editingPanel.getSecondRenameField().setPlaceholder("");
+            return;
+        }
+        String name = Optional
+                .ofNullable(model.getStringValue(
+                        table.convertRowIndexToModel(index), "index_a"))
+                .orElse("");
+        editingPanel.getFirstRenameField().setPlaceholder(
+                name.isEmpty() ? "" : (name + "_" + firstRenameSuffix));
+        name = Optional
+                .ofNullable(model.getStringValue(
+                        table.convertRowIndexToModel(index), "index_b"))
+                .orElse("");
+        editingPanel.getSecondRenameField().setPlaceholder(
+                name.isEmpty() ? "" : (name + "_" + secondRenameSuffix));
     }
 
     protected void associateKeyWithField(String key, JSpinner field) {
@@ -473,6 +501,24 @@ public class ColumnPairManager {
     public void addValueChangeSelectionListener(
             ColumnPairValueChangeListener listener) {
         valueChangeListeners.add(listener);
+    }
+
+    public String getFirstRenameSuffix() {
+        return firstRenameSuffix;
+    }
+
+    public void setFirstRenameSuffix(String firstRenameSuffix) {
+        this.firstRenameSuffix = Optional.of(firstRenameSuffix).orElse("");
+        updateRenameFieldPlaceholder();
+    }
+
+    public String getSecondRenameSuffix() {
+        return secondRenameSuffix;
+    }
+
+    public void setSecondRenameSuffix(String secondRenameSuffix) {
+        this.secondRenameSuffix = Optional.of(secondRenameSuffix).orElse("");
+        updateRenameFieldPlaceholder();
     }
 
 }

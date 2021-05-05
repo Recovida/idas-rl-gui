@@ -17,7 +17,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
@@ -28,8 +27,8 @@ public class LinkageColumnEditingPanel extends JPanel {
     private static final String[] TYPES = { "copy", "name", "date", "ibge",
             "gender", "numerical_id", "categorical" };
 
-    private JTextField firstRenameField;
-    private JTextField secondRenameField;
+    private JTextFieldWithPlaceholder firstRenameField;
+    private JTextFieldWithPlaceholder secondRenameField;
     private final Component rightHorizontalGlue = Box.createHorizontalGlue();
     private JSpinnerWithBlankValue weightField;
     private JSpinnerWithBlankValue phonWeightField;
@@ -46,11 +45,11 @@ public class LinkageColumnEditingPanel extends JPanel {
 
     private JLabel phonWeightLbl;
 
-    public JTextField getFirstRenameField() {
+    public JTextFieldWithPlaceholder getFirstRenameField() {
         return firstRenameField;
     }
 
-    public JTextField getSecondRenameField() {
+    public JTextFieldWithPlaceholder getSecondRenameField() {
         return secondRenameField;
     }
 
@@ -84,8 +83,8 @@ public class LinkageColumnEditingPanel extends JPanel {
         JPanel panel = new JPanel();
         add(panel);
         GridBagLayout gbl_panel = new GridBagLayout();
-        gbl_panel.columnWidths = new int[] { 0, 60, 30, 40, 30, 40, 40, 30, 40,
-                70, 0 };
+        gbl_panel.columnWidths = new int[] { 0, 60, 30, 40, 30, 40, 40, 30, 30,
+                80, 0 };
         gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
         gbl_panel.columnWeights = new double[] { 0.0, 1.0, 0.0, 1.0, 0.0, 1.0,
                 1.0, 0.0, 0.0, 1.0, 0.0 };
@@ -157,7 +156,7 @@ public class LinkageColumnEditingPanel extends JPanel {
         gbc_renameFirstLbl.gridy = 1;
         panel.add(renameFirstLbl, gbc_renameFirstLbl);
 
-        firstRenameField = new JTextField();
+        firstRenameField = new JTextFieldWithPlaceholder();
         GridBagConstraints gbc_firstRenameField = new GridBagConstraints();
         gbc_firstRenameField.insets = new Insets(0, 0, 5, 5);
         gbc_firstRenameField.fill = GridBagConstraints.BOTH;
@@ -236,7 +235,7 @@ public class LinkageColumnEditingPanel extends JPanel {
         gbc_renameSecondLbl.gridy = 2;
         panel.add(renameSecondLbl, gbc_renameSecondLbl);
 
-        secondRenameField = new JTextField();
+        secondRenameField = new JTextFieldWithPlaceholder();
         GridBagConstraints gbc_secondRenameField = new GridBagConstraints();
         gbc_secondRenameField.insets = new Insets(0, 0, 5, 5);
         gbc_secondRenameField.fill = GridBagConstraints.BOTH;
