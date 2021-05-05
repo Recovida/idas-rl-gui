@@ -5,14 +5,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -32,8 +29,6 @@ import java.util.stream.Collectors;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -71,6 +66,7 @@ import com.cidacs.rl.editor.gui.JSpinnerWithBlankValue;
 import com.cidacs.rl.editor.gui.JTextFieldWithPlaceholder;
 import com.cidacs.rl.editor.gui.LinkageColumnButtonPanel;
 import com.cidacs.rl.editor.gui.LinkageColumnEditingPanel;
+import com.cidacs.rl.editor.gui.WarningIcon;
 import com.cidacs.rl.editor.listener.ColumnPairInclusionExclusionListener;
 import com.cidacs.rl.editor.listener.ColumnPairSelectionListener;
 import com.cidacs.rl.editor.listener.ColumnPairValueChangeListener;
@@ -83,13 +79,6 @@ import com.cidacs.rl.editor.settingitem.StringSettingItemWithList;
 import com.cidacs.rl.editor.undo.HistoryPropertyChangeEventListener;
 import com.cidacs.rl.editor.undo.UndoHistory;
 
-/**
- *
- */
-
-/**
- *
- */
 public class MainWindow {
 
     /* Non-GUI attributes */
@@ -113,19 +102,21 @@ public class MainWindow {
     private JTextFieldWithPlaceholder indexDirField;
     private JSpinner minScoreField;
     private JSpinner maxRowsField;
+    private JComboBoxWithPlaceholder firstEncodingField;
+    private JComboBoxWithPlaceholder secondEncodingField;
     private JMenuItem exitMenuItem;
     private JMenuItem newFileMenuItem;
     private JMenuItem openFileMenuItem;
     private JMenuItem saveFileMenuItem;
     private JMenuItem saveAsFileMenuItem;
-    private JLabel firstDatasetSuffixWarningLbl;
-    private JLabel secondDatasetSuffixWarningLbl;
-    private JLabel secondDatasetRowNumColWarningLbl;
-    private JLabel firstDatasetRowNumColWarningLbl;
-    private JComboBoxWithPlaceholder firstEncodingField;
-    private JComboBoxWithPlaceholder secondEncodingField;
-    private JLabel firstEncodingWarningLbl;
-    private JLabel secondEncodingWarningLbl;
+    private WarningIcon firstDatasetSuffixWarningLbl;
+    private WarningIcon secondDatasetSuffixWarningLbl;
+    private WarningIcon secondDatasetRowNumColWarningLbl;
+    private WarningIcon firstDatasetRowNumColWarningLbl;
+    private WarningIcon firstEncodingWarningLbl;
+    private WarningIcon secondEncodingWarningLbl;
+    private WarningIcon firstDatasetWarningLbl;
+    private WarningIcon secondDatasetWarningLbl;
     private JMenuItem undoMenuItem;
     private JMenuItem redoMenuItem;
     private JMenu helpMenu;
@@ -138,8 +129,6 @@ public class MainWindow {
     private LinkageColumnButtonPanel linkageColsButtonPanel;
     private ColumnPairTableModel columnPairTableModel;
     private JPanel linkageColsTabPanel;
-    private JLabel firstDatasetWarningLbl;
-    private JLabel secondDatasetWarningLbl;
 
     private ColumnPairManager manager;
 
@@ -152,7 +141,6 @@ public class MainWindow {
             public void run() {
                 try {
                     MainWindow window = new MainWindow();
-                    window.frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -302,8 +290,10 @@ public class MainWindow {
                     }
                 });
 
+        frame.setVisible(true);
+
         // Initial validation
-        validateAllTabs();
+        SwingUtilities.invokeLater(() -> validateAllTabs());
 
     }
 
@@ -609,7 +599,7 @@ public class MainWindow {
         firstDatasetContainer.setLayout(
                 new BoxLayout(firstDatasetContainer, BoxLayout.X_AXIS));
 
-        firstDatasetWarningLbl = new JLabel(" ");
+        firstDatasetWarningLbl = new WarningIcon();
         firstDatasetContainer.add(firstDatasetWarningLbl);
 
         firstDatasetField = new JTextField();
@@ -666,7 +656,7 @@ public class MainWindow {
         secondDatasetContainer.add(secondDatasetField);
         secondDatasetField.setColumns(10);
 
-        secondDatasetWarningLbl = new JLabel(" ");
+        secondDatasetWarningLbl = new WarningIcon();
         secondDatasetContainer.add(secondDatasetWarningLbl);
 
         JPanel firstEncodingContainer = new JPanel();
@@ -680,7 +670,7 @@ public class MainWindow {
         firstEncodingContainer.setLayout(
                 new BoxLayout(firstEncodingContainer, BoxLayout.X_AXIS));
 
-        firstEncodingWarningLbl = new JLabel(" ");
+        firstEncodingWarningLbl = new WarningIcon();
         firstEncodingContainer.add(firstEncodingWarningLbl);
 
         firstEncodingField = new JComboBoxWithPlaceholder();
@@ -709,7 +699,7 @@ public class MainWindow {
         new JComboBoxSuggestionProvider(secondEncodingField);
         secondEncodingContainer.add(secondEncodingField);
 
-        secondEncodingWarningLbl = new JLabel(" ");
+        secondEncodingWarningLbl = new WarningIcon();
         secondEncodingContainer.add(secondEncodingWarningLbl);
 
         JPanel firstDatasetSuffixContainer = new JPanel();
@@ -723,7 +713,7 @@ public class MainWindow {
         firstDatasetSuffixContainer.setLayout(
                 new BoxLayout(firstDatasetSuffixContainer, BoxLayout.X_AXIS));
 
-        firstDatasetSuffixWarningLbl = new JLabel(" ");
+        firstDatasetSuffixWarningLbl = new WarningIcon();
         firstDatasetSuffixContainer.add(firstDatasetSuffixWarningLbl);
 
         firstDatasetSuffixField = new JTextFieldWithPlaceholder();
@@ -752,7 +742,7 @@ public class MainWindow {
         secondDatasetSuffixContainer.add(secondDatasetSuffixField);
         secondDatasetSuffixField.setColumns(10);
 
-        secondDatasetSuffixWarningLbl = new JLabel(" ");
+        secondDatasetSuffixWarningLbl = new WarningIcon();
         secondDatasetSuffixContainer.add(secondDatasetSuffixWarningLbl);
 
         JPanel firstDatasetRowNumColContainer = new JPanel();
@@ -766,7 +756,7 @@ public class MainWindow {
         firstDatasetRowNumColContainer.setLayout(new BoxLayout(
                 firstDatasetRowNumColContainer, BoxLayout.X_AXIS));
 
-        firstDatasetRowNumColWarningLbl = new JLabel(" ");
+        firstDatasetRowNumColWarningLbl = new WarningIcon();
         firstDatasetRowNumColContainer.add(firstDatasetRowNumColWarningLbl);
 
         firstDatasetRowNumColField = new JTextFieldWithPlaceholder();
@@ -796,7 +786,7 @@ public class MainWindow {
         secondDatasetRowNumColContainer.add(secondDatasetRowNumColField);
         secondDatasetRowNumColField.setColumns(10);
 
-        secondDatasetRowNumColWarningLbl = new JLabel(" ");
+        secondDatasetRowNumColWarningLbl = new WarningIcon();
         secondDatasetRowNumColContainer.add(secondDatasetRowNumColWarningLbl);
 
         Component datasetsTabBottomMargin = Box.createVerticalGlue();
@@ -846,7 +836,7 @@ public class MainWindow {
         linkageDirContainer.setLayout(
                 new BoxLayout(linkageDirContainer, BoxLayout.X_AXIS));
 
-        JLabel linkageDirWarningLbl = new JLabel(" ");
+        JLabel linkageDirWarningLbl = new WarningIcon();
         linkageDirContainer.add(linkageDirWarningLbl);
 
         linkageDirField = new JTextFieldWithPlaceholder();
@@ -887,7 +877,7 @@ public class MainWindow {
         indexDirContainer
                 .setLayout(new BoxLayout(indexDirContainer, BoxLayout.X_AXIS));
 
-        JLabel indexDirWarningLbl = new JLabel(" ");
+        JLabel indexDirWarningLbl = new WarningIcon();
         indexDirContainer.add(indexDirWarningLbl);
 
         indexDirField = new JTextFieldWithPlaceholder();
@@ -1048,15 +1038,6 @@ public class MainWindow {
 
         frame.pack();
 
-        JLabel[] warningLabels = { firstDatasetWarningLbl,
-                secondDatasetWarningLbl, firstDatasetSuffixWarningLbl,
-                secondDatasetSuffixWarningLbl, firstDatasetRowNumColWarningLbl,
-                secondDatasetRowNumColWarningLbl, indexDirWarningLbl,
-                linkageDirWarningLbl, firstEncodingWarningLbl,
-                secondEncodingWarningLbl };
-        Icon warningIcon = UIManager.getIcon("OptionPane.errorIcon");
-        for (JLabel label : warningLabels)
-            setLabelIcon(label, warningIcon, false);
     }
 
     private String selectDatasetFile(String currentFileName) {
@@ -1092,19 +1073,6 @@ public class MainWindow {
             return chooser.getSelectedFile().getAbsolutePath();
         }
         return null;
-    }
-
-    private void setLabelIcon(JLabel label, Icon icon, boolean visible) {
-        BufferedImage bufferedImage = new BufferedImage(icon.getIconWidth(),
-                icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = bufferedImage.createGraphics();
-        icon.paintIcon(null, g, 0, 0);
-        g.dispose();
-        int d = label.getSize().height; // square
-        label.setIcon(new ImageIcon(
-                bufferedImage.getScaledInstance(d, d, Image.SCALE_SMOOTH)));
-        label.setText("");
-        label.setVisible(visible);
     }
 
     private void updateConfigFileLabel() {
