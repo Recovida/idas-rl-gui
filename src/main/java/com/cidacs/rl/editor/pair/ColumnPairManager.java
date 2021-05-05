@@ -5,6 +5,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -90,8 +91,8 @@ public class ColumnPairManager {
                 Set<String> alreadyIncludedLeft = new HashSet<>();
                 Set<String> alreadyIncludedRight = new HashSet<>();
                 for (int i = 0; i < model.getRowCount(); i++) {
-                    String left = model.getStringValue(i, "db_a");
-                    String right = model.getStringValue(i, "db_b");
+                    String left = model.getStringValue(i, "index_a");
+                    String right = model.getStringValue(i, "index_b");
                     if (left != null && !left.isEmpty())
                         alreadyIncludedLeft.add(left);
                     if (right != null && !right.isEmpty())
@@ -156,9 +157,9 @@ public class ColumnPairManager {
                     editingPanel.getPhonWeightField().setValue(zeroIfNull(
                             model.getDoubleValue(index, "phon_weight")));
                     editingPanel.getFirstNameField().setSelectedItem(
-                            model.getStringValue(index, "db_a"));
+                            model.getStringValue(index, "index_a"));
                     editingPanel.getSecondNameField().setSelectedItem(
-                            model.getStringValue(index, "db_b"));
+                            model.getStringValue(index, "index_b"));
                     editingPanel.getFirstRenameField()
                             .setText(model.getStringValue(index, "rename_a"));
                     editingPanel.getSecondRenameField()
@@ -175,8 +176,8 @@ public class ColumnPairManager {
 
         associateKeyWithField("rename_a", editingPanel.getFirstRenameField());
         associateKeyWithField("rename_b", editingPanel.getSecondRenameField());
-        associateKeyWithField("db_a", editingPanel.getFirstNameField());
-        associateKeyWithField("db_b", editingPanel.getSecondNameField());
+        associateKeyWithField("index_a", editingPanel.getFirstNameField());
+        associateKeyWithField("index_b", editingPanel.getSecondNameField());
         associateKeyWithField("type", editingPanel.getTypeField());
         associateKeyWithField("weight", editingPanel.getWeightField());
         associateKeyWithField("phon_weight", editingPanel.getPhonWeightField());
@@ -196,6 +197,8 @@ public class ColumnPairManager {
             }
         });
 
+        editingPanel.getPhonWeightLbl().setVisible(false);
+        editingPanel.getPhonWeightField().setVisible(false);
     }
 
     public UndoHistory getHistory() {
@@ -234,9 +237,9 @@ public class ColumnPairManager {
         contents[model.getColumnIndex("number")] = getNextNumber(
                 "copy".equals(type) ? nextCopyNumber : nextNumber);
         if (firstDatasetColumn != null)
-            contents[model.getColumnIndex("db_a")] = firstDatasetColumn;
+            contents[model.getColumnIndex("index_a")] = firstDatasetColumn;
         if (secondDatasetColumn != null)
-            contents[model.getColumnIndex("db_b")] = secondDatasetColumn;
+            contents[model.getColumnIndex("index_b")] = secondDatasetColumn;
         if (type != null)
             contents[model.getColumnIndex("type")] = type;
         return addColumnPair(model.getRowCount(), contents);
@@ -275,6 +278,11 @@ public class ColumnPairManager {
         for (ColumnPairValueChangeListener listener : valueChangeListeners)
             if (listener != null)
                 listener.changed(rowIndex, key, newValue);
+        if ("type".equals(key)) {
+            boolean phon = "name".equals(newValue);
+            editingPanel.getPhonWeightLbl().setVisible(phon);
+            editingPanel.getPhonWeightField().setVisible(phon);
+        }
     }
 
     protected void associateKeyWithField(String key, JSpinner field) {
@@ -406,7 +414,8 @@ public class ColumnPairManager {
     }
 
     public Collection<String> getFirstDatasetColumnNames() {
-        return firstDatasetColumnNames;
+        return firstDatasetColumnNames == null ? null
+                : Collections.unmodifiableCollection(firstDatasetColumnNames);
     }
 
     public void setFirstDatasetColumnNames(
@@ -417,7 +426,7 @@ public class ColumnPairManager {
         setComboBoxItems(field, firstDatasetColumnNames);
         int idx = table.getSelectedRow();
         field.setSelectedItem(idx == -1 ? ""
-                : model.getValue(table.convertRowIndexToModel(idx), "db_a"));
+                : model.getValue(table.convertRowIndexToModel(idx), "index_a"));
         completelyIgnoreChangeEvent = false;
         buttonPanel.getAddCopyColsBtn()
                 .setEnabled(firstDatasetColumnNames != null
@@ -425,7 +434,8 @@ public class ColumnPairManager {
     }
 
     public Collection<String> getSecondDatasetColumnNames() {
-        return secondDatasetColumnNames;
+        return secondDatasetColumnNames == null ? null
+                : Collections.unmodifiableCollection(secondDatasetColumnNames);
     }
 
     public void setSecondDatasetColumnNames(
@@ -436,7 +446,7 @@ public class ColumnPairManager {
         setComboBoxItems(field, secondDatasetColumnNames);
         int idx = table.getSelectedRow();
         field.setSelectedItem(idx == -1 ? ""
-                : model.getValue(table.convertRowIndexToModel(idx), "db_b"));
+                : model.getValue(table.convertRowIndexToModel(idx), "index_b"));
         completelyIgnoreChangeEvent = false;
         buttonPanel.getAddCopyColsBtn()
                 .setEnabled(firstDatasetColumnNames != null

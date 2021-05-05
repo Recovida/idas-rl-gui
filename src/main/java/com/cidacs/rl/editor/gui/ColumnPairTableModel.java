@@ -10,7 +10,7 @@ public class ColumnPairTableModel extends DefaultTableModel {
     private static final long serialVersionUID = 1L;
 
     private final String[] keys = { "number", "type", "weight", "phon_weight",
-            "db_a", "rename_a", "db_b", "rename_b" };
+            "index_a", "rename_a", "index_b", "rename_b" };
     private final Class<?>[] types = { Integer.class, String.class,
             Double.class, Double.class, String.class, String.class,
             String.class, String.class };

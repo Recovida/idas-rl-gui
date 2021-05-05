@@ -17,6 +17,7 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -218,7 +219,13 @@ public class MainWindow {
             System.out
                     .println("CHANGE: " + key + "=" + newValue + " @" + index);
             tabbedPane.setSelectedComponent(linkageColsTabPanel);
-            validateLinkageColsTab();
+            if (index >= 0) {
+                if ("type".equals(key))
+                    validateLinkageColsTab(index); // type affects
+                                                   // validation of other fields
+                else
+                    validateLinkageColsTab(index, key);
+            }
         };
         ColumnPairInclusionExclusionListener linkageColsTabValueChangeEventListener = new ColumnPairInclusionExclusionListener() {
 
@@ -235,6 +242,7 @@ public class MainWindow {
         ColumnPairSelectionListener linkageColsTabSelChangeEventListener = (
                 int index) -> {
             System.out.println("SELECT: " + index);
+            validateLinkageColsTab(index);
         };
         manager = new ColumnPairManager(history, linkageColsButtonPanel,
                 linkageColsEditingPanel, linkageColsTable);
@@ -352,6 +360,7 @@ public class MainWindow {
         } else
             secondDatasetWarningLbl.setVisible(false);
         manager.setSecondDatasetColumnNames(p.getColumnNames());
+        validateLinkageColsTab();
     }
 
     public void validateDatasetsTabBottomPart() {
@@ -408,9 +417,75 @@ public class MainWindow {
             return;
     }
 
+    public void validateLinkageColsTab(int rowIndex, String key) {
+        if (skipValidation)
+            return;
+        Object value = rowIndex >= 0
+                ? columnPairTableModel.getValue(rowIndex, key)
+                : null;
+        Collection<String> allowed;
+        boolean error;
+        JLabel lbl;
+        String type = rowIndex >= 0
+                ? columnPairTableModel.getStringValue(rowIndex, "type")
+                : "";
+        boolean isCopyType = "copy".equals(type);
+        switch (key) {
+        case "index_a":
+            allowed = manager.getFirstDatasetColumnNames();
+            error = rowIndex >= 0 && allowed != null && !allowed.contains(value)
+                    && !(isCopyType && "".equals(value == null ? "" : value));
+            lbl = linkageColsEditingPanel.getFirstNameWarningLbl();
+            lbl.setVisible(error);
+            lbl.setToolTipText(error
+                    ? "Non-existent column. Click the downwards arrow to see the list of columns."
+                    : "");
+            break;
+        case "index_b":
+            allowed = manager.getSecondDatasetColumnNames();
+            error = rowIndex >= 0 && allowed != null && !allowed.contains(value)
+                    && !(isCopyType && "".equals(value == null ? "" : value));
+            lbl = linkageColsEditingPanel.getSecondNameWarningLbl();
+            lbl.setVisible(error);
+            lbl.setToolTipText(error
+                    ? "Non-existent column. Click the downwards arrow to see the list of columns."
+                    : "");
+            break;
+        case "type":
+            allowed = linkageColsEditingPanel.getTypes();
+            error = rowIndex >= 0 && !allowed.contains(value);
+            lbl = linkageColsEditingPanel.getTypeWarningLbl();
+            lbl.setVisible(error);
+            lbl.setToolTipText(error
+                    ? "Invalid type. Click the downwards arrow to see the valid types."
+                    : "");
+            break;
+        case "weight":
+        case "phon_weight":
+        case "number":
+        case "rename_a":
+        case "rename_b":
+        default:
+            break;
+        }
+    }
+
+    public void validateLinkageColsTab(int index) {
+        if (skipValidation)
+            return;
+        String[] keys = { "number", "index_a", "index_b", "type", "weight",
+                "phon_weight", "rename_a", "rename_b" };
+        for (String key : keys)
+            validateLinkageColsTab(index, key);
+    }
+
     public void validateLinkageColsTab() {
         if (skipValidation)
             return;
+        int index = linkageColsTable.getSelectedRow();
+        if (index >= 0)
+            index = linkageColsTable.convertRowIndexToModel(index);
+        validateLinkageColsTab(index);
     }
 
     public void validateAllTabs() {

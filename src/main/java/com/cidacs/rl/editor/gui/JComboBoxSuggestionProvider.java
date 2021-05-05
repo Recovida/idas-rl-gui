@@ -103,6 +103,8 @@ public class JComboBoxSuggestionProvider {
             }
         }
         list1.addAll(list2);
+        if (list1.size() == 1 && list1.get(0).equals(value))
+            return;
         for (String v : list1) {
             JMenuItem item = new JMenuItem(v);
             item.addActionListener(e -> {

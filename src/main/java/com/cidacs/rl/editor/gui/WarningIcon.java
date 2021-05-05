@@ -36,14 +36,14 @@ public class WarningIcon extends JLabel {
     public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (visible && !ready) {
-            SwingUtilities.invokeLater(() -> {
-                int d = getSize().height; // square
-                System.out.println(d);
+            int d = getSize().height; // square
+            if (d > 0) {
                 setIcon(new ImageIcon(bufferedImage.getScaledInstance(d, d,
                         Image.SCALE_SMOOTH)));
                 setText("");
                 ready = true;
-            });
+            } else // not ready yet
+                SwingUtilities.invokeLater(() -> setVisible(visible));
         }
     }
 
