@@ -14,6 +14,7 @@ public class RenameColumnPairCellRenderer extends ColumnPairCellRenderer
     private String suffix = "";
 
     public RenameColumnPairCellRenderer(String nameKey) {
+        super();
         this.nameKey = nameKey;
     }
 

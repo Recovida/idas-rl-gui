@@ -427,7 +427,7 @@ public class LinkageColumnEditingPanel extends JPanel {
         return firstNameWarningLbl;
     }
 
-    public Collection<String> getTypes() {
+    public static Collection<String> getTypes() {
         return Arrays.asList(TYPES);
     }
 
