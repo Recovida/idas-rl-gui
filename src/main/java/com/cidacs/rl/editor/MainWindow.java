@@ -138,6 +138,7 @@ public class MainWindow {
     private JPanel linkageColsTabPanel;
 
     private ColumnPairManager manager;
+    private JButton checkBtn;
 
     /**
      * Launch the application.
@@ -508,18 +509,15 @@ public class MainWindow {
             String fileName) {
         switch (result) {
         case BLANK_NAME:
-            return String.format("File name should not be blank.", fileName);
+            return "File name should not be blank.";
         case FILE_NOT_FOUND:
-            return String.format("File “%s” does not exist.", fileName);
+            return "This file does not exist.";
         case IO_ERROR:
-            return String.format("File “%s” could not be read.", fileName);
+            return "This file could not be read.";
         case UNSUPPORTED_CONTENTS:
-            return String.format(
-                    "The contents of the file “%s” are not supported.",
-                    fileName);
+            return "Either this file has a different encoding than the specified below or its contents are not supported.";
         case UNSUPPORTED_FORMAT:
-            return String.format(
-                    "The format of the file “%s” is not supported.", fileName);
+            return "The format of this file is not supported.";
         default:
             return null;
         }
@@ -627,7 +625,7 @@ public class MainWindow {
         frame = new JFrame();
         frame.setPreferredSize(new Dimension(900, 500));
         frame.setMinimumSize(new Dimension(900, 400));
-        frame.setBounds(100, 100, 586, 377);
+        frame.setBounds(100, 100, 799, 481);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout(0, 0));
 
@@ -637,19 +635,20 @@ public class MainWindow {
         datasetsTabPanel = new JPanel();
         tabbedPane.addTab("Datasets", null, datasetsTabPanel, null);
         GridBagLayout gbl_datasetsTabPanel = new GridBagLayout();
-        gbl_datasetsTabPanel.columnWidths = new int[] { 200, 100, 200 };
-        gbl_datasetsTabPanel.rowHeights = new int[] { 10, 20, 30, 0, 30, 30,
+        gbl_datasetsTabPanel.columnWidths = new int[] { 35, 150, 150, 150, 35 };
+        gbl_datasetsTabPanel.rowHeights = new int[] { 10, 20, 30, 0, 30, 30, 0,
                 30 };
-        gbl_datasetsTabPanel.columnWeights = new double[] { 0.0, 0.0, 0.0 };
+        gbl_datasetsTabPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0,
+                0.0 };
         gbl_datasetsTabPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 1.0 };
+                0.0, 0.0, 0.0, 1.0 };
         datasetsTabPanel.setLayout(gbl_datasetsTabPanel);
 
         Component datasetsTabTopMargin = Box
                 .createRigidArea(new Dimension(20, 20));
         GridBagConstraints gbc_datasetsTabTopMargin = new GridBagConstraints();
         gbc_datasetsTabTopMargin.insets = new Insets(0, 0, 5, 5);
-        gbc_datasetsTabTopMargin.gridx = 1;
+        gbc_datasetsTabTopMargin.gridx = 2;
         gbc_datasetsTabTopMargin.gridy = 0;
         datasetsTabPanel.add(datasetsTabTopMargin, gbc_datasetsTabTopMargin);
 
@@ -659,7 +658,7 @@ public class MainWindow {
         GridBagConstraints gbc_firstDatasetLabel = new GridBagConstraints();
         gbc_firstDatasetLabel.weightx = 1.0;
         gbc_firstDatasetLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_firstDatasetLabel.gridx = 0;
+        gbc_firstDatasetLabel.gridx = 1;
         gbc_firstDatasetLabel.gridy = 1;
         datasetsTabPanel.add(firstDatasetLabel, gbc_firstDatasetLabel);
 
@@ -668,23 +667,29 @@ public class MainWindow {
                 .setFont(secondDatasetLabel.getFont().deriveFont(Font.BOLD));
         GridBagConstraints gbc_secondDatasetLabel = new GridBagConstraints();
         gbc_secondDatasetLabel.weightx = 1.0;
-        gbc_secondDatasetLabel.insets = new Insets(0, 0, 5, 0);
-        gbc_secondDatasetLabel.gridx = 2;
+        gbc_secondDatasetLabel.insets = new Insets(0, 0, 5, 5);
+        gbc_secondDatasetLabel.gridx = 3;
         gbc_secondDatasetLabel.gridy = 1;
         datasetsTabPanel.add(secondDatasetLabel, gbc_secondDatasetLabel);
+
+        firstDatasetWarningLbl = new WarningIcon();
+        GridBagConstraints gbc_firstDatasetWarningLbl = new GridBagConstraints();
+        gbc_firstDatasetWarningLbl.anchor = GridBagConstraints.EAST;
+        gbc_firstDatasetWarningLbl.insets = new Insets(0, 0, 5, 5);
+        gbc_firstDatasetWarningLbl.gridx = 0;
+        gbc_firstDatasetWarningLbl.gridy = 2;
+        datasetsTabPanel.add(firstDatasetWarningLbl,
+                gbc_firstDatasetWarningLbl);
 
         JPanel firstDatasetContainer = new JPanel();
         GridBagConstraints gbc_firstDatasetContainer = new GridBagConstraints();
         gbc_firstDatasetContainer.insets = new Insets(0, 0, 5, 5);
         gbc_firstDatasetContainer.fill = GridBagConstraints.HORIZONTAL;
-        gbc_firstDatasetContainer.gridx = 0;
+        gbc_firstDatasetContainer.gridx = 1;
         gbc_firstDatasetContainer.gridy = 2;
         datasetsTabPanel.add(firstDatasetContainer, gbc_firstDatasetContainer);
         firstDatasetContainer.setLayout(
                 new BoxLayout(firstDatasetContainer, BoxLayout.X_AXIS));
-
-        firstDatasetWarningLbl = new WarningIcon();
-        firstDatasetContainer.add(firstDatasetWarningLbl);
 
         firstDatasetField = new JTextField();
         firstDatasetField.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -707,15 +712,15 @@ public class MainWindow {
         JLabel fileNameLbl = new JLabel("File");
         GridBagConstraints gbc_fileNameLbl = new GridBagConstraints();
         gbc_fileNameLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_fileNameLbl.gridx = 1;
+        gbc_fileNameLbl.gridx = 2;
         gbc_fileNameLbl.gridy = 2;
         datasetsTabPanel.add(fileNameLbl, gbc_fileNameLbl);
 
         JPanel secondDatasetContainer = new JPanel();
         GridBagConstraints gbc_secondDatasetContainer = new GridBagConstraints();
-        gbc_secondDatasetContainer.insets = new Insets(0, 0, 5, 0);
+        gbc_secondDatasetContainer.insets = new Insets(0, 0, 5, 5);
         gbc_secondDatasetContainer.fill = GridBagConstraints.HORIZONTAL;
-        gbc_secondDatasetContainer.gridx = 2;
+        gbc_secondDatasetContainer.gridx = 3;
         gbc_secondDatasetContainer.gridy = 2;
         datasetsTabPanel.add(secondDatasetContainer,
                 gbc_secondDatasetContainer);
@@ -741,21 +746,33 @@ public class MainWindow {
         secondDatasetField.setColumns(10);
 
         secondDatasetWarningLbl = new WarningIcon();
-        secondDatasetContainer.add(secondDatasetWarningLbl);
+        GridBagConstraints gbc_secondDatasetWarningLbl = new GridBagConstraints();
+        gbc_secondDatasetWarningLbl.anchor = GridBagConstraints.WEST;
+        gbc_secondDatasetWarningLbl.insets = new Insets(0, 0, 5, 0);
+        gbc_secondDatasetWarningLbl.gridx = 4;
+        gbc_secondDatasetWarningLbl.gridy = 2;
+        datasetsTabPanel.add(secondDatasetWarningLbl,
+                gbc_secondDatasetWarningLbl);
+
+        firstEncodingWarningLbl = new WarningIcon();
+        GridBagConstraints gbc_firstEncodingWarningLbl = new GridBagConstraints();
+        gbc_firstEncodingWarningLbl.anchor = GridBagConstraints.EAST;
+        gbc_firstEncodingWarningLbl.insets = new Insets(0, 0, 5, 5);
+        gbc_firstEncodingWarningLbl.gridx = 0;
+        gbc_firstEncodingWarningLbl.gridy = 3;
+        datasetsTabPanel.add(firstEncodingWarningLbl,
+                gbc_firstEncodingWarningLbl);
 
         JPanel firstEncodingContainer = new JPanel();
         GridBagConstraints gbc_firstEncodingContainer = new GridBagConstraints();
         gbc_firstEncodingContainer.fill = GridBagConstraints.HORIZONTAL;
         gbc_firstEncodingContainer.insets = new Insets(0, 0, 5, 5);
-        gbc_firstEncodingContainer.gridx = 0;
+        gbc_firstEncodingContainer.gridx = 1;
         gbc_firstEncodingContainer.gridy = 3;
         datasetsTabPanel.add(firstEncodingContainer,
                 gbc_firstEncodingContainer);
         firstEncodingContainer.setLayout(
                 new BoxLayout(firstEncodingContainer, BoxLayout.X_AXIS));
-
-        firstEncodingWarningLbl = new WarningIcon();
-        firstEncodingContainer.add(firstEncodingWarningLbl);
 
         firstEncodingField = new JComboBoxWithPlaceholder();
         firstEncodingField.setEditable(true);
@@ -764,14 +781,16 @@ public class MainWindow {
 
         JLabel encodingLbl = new JLabel("Encoding");
         GridBagConstraints gbc_encodingLbl = new GridBagConstraints();
-        gbc_encodingLbl.gridx = 1;
+        gbc_encodingLbl.insets = new Insets(0, 0, 5, 5);
+        gbc_encodingLbl.gridx = 2;
         gbc_encodingLbl.gridy = 3;
         datasetsTabPanel.add(encodingLbl, gbc_encodingLbl);
 
         JPanel secondEncodingContainer = new JPanel();
         GridBagConstraints gbc_secondEncodingContainer = new GridBagConstraints();
+        gbc_secondEncodingContainer.insets = new Insets(0, 0, 5, 5);
         gbc_secondEncodingContainer.fill = GridBagConstraints.HORIZONTAL;
-        gbc_secondEncodingContainer.gridx = 2;
+        gbc_secondEncodingContainer.gridx = 3;
         gbc_secondEncodingContainer.gridy = 3;
         datasetsTabPanel.add(secondEncodingContainer,
                 gbc_secondEncodingContainer);
@@ -784,21 +803,33 @@ public class MainWindow {
         secondEncodingContainer.add(secondEncodingField);
 
         secondEncodingWarningLbl = new WarningIcon();
-        secondEncodingContainer.add(secondEncodingWarningLbl);
+        GridBagConstraints gbc_secondEncodingWarningLbl = new GridBagConstraints();
+        gbc_secondEncodingWarningLbl.anchor = GridBagConstraints.WEST;
+        gbc_secondEncodingWarningLbl.insets = new Insets(0, 0, 5, 0);
+        gbc_secondEncodingWarningLbl.gridx = 4;
+        gbc_secondEncodingWarningLbl.gridy = 3;
+        datasetsTabPanel.add(secondEncodingWarningLbl,
+                gbc_secondEncodingWarningLbl);
+
+        firstDatasetSuffixWarningLbl = new WarningIcon();
+        GridBagConstraints gbc_firstDatasetSuffixWarningLbl = new GridBagConstraints();
+        gbc_firstDatasetSuffixWarningLbl.anchor = GridBagConstraints.EAST;
+        gbc_firstDatasetSuffixWarningLbl.insets = new Insets(0, 0, 5, 5);
+        gbc_firstDatasetSuffixWarningLbl.gridx = 0;
+        gbc_firstDatasetSuffixWarningLbl.gridy = 4;
+        datasetsTabPanel.add(firstDatasetSuffixWarningLbl,
+                gbc_firstDatasetSuffixWarningLbl);
 
         JPanel firstDatasetSuffixContainer = new JPanel();
         GridBagConstraints gbc_firstDatasetSuffixContainer = new GridBagConstraints();
         gbc_firstDatasetSuffixContainer.fill = GridBagConstraints.BOTH;
         gbc_firstDatasetSuffixContainer.insets = new Insets(0, 0, 5, 5);
-        gbc_firstDatasetSuffixContainer.gridx = 0;
+        gbc_firstDatasetSuffixContainer.gridx = 1;
         gbc_firstDatasetSuffixContainer.gridy = 4;
         datasetsTabPanel.add(firstDatasetSuffixContainer,
                 gbc_firstDatasetSuffixContainer);
         firstDatasetSuffixContainer.setLayout(
                 new BoxLayout(firstDatasetSuffixContainer, BoxLayout.X_AXIS));
-
-        firstDatasetSuffixWarningLbl = new WarningIcon();
-        firstDatasetSuffixContainer.add(firstDatasetSuffixWarningLbl);
 
         firstDatasetSuffixField = new JTextFieldWithPlaceholder();
         firstDatasetSuffixContainer.add(firstDatasetSuffixField);
@@ -807,15 +838,15 @@ public class MainWindow {
         JLabel suffixLbl = new JLabel("Suffix");
         GridBagConstraints gbc_suffixLbl = new GridBagConstraints();
         gbc_suffixLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_suffixLbl.gridx = 1;
+        gbc_suffixLbl.gridx = 2;
         gbc_suffixLbl.gridy = 4;
         datasetsTabPanel.add(suffixLbl, gbc_suffixLbl);
 
         JPanel secondDatasetSuffixContainer = new JPanel();
         GridBagConstraints gbc_secondDatasetSuffixContainer = new GridBagConstraints();
         gbc_secondDatasetSuffixContainer.fill = GridBagConstraints.BOTH;
-        gbc_secondDatasetSuffixContainer.insets = new Insets(0, 0, 5, 0);
-        gbc_secondDatasetSuffixContainer.gridx = 2;
+        gbc_secondDatasetSuffixContainer.insets = new Insets(0, 0, 5, 5);
+        gbc_secondDatasetSuffixContainer.gridx = 3;
         gbc_secondDatasetSuffixContainer.gridy = 4;
         datasetsTabPanel.add(secondDatasetSuffixContainer,
                 gbc_secondDatasetSuffixContainer);
@@ -827,21 +858,33 @@ public class MainWindow {
         secondDatasetSuffixField.setColumns(10);
 
         secondDatasetSuffixWarningLbl = new WarningIcon();
-        secondDatasetSuffixContainer.add(secondDatasetSuffixWarningLbl);
+        GridBagConstraints gbc_secondDatasetSuffixWarningLbl = new GridBagConstraints();
+        gbc_secondDatasetSuffixWarningLbl.anchor = GridBagConstraints.WEST;
+        gbc_secondDatasetSuffixWarningLbl.insets = new Insets(0, 0, 5, 0);
+        gbc_secondDatasetSuffixWarningLbl.gridx = 4;
+        gbc_secondDatasetSuffixWarningLbl.gridy = 4;
+        datasetsTabPanel.add(secondDatasetSuffixWarningLbl,
+                gbc_secondDatasetSuffixWarningLbl);
+
+        firstDatasetRowNumColWarningLbl = new WarningIcon();
+        GridBagConstraints gbc_firstDatasetRowNumColWarningLbl = new GridBagConstraints();
+        gbc_firstDatasetRowNumColWarningLbl.anchor = GridBagConstraints.EAST;
+        gbc_firstDatasetRowNumColWarningLbl.insets = new Insets(0, 0, 5, 5);
+        gbc_firstDatasetRowNumColWarningLbl.gridx = 0;
+        gbc_firstDatasetRowNumColWarningLbl.gridy = 5;
+        datasetsTabPanel.add(firstDatasetRowNumColWarningLbl,
+                gbc_firstDatasetRowNumColWarningLbl);
 
         JPanel firstDatasetRowNumColContainer = new JPanel();
         GridBagConstraints gbc_firstDatasetRowNumColContainer = new GridBagConstraints();
         gbc_firstDatasetRowNumColContainer.fill = GridBagConstraints.BOTH;
         gbc_firstDatasetRowNumColContainer.insets = new Insets(0, 0, 5, 5);
-        gbc_firstDatasetRowNumColContainer.gridx = 0;
+        gbc_firstDatasetRowNumColContainer.gridx = 1;
         gbc_firstDatasetRowNumColContainer.gridy = 5;
         datasetsTabPanel.add(firstDatasetRowNumColContainer,
                 gbc_firstDatasetRowNumColContainer);
         firstDatasetRowNumColContainer.setLayout(new BoxLayout(
                 firstDatasetRowNumColContainer, BoxLayout.X_AXIS));
-
-        firstDatasetRowNumColWarningLbl = new WarningIcon();
-        firstDatasetRowNumColContainer.add(firstDatasetRowNumColWarningLbl);
 
         firstDatasetRowNumColField = new JTextFieldWithPlaceholder();
         firstDatasetRowNumColContainer.add(firstDatasetRowNumColField);
@@ -849,17 +892,16 @@ public class MainWindow {
 
         JLabel rowNumColLbl = new JLabel("Row number column name");
         GridBagConstraints gbc_rowNumColLbl = new GridBagConstraints();
-        gbc_rowNumColLbl.anchor = GridBagConstraints.EAST;
         gbc_rowNumColLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_rowNumColLbl.gridx = 1;
+        gbc_rowNumColLbl.gridx = 2;
         gbc_rowNumColLbl.gridy = 5;
         datasetsTabPanel.add(rowNumColLbl, gbc_rowNumColLbl);
 
         JPanel secondDatasetRowNumColContainer = new JPanel();
         GridBagConstraints gbc_secondDatasetRowNumColContainer = new GridBagConstraints();
         gbc_secondDatasetRowNumColContainer.fill = GridBagConstraints.BOTH;
-        gbc_secondDatasetRowNumColContainer.insets = new Insets(0, 0, 5, 0);
-        gbc_secondDatasetRowNumColContainer.gridx = 2;
+        gbc_secondDatasetRowNumColContainer.insets = new Insets(0, 0, 5, 5);
+        gbc_secondDatasetRowNumColContainer.gridx = 3;
         gbc_secondDatasetRowNumColContainer.gridy = 5;
         datasetsTabPanel.add(secondDatasetRowNumColContainer,
                 gbc_secondDatasetRowNumColContainer);
@@ -871,14 +913,28 @@ public class MainWindow {
         secondDatasetRowNumColField.setColumns(10);
 
         secondDatasetRowNumColWarningLbl = new WarningIcon();
-        secondDatasetRowNumColContainer.add(secondDatasetRowNumColWarningLbl);
+        GridBagConstraints gbc_secondDatasetRowNumColWarningLbl = new GridBagConstraints();
+        gbc_secondDatasetRowNumColWarningLbl.anchor = GridBagConstraints.WEST;
+        gbc_secondDatasetRowNumColWarningLbl.insets = new Insets(0, 0, 5, 0);
+        gbc_secondDatasetRowNumColWarningLbl.gridx = 4;
+        gbc_secondDatasetRowNumColWarningLbl.gridy = 5;
+        datasetsTabPanel.add(secondDatasetRowNumColWarningLbl,
+                gbc_secondDatasetRowNumColWarningLbl);
+
+        checkBtn = new JButton("Check files and encodings");
+        GridBagConstraints gbc_checkBtn = new GridBagConstraints();
+        gbc_checkBtn.fill = GridBagConstraints.HORIZONTAL;
+        gbc_checkBtn.insets = new Insets(0, 0, 5, 5);
+        gbc_checkBtn.gridx = 2;
+        gbc_checkBtn.gridy = 6;
+        datasetsTabPanel.add(checkBtn, gbc_checkBtn);
 
         Component datasetsTabBottomMargin = Box.createVerticalGlue();
         GridBagConstraints gbc_datasetsTabBottomMargin = new GridBagConstraints();
         gbc_datasetsTabBottomMargin.fill = GridBagConstraints.VERTICAL;
         gbc_datasetsTabBottomMargin.insets = new Insets(0, 0, 0, 5);
-        gbc_datasetsTabBottomMargin.gridx = 1;
-        gbc_datasetsTabBottomMargin.gridy = 6;
+        gbc_datasetsTabBottomMargin.gridx = 2;
+        gbc_datasetsTabBottomMargin.gridy = 7;
         datasetsTabPanel.add(datasetsTabBottomMargin,
                 gbc_datasetsTabBottomMargin);
 

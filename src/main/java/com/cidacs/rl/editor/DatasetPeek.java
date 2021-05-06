@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -26,6 +27,9 @@ public class DatasetPeek {
 
     public DatasetPeek(String fileName, String encoding) {
         this.fileName = fileName;
+        if (encoding != null && encoding.toUpperCase()
+                .replaceAll("[^A-Z0-9]", "").equals("ANSI"))
+            encoding = "Cp1252";
         this.encoding = encoding;
         this.columnNames = null;
     }
@@ -87,6 +91,7 @@ public class DatasetPeek {
             int c;
             CsvLineParseState state = CsvLineParseState.START;
             StringBuilder currentColumnName = new StringBuilder();
+            int readChars = 0;
             while (-1 != (c = reader.read())
                     && state != CsvLineParseState.FINAL) {
                 char ch = (char) c;
@@ -146,6 +151,8 @@ public class DatasetPeek {
                 case FINAL:
                     break;
                 }
+                if (++readChars > 10000)
+                    break;
             }
             if (currentColumnName.length() > 0) {
                 columnNames.add(currentColumnName.toString());
@@ -156,6 +163,9 @@ public class DatasetPeek {
         } catch (IOException e) {
             this.columnNames = null;
             return DatasetPeekResult.IO_ERROR;
+        } catch (UnsupportedCharsetException e) {
+            this.columnNames = null;
+            return DatasetPeekResult.UNSUPPORTED_CONTENTS;
         }
         return DatasetPeekResult.SUCCESS;
     }
