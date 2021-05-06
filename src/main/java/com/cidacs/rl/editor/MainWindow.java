@@ -69,6 +69,7 @@ import com.cidacs.rl.editor.gui.LinkageColumnButtonPanel;
 import com.cidacs.rl.editor.gui.LinkageColumnEditingPanel;
 import com.cidacs.rl.editor.gui.WarningIcon;
 import com.cidacs.rl.editor.gui.cellrendering.NameColumnPairCellRenderer;
+import com.cidacs.rl.editor.gui.cellrendering.NumberColumnPairCellRenderer;
 import com.cidacs.rl.editor.gui.cellrendering.PhonWeightColumnPairCellRenderer;
 import com.cidacs.rl.editor.gui.cellrendering.RenameColumnPairCellRenderer;
 import com.cidacs.rl.editor.gui.cellrendering.TypeColumnPairCellRenderer;
@@ -460,7 +461,7 @@ public class MainWindow {
                     : "");
             break;
         case "type":
-            allowed = linkageColsEditingPanel.getTypes();
+            allowed = LinkageColumnEditingPanel.getTypes();
             error = rowIndex >= 0 && !allowed.contains(value);
             lbl = linkageColsEditingPanel.getTypeWarningLbl();
             lbl.setVisible(error);
@@ -1054,6 +1055,9 @@ public class MainWindow {
         linkageColsTable.getColumnModel()
                 .getColumn(columnPairTableModel.getColumnIndex("type"))
                 .setCellRenderer(new TypeColumnPairCellRenderer());
+        linkageColsTable.getColumnModel()
+                .getColumn(columnPairTableModel.getColumnIndex("number"))
+                .setCellRenderer(new NumberColumnPairCellRenderer());
         JScrollPane linkageColsScrollPane = new JScrollPane(linkageColsTable);
         linkageColsTabPanel.add(linkageColsScrollPane);
 

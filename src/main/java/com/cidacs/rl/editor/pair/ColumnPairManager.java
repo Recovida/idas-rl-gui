@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -38,6 +39,7 @@ import com.cidacs.rl.editor.gui.ColumnPairTableModel;
 import com.cidacs.rl.editor.gui.LinkageColumnButtonPanel;
 import com.cidacs.rl.editor.gui.LinkageColumnEditingPanel;
 import com.cidacs.rl.editor.gui.cellrendering.NameColumnPairCellRenderer;
+import com.cidacs.rl.editor.gui.cellrendering.NumberColumnPairCellRenderer;
 import com.cidacs.rl.editor.gui.cellrendering.RenameColumnPairCellRenderer;
 import com.cidacs.rl.editor.listener.ColumnPairInclusionExclusionListener;
 import com.cidacs.rl.editor.listener.ColumnPairSelectionListener;
@@ -76,6 +78,8 @@ public class ColumnPairManager {
     protected List<ColumnPairSelectionListener> selectionListeners = new LinkedList<>();
     protected List<ColumnPairInclusionExclusionListener> rowInclusionExclusionListeners = new LinkedList<>();
     protected List<ColumnPairValueChangeListener> valueChangeListeners = new LinkedList<>();
+
+    protected Map<Integer, Collection<Integer>> numberToColIdx = new HashMap<>();
 
     public ColumnPairManager(UndoHistory history,
             LinkageColumnButtonPanel buttonPanel,
@@ -208,6 +212,13 @@ public class ColumnPairManager {
         editingPanel.getPhonWeightLbl().setVisible(false);
         editingPanel.getPhonWeightField().setVisible(false);
 
+        TableCellRenderer renderer = table.getColumnModel()
+                .getColumn(model.getColumnIndex("number")).getCellRenderer();
+        if (renderer instanceof NumberColumnPairCellRenderer) {
+            ((NumberColumnPairCellRenderer) renderer).setColIdxProvider(
+                    (int number) -> getColIdxWithNumber(number));
+        }
+
     }
 
     public UndoHistory getHistory() {
@@ -231,6 +242,14 @@ public class ColumnPairManager {
     }
 
     public int addColumnPair(int index, Object[] contents) {
+        int numberIndex = model.getColumnIndex("number");
+        if (contents != null && numberIndex < contents.length) {
+            int number = (int) contents[numberIndex];
+            if (!numberToColIdx.containsKey(number))
+                numberToColIdx.put(number, new HashSet<>());
+            numberToColIdx.get(number).add(index);
+            updateCellsWithNumber(number);
+        }
         model.insertRow(index, contents);
         int viewIndex = table.convertRowIndexToView(index);
         table.setRowSelectionInterval(viewIndex, viewIndex);
@@ -238,6 +257,13 @@ public class ColumnPairManager {
             if (listener != null)
                 listener.insertedColumnPair(index, contents);
         return index;
+    }
+
+    public void updateCellsWithNumber(int number) {
+        for (int i = 0; i < model.getRowCount(); i++)
+            if (Objects.equals(Integer.valueOf(number),
+                    model.getValue(i, "number")))
+                model.fireTableRowsUpdated(i, i);
     }
 
     public int addColumnPair(String type, String firstDatasetColumn,
@@ -267,20 +293,40 @@ public class ColumnPairManager {
     }
 
     public Object[] deleteColumnPair(int index) {
+        Integer number = (Integer) model.getValue(index, "number");
+        if (number != null) {
+            numberToColIdx.getOrDefault(number, Collections.emptySet())
+                    .remove(index);
+            updateCellsWithNumber(number);
+        }
         Object[] r = model.getRowAsArray(index);
         model.removeRow(index);
         int n = model.getRowCount();
-        if (index < n)
-            table.setRowSelectionInterval(index, index);
+        int viewIndex = table.convertColumnIndexToView(index);
+        if (viewIndex < n)
+            table.setRowSelectionInterval(viewIndex, viewIndex);
         else if (n > 0)
             table.setRowSelectionInterval(n - 1, n - 1);
         for (ColumnPairInclusionExclusionListener listener : rowInclusionExclusionListeners)
             if (listener != null)
-                listener.deletedColumnPair(index, r);
+                listener.deletedColumnPair(viewIndex, r);
         return r;
     }
 
     public void onChange(int rowIndex, String key, Object newValue) {
+        if ("number".equals(key)) {
+            Integer oldNumber = (Integer) model.getValue(rowIndex, "number");
+            Integer newNumber = (Integer) newValue;
+            if (!Objects.equals(oldNumber, newNumber)) {
+                if (oldNumber != null)
+                    numberToColIdx.get(oldNumber).remove(rowIndex);
+                if (!numberToColIdx.containsKey(newNumber))
+                    numberToColIdx.put(newNumber, new HashSet<>());
+                numberToColIdx.get(newNumber).add(rowIndex);
+                updateCellsWithNumber(oldNumber);
+                updateCellsWithNumber(newNumber);
+            }
+        }
         System.out.format("%d_%s = “%s”%n", rowIndex, key, newValue);
         ignoreSelectionEvent = true;
         model.setValue(rowIndex, key, newValue);
@@ -564,6 +610,11 @@ public class ColumnPairManager {
         this.secondRenameSuffix = Optional.of(secondRenameSuffix).orElse("");
         updateRenameFieldPlaceholder();
         updateRenameCellsPlaceholder();
+    }
+
+    public Collection<Integer> getColIdxWithNumber(int number) {
+        return Collections.unmodifiableCollection(
+                numberToColIdx.getOrDefault(number, Collections.emptySet()));
     }
 
 }
