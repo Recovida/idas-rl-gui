@@ -17,8 +17,8 @@ public class WarningIcon extends JLabel {
 
     private boolean ready = false;
 
-    private final Icon icon = UIManager.getIcon("OptionPane.errorIcon");
-    private final BufferedImage bufferedImage = new BufferedImage(
+    private static final Icon icon = UIManager.getIcon("OptionPane.errorIcon");
+    private static final BufferedImage bufferedImage = new BufferedImage(
             icon.getIconWidth(), icon.getIconHeight(),
             BufferedImage.TYPE_INT_ARGB);
 
@@ -38,13 +38,25 @@ public class WarningIcon extends JLabel {
         if (visible && !ready) {
             int d = getSize().height; // square
             if (d > 0) {
-                setIcon(new ImageIcon(bufferedImage.getScaledInstance(d, d,
-                        Image.SCALE_SMOOTH)));
+                applyIconToLabel(this, d);
                 setText("");
                 ready = true;
             } else // not ready yet
                 SwingUtilities.invokeLater(() -> setVisible(visible));
         }
+    }
+
+    public static void applyIconToLabel(JLabel label, int size) {
+        label.setIcon(new ImageIcon(bufferedImage.getScaledInstance(size, size,
+                Image.SCALE_SMOOTH)));
+    }
+
+    public static void applyIconToLabel(JLabel label) {
+        int d = label.getSize().height; // square
+        if (d > 0) {
+            applyIconToLabel(label);
+        } else // not ready yet
+            SwingUtilities.invokeLater(() -> applyIconToLabel(label));
     }
 
 }

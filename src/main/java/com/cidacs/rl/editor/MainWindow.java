@@ -68,7 +68,9 @@ import com.cidacs.rl.editor.gui.JTextFieldWithPlaceholder;
 import com.cidacs.rl.editor.gui.LinkageColumnButtonPanel;
 import com.cidacs.rl.editor.gui.LinkageColumnEditingPanel;
 import com.cidacs.rl.editor.gui.WarningIcon;
+import com.cidacs.rl.editor.gui.cellrendering.NameColumnPairCellRenderer;
 import com.cidacs.rl.editor.gui.cellrendering.PhonWeightColumnPairCellRenderer;
+import com.cidacs.rl.editor.gui.cellrendering.RenameColumnPairCellRenderer;
 import com.cidacs.rl.editor.gui.cellrendering.WeightColumnPairCellRenderer;
 import com.cidacs.rl.editor.listener.ColumnPairInclusionExclusionListener;
 import com.cidacs.rl.editor.listener.ColumnPairSelectionListener;
@@ -966,11 +968,6 @@ public class MainWindow {
         indexDirField.setColumns(10);
 
         JButton indexDirBtn = new JButton("Select...");
-        indexDirBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            }
-        });
         indexDirContainer.add(indexDirBtn);
 
         JLabel minScoreLbl = new JLabel("Minimum score");
@@ -1041,6 +1038,18 @@ public class MainWindow {
         linkageColsTable.getColumnModel()
                 .getColumn(columnPairTableModel.getColumnIndex("phon_weight"))
                 .setCellRenderer(new PhonWeightColumnPairCellRenderer());
+        linkageColsTable.getColumnModel()
+                .getColumn(columnPairTableModel.getColumnIndex("rename_a"))
+                .setCellRenderer(new RenameColumnPairCellRenderer("index_a"));
+        linkageColsTable.getColumnModel()
+                .getColumn(columnPairTableModel.getColumnIndex("rename_b"))
+                .setCellRenderer(new RenameColumnPairCellRenderer("index_b"));
+        linkageColsTable.getColumnModel()
+                .getColumn(columnPairTableModel.getColumnIndex("index_a"))
+                .setCellRenderer(new NameColumnPairCellRenderer());
+        linkageColsTable.getColumnModel()
+                .getColumn(columnPairTableModel.getColumnIndex("index_b"))
+                .setCellRenderer(new NameColumnPairCellRenderer());
         JScrollPane linkageColsScrollPane = new JScrollPane(linkageColsTable);
         linkageColsTabPanel.add(linkageColsScrollPane);
 

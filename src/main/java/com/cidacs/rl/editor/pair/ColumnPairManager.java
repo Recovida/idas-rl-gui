@@ -27,6 +27,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.Document;
@@ -36,6 +37,8 @@ import com.cidacs.rl.editor.gui.BulkCopyColumnInclusionDialogue;
 import com.cidacs.rl.editor.gui.ColumnPairTableModel;
 import com.cidacs.rl.editor.gui.LinkageColumnButtonPanel;
 import com.cidacs.rl.editor.gui.LinkageColumnEditingPanel;
+import com.cidacs.rl.editor.gui.cellrendering.NameColumnPairCellRenderer;
+import com.cidacs.rl.editor.gui.cellrendering.RenameColumnPairCellRenderer;
 import com.cidacs.rl.editor.listener.ColumnPairInclusionExclusionListener;
 import com.cidacs.rl.editor.listener.ColumnPairSelectionListener;
 import com.cidacs.rl.editor.listener.ColumnPairValueChangeListener;
@@ -318,6 +321,24 @@ public class ColumnPairManager {
                 name.isEmpty() ? "" : (name + "_" + secondRenameSuffix));
     }
 
+    protected void updateRenameCellsPlaceholder() {
+        TableCellRenderer renderer;
+        renderer = table.getColumnModel()
+                .getColumn(model.getColumnIndex("rename_a")).getCellRenderer();
+        if (renderer instanceof RenameColumnPairCellRenderer) {
+            ((RenameColumnPairCellRenderer) renderer)
+                    .setSuffix(firstRenameSuffix);
+        }
+        renderer = table.getColumnModel()
+                .getColumn(model.getColumnIndex("rename_b")).getCellRenderer();
+        if (renderer instanceof RenameColumnPairCellRenderer) {
+            ((RenameColumnPairCellRenderer) renderer)
+                    .setSuffix(secondRenameSuffix);
+        }
+        if (model.getRowCount() > 0)
+            model.fireTableRowsUpdated(0, model.getRowCount() - 1);
+    }
+
     protected void associateKeyWithField(String key, JSpinner field) {
         fieldFromKey.put(key, field);
         JFormattedTextField tf = ((JSpinner.DefaultEditor) field.getEditor())
@@ -464,6 +485,15 @@ public class ColumnPairManager {
         buttonPanel.getAddCopyColsBtn()
                 .setEnabled(firstDatasetColumnNames != null
                         || secondDatasetColumnNames != null);
+        TableCellRenderer renderer = table.getColumnModel()
+                .getColumn(model.getColumnIndex("index_a")).getCellRenderer();
+        if (renderer instanceof NameColumnPairCellRenderer) {
+            ((NameColumnPairCellRenderer) renderer)
+                    .setValidNames(firstDatasetColumnNames);
+            if (model.getRowCount() > 0)
+                model.fireTableRowsUpdated(0, model.getRowCount() - 1);
+        }
+
     }
 
     public Collection<String> getSecondDatasetColumnNames() {
@@ -484,6 +514,14 @@ public class ColumnPairManager {
         buttonPanel.getAddCopyColsBtn()
                 .setEnabled(firstDatasetColumnNames != null
                         || secondDatasetColumnNames != null);
+        TableCellRenderer renderer = table.getColumnModel()
+                .getColumn(model.getColumnIndex("index_b")).getCellRenderer();
+        if (renderer instanceof NameColumnPairCellRenderer) {
+            ((NameColumnPairCellRenderer) renderer)
+                    .setValidNames(secondDatasetColumnNames);
+            if (model.getRowCount() > 0)
+                model.fireTableRowsUpdated(0, model.getRowCount() - 1);
+        }
     }
 
     public void setComboBoxItems(JComboBox<String> field,
@@ -515,6 +553,7 @@ public class ColumnPairManager {
     public void setFirstRenameSuffix(String firstRenameSuffix) {
         this.firstRenameSuffix = Optional.of(firstRenameSuffix).orElse("");
         updateRenameFieldPlaceholder();
+        updateRenameCellsPlaceholder();
     }
 
     public String getSecondRenameSuffix() {
@@ -524,6 +563,7 @@ public class ColumnPairManager {
     public void setSecondRenameSuffix(String secondRenameSuffix) {
         this.secondRenameSuffix = Optional.of(secondRenameSuffix).orElse("");
         updateRenameFieldPlaceholder();
+        updateRenameCellsPlaceholder();
     }
 
 }

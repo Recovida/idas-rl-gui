@@ -53,6 +53,10 @@ public class ColumnPairTableModel extends DefaultTableModel {
         super.setValueAt(value, rowIndex, colIndex);
         if (colIndex == getColumnIndex("type"))
             fireTableRowsUpdated(rowIndex, rowIndex);
+        else if (colIndex == getColumnIndex("index_a"))
+            fireTableCellUpdated(rowIndex, getColumnIndex("rename_a"));
+        else if (colIndex == getColumnIndex("index_b"))
+            fireTableCellUpdated(rowIndex, getColumnIndex("rename_b"));
     }
 
     public void setValue(int rowIndex, String key, Object value) {

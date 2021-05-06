@@ -9,6 +9,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 import com.cidacs.rl.editor.gui.ColumnPairTableModel;
+import com.cidacs.rl.editor.gui.WarningIcon;
 
 public abstract class ColumnPairCellRenderer extends JLabel
         implements TableCellRenderer {
@@ -33,6 +34,19 @@ public abstract class ColumnPairCellRenderer extends JLabel
 
     protected Color getErrorColour(boolean isSelected) {
         return !isSelected ? new Color(255, 0, 0) : new Color(255, 150, 150);
+    }
+
+    protected Color getPlaceholderColour(boolean isSelected) {
+        return !isSelected ? Color.GRAY : Color.LIGHT_GRAY;
+    }
+
+    protected void showErrorIcon(JTable table, JLabel c) {
+        WarningIcon.applyIconToLabel(c, table.getRowHeight() * 4 / 5);
+    }
+
+    protected void showErrorIcon(JTable table, Component c) {
+        if (c instanceof JLabel)
+            showErrorIcon(table, (JLabel) c);
     }
 
 }
