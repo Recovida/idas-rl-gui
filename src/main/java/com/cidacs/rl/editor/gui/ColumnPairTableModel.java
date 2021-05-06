@@ -48,6 +48,13 @@ public class ColumnPairTableModel extends DefaultTableModel {
         return (Double) getValue(rowIndex, key);
     }
 
+    @Override
+    public void setValueAt(Object value, int rowIndex, int colIndex) {
+        super.setValueAt(value, rowIndex, colIndex);
+        if (colIndex == getColumnIndex("type"))
+            fireTableRowsUpdated(rowIndex, rowIndex);
+    }
+
     public void setValue(int rowIndex, String key, Object value) {
         setValueAt(value, rowIndex, indexFromKey.get(key));
     }

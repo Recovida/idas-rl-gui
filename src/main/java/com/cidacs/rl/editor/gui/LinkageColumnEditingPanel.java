@@ -36,7 +36,6 @@ public class LinkageColumnEditingPanel extends JPanel {
     private JComboBox<String> firstNameField;
     private JSpinner numberField;
     private JComboBox<String> secondNameField;
-    private WarningIcon phonWeightWarningLbl;
     private WarningIcon weightWarningLbl;
     private WarningIcon typeWarningLbl;
     private WarningIcon secondNameWarningLbl;
@@ -44,6 +43,10 @@ public class LinkageColumnEditingPanel extends JPanel {
     private WarningIcon firstNameWarningLbl;
 
     private JLabel phonWeightLbl;
+
+    private JLabel weightLbl;
+
+    private WarningIcon phonWeightWarningLbl;
 
     public JTextFieldWithPlaceholder getFirstRenameField() {
         return firstRenameField;
@@ -83,11 +86,11 @@ public class LinkageColumnEditingPanel extends JPanel {
         JPanel panel = new JPanel();
         add(panel);
         GridBagLayout gbl_panel = new GridBagLayout();
-        gbl_panel.columnWidths = new int[] { 0, 60, 30, 40, 30, 40, 40, 30, 30,
-                80, 0 };
-        gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+        gbl_panel.columnWidths = new int[] { 0, 50, 35, 60, 35, 50, 45, 35, 35,
+                40, 35 };
+        gbl_panel.rowHeights = new int[] { 0, 35, 35, 35, 35, 0, 0 };
         gbl_panel.columnWeights = new double[] { 0.0, 1.0, 0.0, 1.0, 0.0, 1.0,
-                1.0, 0.0, 0.0, 1.0, 0.0 };
+                1.0, 0.0, 0.0, 1.0, 0.0, 0.0 };
         gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 Double.MIN_VALUE };
         panel.setLayout(gbl_panel);
@@ -257,7 +260,7 @@ public class LinkageColumnEditingPanel extends JPanel {
         gbc_typeLbl.gridy = 3;
         panel.add(typeLbl, gbc_typeLbl);
 
-        JLabel weightLbl = new JLabel("Weight");
+        weightLbl = new JLabel("Weight");
         weightLbl.setVerticalAlignment(SwingConstants.BOTTOM);
         weightLbl.setVerticalTextPosition(SwingConstants.BOTTOM);
         weightLbl.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -331,19 +334,6 @@ public class LinkageColumnEditingPanel extends JPanel {
         weightField.setPreferredSize(new Dimension(65, 30));
         weightField.setMinimumSize(new Dimension(50, 30));
 
-        JPanel phonWeightContainer = new JPanel();
-        GridBagConstraints gbc_phonWeightContainer = new GridBagConstraints();
-        gbc_phonWeightContainer.fill = GridBagConstraints.BOTH;
-        gbc_phonWeightContainer.insets = new Insets(0, 0, 5, 5);
-        gbc_phonWeightContainer.gridx = 6;
-        gbc_phonWeightContainer.gridy = 4;
-        panel.add(phonWeightContainer, gbc_phonWeightContainer);
-        phonWeightContainer.setLayout(
-                new BoxLayout(phonWeightContainer, BoxLayout.X_AXIS));
-
-        phonWeightWarningLbl = new WarningIcon();
-        phonWeightContainer.add(phonWeightWarningLbl);
-
         weightWarningLbl = new WarningIcon();
         GridBagConstraints gbc_weightWarningLbl = new GridBagConstraints();
         gbc_weightWarningLbl.anchor = GridBagConstraints.WEST;
@@ -352,22 +342,35 @@ public class LinkageColumnEditingPanel extends JPanel {
         gbc_weightWarningLbl.gridy = 4;
         panel.add(weightWarningLbl, gbc_weightWarningLbl);
 
+        JPanel phonWeightContainer = new JPanel();
+        GridBagConstraints gbc_phonWeightContainer = new GridBagConstraints();
+        gbc_phonWeightContainer.fill = GridBagConstraints.BOTH;
+        gbc_phonWeightContainer.insets = new Insets(0, 0, 5, 5);
+        gbc_phonWeightContainer.gridx = 9;
+        gbc_phonWeightContainer.gridy = 4;
+        panel.add(phonWeightContainer, gbc_phonWeightContainer);
+        phonWeightContainer.setLayout(
+                new BoxLayout(phonWeightContainer, BoxLayout.X_AXIS));
+
         phonWeightField = new JSpinnerWithBlankValue(
                 new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1));
-        GridBagConstraints gbc_phonWeightField = new GridBagConstraints();
-        gbc_phonWeightField.fill = GridBagConstraints.HORIZONTAL;
-        gbc_phonWeightField.insets = new Insets(0, 0, 5, 5);
-        gbc_phonWeightField.gridx = 9;
-        gbc_phonWeightField.gridy = 4;
-        panel.add(phonWeightField, gbc_phonWeightField);
+        phonWeightContainer.add(phonWeightField);
         phonWeightField.setBlankValue(zero);
         phonWeightField.setEditor(
                 new JSpinner.NumberEditor(phonWeightField, "0.0000"));
         phonWeightField.setPreferredSize(new Dimension(65, 30));
         phonWeightField.setMinimumSize(new Dimension(50, 30));
+
+        phonWeightWarningLbl = new WarningIcon();
+        GridBagConstraints gbc_phonWeightWarningLbl = new GridBagConstraints();
+        gbc_phonWeightWarningLbl.anchor = GridBagConstraints.WEST;
+        gbc_phonWeightWarningLbl.insets = new Insets(0, 0, 5, 5);
+        gbc_phonWeightWarningLbl.gridx = 10;
+        gbc_phonWeightWarningLbl.gridy = 4;
+        panel.add(phonWeightWarningLbl, gbc_phonWeightWarningLbl);
         GridBagConstraints gbc_rightHorizontalGlue = new GridBagConstraints();
         gbc_rightHorizontalGlue.insets = new Insets(0, 0, 5, 0);
-        gbc_rightHorizontalGlue.gridx = 10;
+        gbc_rightHorizontalGlue.gridx = 11;
         gbc_rightHorizontalGlue.gridy = 4;
         panel.add(rightHorizontalGlue, gbc_rightHorizontalGlue);
 
@@ -430,6 +433,10 @@ public class LinkageColumnEditingPanel extends JPanel {
 
     public JLabel getPhonWeightLbl() {
         return phonWeightLbl;
+    }
+
+    public JLabel getWeightLbl() {
+        return weightLbl;
     }
 
 }

@@ -204,6 +204,7 @@ public class ColumnPairManager {
 
         editingPanel.getPhonWeightLbl().setVisible(false);
         editingPanel.getPhonWeightField().setVisible(false);
+
     }
 
     public UndoHistory getHistory() {
@@ -247,6 +248,7 @@ public class ColumnPairManager {
             contents[model.getColumnIndex("index_b")] = secondDatasetColumn;
         if (type != null)
             contents[model.getColumnIndex("type")] = type;
+        contents[model.getColumnIndex("weight")] = 0.0;
         return addColumnPair(model.getRowCount(), contents);
     }
 
@@ -284,9 +286,12 @@ public class ColumnPairManager {
             if (listener != null)
                 listener.changed(rowIndex, key, newValue);
         if ("type".equals(key)) {
-            boolean phon = "name".equals(newValue);
-            editingPanel.getPhonWeightLbl().setVisible(phon);
-            editingPanel.getPhonWeightField().setVisible(phon);
+            boolean hasPhonWeight = "name".equals(newValue);
+            boolean hasWeight = !"copy".equals(newValue);
+            editingPanel.getPhonWeightLbl().setVisible(hasPhonWeight);
+            editingPanel.getPhonWeightField().setVisible(hasPhonWeight);
+            editingPanel.getWeightField().setVisible(hasWeight);
+            editingPanel.getWeightLbl().setVisible(hasWeight);
         } else if ("index_a".equals(key) || "index_b".equals(key)) {
             updateRenameFieldPlaceholder();
         }

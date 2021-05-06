@@ -68,6 +68,8 @@ import com.cidacs.rl.editor.gui.JTextFieldWithPlaceholder;
 import com.cidacs.rl.editor.gui.LinkageColumnButtonPanel;
 import com.cidacs.rl.editor.gui.LinkageColumnEditingPanel;
 import com.cidacs.rl.editor.gui.WarningIcon;
+import com.cidacs.rl.editor.gui.cellrendering.PhonWeightColumnPairCellRenderer;
+import com.cidacs.rl.editor.gui.cellrendering.WeightColumnPairCellRenderer;
 import com.cidacs.rl.editor.listener.ColumnPairInclusionExclusionListener;
 import com.cidacs.rl.editor.listener.ColumnPairSelectionListener;
 import com.cidacs.rl.editor.listener.ColumnPairValueChangeListener;
@@ -1033,7 +1035,12 @@ public class MainWindow {
         linkageColsTable.setRowSorter(sorter);
         linkageColsTable.setUpdateSelectionOnSort(true);
         sorter.setSortsOnUpdates(true);
-
+        linkageColsTable.getColumnModel()
+                .getColumn(columnPairTableModel.getColumnIndex("weight"))
+                .setCellRenderer(new WeightColumnPairCellRenderer());
+        linkageColsTable.getColumnModel()
+                .getColumn(columnPairTableModel.getColumnIndex("phon_weight"))
+                .setCellRenderer(new PhonWeightColumnPairCellRenderer());
         JScrollPane linkageColsScrollPane = new JScrollPane(linkageColsTable);
         linkageColsTabPanel.add(linkageColsScrollPane);
 

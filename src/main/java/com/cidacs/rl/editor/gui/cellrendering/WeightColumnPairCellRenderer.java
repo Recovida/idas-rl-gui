@@ -1,0 +1,30 @@
+package com.cidacs.rl.editor.gui.cellrendering;
+
+import java.awt.Component;
+
+import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
+
+public class WeightColumnPairCellRenderer extends ColumnPairCellRenderer
+        implements TableCellRenderer {
+
+    private static final long serialVersionUID = 4089960339928197149L;
+
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value,
+            boolean isSelected, boolean hasFocus, int row, int column) {
+        System.out.println(row + ", " + column + ": " + value);
+        if (shouldBeBlank(table, row))
+            value = "";
+        Component c = getDefaultRenderer(table, value, isSelected, hasFocus,
+                row, column);
+        if (value instanceof Double && ((Double) value) < 0)
+            c.setForeground(getErrorColour(isSelected));
+        return c;
+    }
+
+    public boolean shouldBeBlank(JTable table, int row) {
+        return "copy".equals(getValue(table, row, "type"));
+    }
+
+}
