@@ -29,7 +29,7 @@ public class WarningIcon extends JLabel {
         Graphics2D g = bufferedImage.createGraphics();
         icon.paintIcon(null, g, 0, 0);
         g.dispose();
-        setVisible(true);
+        setVisible(false);
     }
 
     @Override

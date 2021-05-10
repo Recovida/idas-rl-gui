@@ -175,6 +175,8 @@ public class ColumnPairManager {
                             .setText(model.getStringValue(index, "rename_a"));
                     editingPanel.getSecondRenameField()
                             .setText(model.getStringValue(index, "rename_b"));
+                    updateWeightFieldVisibility(
+                            model.getStringValue(index, "type"));
                     editingPanel.setEnabled(true);
                     completelyIgnoreChangeEvent = false;
                 }
@@ -281,6 +283,10 @@ public class ColumnPairManager {
         return addColumnPair(model.getRowCount(), contents);
     }
 
+    public int addColumnPair() {
+        return addColumnPair(null, null, null);
+    }
+
     protected int getNextNumber(AtomicInteger counter) {
         Set<Integer> used = new HashSet<>();
         for (int i = 0; i < model.getRowCount(); i++)
@@ -335,15 +341,19 @@ public class ColumnPairManager {
             if (listener != null)
                 listener.changed(rowIndex, key, newValue);
         if ("type".equals(key)) {
-            boolean hasPhonWeight = "name".equals(newValue);
-            boolean hasWeight = !"copy".equals(newValue);
-            editingPanel.getPhonWeightLbl().setVisible(hasPhonWeight);
-            editingPanel.getPhonWeightField().setVisible(hasPhonWeight);
-            editingPanel.getWeightField().setVisible(hasWeight);
-            editingPanel.getWeightLbl().setVisible(hasWeight);
+            updateWeightFieldVisibility((String) newValue);
         } else if ("index_a".equals(key) || "index_b".equals(key)) {
             updateRenameFieldPlaceholder();
         }
+    }
+
+    protected void updateWeightFieldVisibility(String type) {
+        boolean hasPhonWeight = "name".equals(type);
+        boolean hasWeight = !"copy".equals(type);
+        editingPanel.getPhonWeightLbl().setVisible(hasPhonWeight);
+        editingPanel.getPhonWeightField().setVisible(hasPhonWeight);
+        editingPanel.getWeightField().setVisible(hasWeight);
+        editingPanel.getWeightLbl().setVisible(hasWeight);
     }
 
     protected void updateRenameFieldPlaceholder() {

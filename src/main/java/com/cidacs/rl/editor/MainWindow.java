@@ -93,7 +93,7 @@ public class MainWindow {
     ConfigurationFile cf = new ConfigurationFile();
     String currentFileName = null;
     private JLabel currentFileLbl;
-    boolean dirty = true;
+    boolean dirty = false;
     boolean skipValidation = false; // while filling in values read from file
 
     /* Non-GUI components */
@@ -534,6 +534,7 @@ public class MainWindow {
                 ((JComboBox<String>) item.getGuiComponent())
                         .setSelectedItem("");
         }
+        columnPairTableModel.setRowCount(0);
     }
 
     protected static boolean isValidEncoding(String enc) {
