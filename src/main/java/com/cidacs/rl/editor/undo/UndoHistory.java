@@ -139,4 +139,12 @@ public class UndoHistory {
         return summary;
     }
 
+    public void clearAll() {
+        HistoryPropertyState oldState = HistoryPropertyState.get(this);
+        commandList = new LinkedList<>();
+        commandListIterator = commandList.listIterator();
+        cleanIndex = 0;
+        HistoryPropertyState.get(this).notifyIfChanged(oldState, listeners);
+    }
+
 }

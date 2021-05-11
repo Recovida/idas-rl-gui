@@ -329,7 +329,6 @@ public class LinkageColumnEditingPanel extends JPanel {
         weightField = new JSpinnerWithBlankValue(
                 new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1));
         weightContainer.add(weightField);
-        weightField.setBlankValue(zero);
         weightField.setEditor(new JSpinner.NumberEditor(weightField, "0.0000"));
         weightField.setPreferredSize(new Dimension(65, 30));
         weightField.setMinimumSize(new Dimension(50, 30));

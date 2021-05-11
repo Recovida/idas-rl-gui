@@ -11,7 +11,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Path;
@@ -183,26 +182,28 @@ public class MainWindow {
             tabbedPane.setSelectedComponent(datasetsTabPanel);
             validateDatasetsTabBottomPart();
         };
+
         cf.addSettingItem("db_a", new StringSettingItem(history, "", "",
                 firstDatasetField, datasetsTabEventListenerTop));
-        cf.addSettingItem("db_b", new StringSettingItem(history, "", "",
-                secondDatasetField, datasetsTabEventListenerTop));
+        cf.addSettingItem("encoding_a", new StringSettingItemWithList(history,
+                "", "UTF-8", firstEncodingField, datasetsTabEventListenerTop));
         cf.addSettingItem("suffix_a", new StringSettingItem(history, "", "_dsa",
                 firstDatasetSuffixField, datasetsTabEventListenerBottom));
-        cf.addSettingItem("suffix_b", new StringSettingItem(history, "", "_dsb",
-                secondDatasetSuffixField, datasetsTabEventListenerBottom));
         cf.addSettingItem("row_num_col_a",
                 new StringSettingItem(history, "", "#A",
                         firstDatasetRowNumColField,
                         datasetsTabEventListenerBottom));
+
+        cf.addSettingItem("db_b", new StringSettingItem(history, "", "",
+                secondDatasetField, datasetsTabEventListenerTop));
+        cf.addSettingItem("encoding_b", new StringSettingItemWithList(history,
+                "", "UTF-8", secondEncodingField, datasetsTabEventListenerTop));
+        cf.addSettingItem("suffix_b", new StringSettingItem(history, "", "_dsb",
+                secondDatasetSuffixField, datasetsTabEventListenerBottom));
         cf.addSettingItem("row_num_col_b",
                 new StringSettingItem(history, "", "#B",
                         secondDatasetRowNumColField,
                         datasetsTabEventListenerBottom));
-        cf.addSettingItem("encoding_a", new StringSettingItemWithList(history,
-                "", "UTF-8", firstEncodingField, datasetsTabEventListenerTop));
-        cf.addSettingItem("encoding_b", new StringSettingItemWithList(history,
-                "", "UTF-8", secondEncodingField, datasetsTabEventListenerTop));
 
         // Tab: OPTIONS
         SettingItemChangeListener optionsTabEventListener = (o) -> {
@@ -560,7 +561,12 @@ public class MainWindow {
 
     protected void doOpen() {
         if (dirty) {
-            promptToSave();
+            int ans = promptToSaveChanges();
+            if (ans == JOptionPane.YES_OPTION)
+                doSave();
+            else if (ans == JOptionPane.CANCEL_OPTION
+                    || ans == JOptionPane.CLOSED_OPTION)
+                return;
         }
         String newConfigFileName = selectConfigFile(currentFileName == null
                 ? null
@@ -568,48 +574,57 @@ public class MainWindow {
         if (newConfigFileName != null) {
             skipValidation = true;
             clearAllFields();
-            try {
-                cf.load(newConfigFileName);
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        tabbedPane.setSelectedComponent(datasetsTabPanel);
-                    }
-
-                });
+            Component selectedComponent = tabbedPane.getSelectedComponent();
+            if (cf.load(newConfigFileName)) {
+                if (selectedComponent != null)
+                    SwingUtilities.invokeLater(() -> {
+                        tabbedPane.setSelectedComponent(selectedComponent);
+                    });
                 currentFileName = newConfigFileName;
                 dirty = false;
                 updateConfigFileLabel();
-            } catch (IOException e1) {
-                System.err.println("ERROR");
-            } finally {
-                skipValidation = false;
                 validateAllTabs();
+                history.clearAll();
+                manager.resetDefaultNumbers();
             }
+            skipValidation = false;
         }
     }
 
     protected void doSave() {
         if (currentFileName == null) {
             doSaveAs();
-        } else {
+            return;
+        }
 
+        if (cf.save(currentFileName)) {
+            dirty = false;
+            updateConfigFileLabel();
+            history.setClean();
         }
     }
 
     protected void doSaveAs() {
-
+        String fn = selectConfigFile(currentFileName, true);
+        if (fn != null) {
+            currentFileName = fn;
+            doSave();
+        }
     }
 
     protected void doExit() {
         if (dirty) {
-            promptToSave();
+            int ans = promptToSaveChanges();
+            if (ans == JOptionPane.YES_OPTION)
+                doSave();
+            else if (ans == JOptionPane.CANCEL_OPTION
+                    || ans == JOptionPane.CLOSED_OPTION)
+                return;
         }
         frame.dispose();
     }
 
-    protected int promptToSave() {
+    protected int promptToSaveChanges() {
         String msg = (currentFileName == null
                 ? "Save the contents of this currently unsaved file?"
                 : String.format("Save the changes made to the file “%s”?",
@@ -1219,7 +1234,7 @@ public class MainWindow {
         return null;
     }
 
-    private String selectConfigFile(String fileName) {
+    private String selectConfigFile(String fileName, boolean save) {
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(
                 fileName != null ? new File(fileName).getParentFile()
@@ -1228,10 +1243,15 @@ public class MainWindow {
                 "Properties file (properties)", "properties", "ini");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
-        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+        int result = save ? chooser.showSaveDialog(frame)
+                : chooser.showOpenDialog(frame);
+        if (result == JFileChooser.APPROVE_OPTION)
             return chooser.getSelectedFile().getAbsolutePath();
-        }
         return null;
+    }
+
+    private String selectConfigFile(String fileName) {
+        return selectConfigFile(fileName, false);
     }
 
     private void updateConfigFileLabel() {

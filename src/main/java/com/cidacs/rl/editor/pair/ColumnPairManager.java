@@ -63,8 +63,12 @@ public class ColumnPairManager {
     protected String firstRenameSuffix = "";
     protected String secondRenameSuffix = "";
 
-    protected AtomicInteger nextNumber = new AtomicInteger(1);
-    protected AtomicInteger nextCopyNumber = new AtomicInteger(201);
+    public final int FIRST_NUMBER = 1;
+    public final int FIRST_COPY_NUMBER = 201;
+
+    protected final AtomicInteger nextNumber = new AtomicInteger(FIRST_NUMBER);
+    protected final AtomicInteger nextCopyNumber = new AtomicInteger(
+            FIRST_COPY_NUMBER);
 
     protected boolean ignoreSelectionEvent = false;
     protected boolean ignoreChangeEvent = false;
@@ -285,6 +289,14 @@ public class ColumnPairManager {
 
     public int addColumnPair() {
         return addColumnPair(null, null, null);
+    }
+
+    public Map<String, Object> getColumnPair(int index) {
+        return model.getRowAsMap(index);
+    }
+
+    public int getColumnPairCount() {
+        return model.getRowCount();
     }
 
     protected int getNextNumber(AtomicInteger counter) {
@@ -625,6 +637,11 @@ public class ColumnPairManager {
     public Collection<Integer> getColIdxWithNumber(int number) {
         return Collections.unmodifiableCollection(
                 numberToColIdx.getOrDefault(number, Collections.emptySet()));
+    }
+
+    public void resetDefaultNumbers() {
+        nextNumber.set(FIRST_NUMBER);
+        nextCopyNumber.set(FIRST_COPY_NUMBER);
     }
 
 }

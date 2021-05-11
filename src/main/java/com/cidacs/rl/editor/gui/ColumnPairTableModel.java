@@ -1,6 +1,7 @@
 package com.cidacs.rl.editor.gui;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.table.DefaultTableModel;
@@ -67,6 +68,14 @@ public class ColumnPairTableModel extends DefaultTableModel {
         Object[] r = new Object[getColumnCount()];
         for (int i = 0; i < getColumnCount(); i++)
             r[i] = getValueAt(rowIndex, i);
+        return r;
+    }
+
+    public Map<String, Object> getRowAsMap(int rowIndex) {
+        Map<String, Object> r = new LinkedHashMap<>();
+        for (int i = 0; i < getColumnCount(); i++) {
+            r.put(keys[i], getValueAt(rowIndex, i));
+        }
         return r;
     }
 
