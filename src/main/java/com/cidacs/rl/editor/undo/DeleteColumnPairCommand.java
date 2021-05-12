@@ -1,5 +1,6 @@
 package com.cidacs.rl.editor.undo;
 
+import com.cidacs.rl.editor.lang.MessageProvider;
 import com.cidacs.rl.editor.pair.ColumnPairManager;
 
 public class DeleteColumnPairCommand extends Command {
@@ -25,7 +26,7 @@ public class DeleteColumnPairCommand extends Command {
 
     @Override
     public String getSummary() {
-        return "delete column";
+        return MessageProvider.getMessage("columns.delete.summary");
     }
 
 }

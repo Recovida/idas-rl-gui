@@ -19,6 +19,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
+import com.cidacs.rl.editor.lang.MessageProvider;
+
 public class BulkCopyColumnInclusionDialogue extends JDialog {
     private static final long serialVersionUID = 1609116129275788504L;
     private JPanel rightPanel;
@@ -40,7 +42,8 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
         JPanel bottomPanel = new JPanel();
         getContentPane().add(bottomPanel, BorderLayout.SOUTH);
 
-        JButton okBtn = new JButton("Insert selected columns");
+        JButton okBtn = new JButton(
+                MessageProvider.getMessage("columns.addcopy.insert"));
         bottomPanel.add(okBtn);
         getContentPane().add(mainPanel, BorderLayout.CENTER);
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.X_AXIS));
@@ -59,7 +62,8 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
         JPanel firstDatasetLblContainer = new JPanel();
         leftScrollPane.setColumnHeaderView(firstDatasetLblContainer);
 
-        JLabel firstDatasetLbl = new JLabel("Dataset A");
+        JLabel firstDatasetLbl = new JLabel(
+                MessageProvider.getMessage("columns.addcopy.dataseta"));
         firstDatasetLblContainer.add(firstDatasetLbl);
         firstDatasetLbl
                 .setFont(firstDatasetLbl.getFont().deriveFont(Font.BOLD));
@@ -70,7 +74,8 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
         JPanel secondDatasetLblContainer = new JPanel();
         rightScrollPane.setColumnHeaderView(secondDatasetLblContainer);
 
-        JLabel secondDatasetLbl = new JLabel("Dataset B");
+        JLabel secondDatasetLbl = new JLabel(
+                MessageProvider.getMessage("columns.addcopy.datasetb"));
         secondDatasetLbl
                 .setFont(secondDatasetLbl.getFont().deriveFont(Font.BOLD));
         secondDatasetLblContainer.add(secondDatasetLbl);
@@ -84,11 +89,11 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.PAGE_AXIS));
 
         JLabel instrLbl1 = new JLabel(
-                "Choose the columns that should only be copied to the output file. ");
+                MessageProvider.getMessage("columns.addcopy.choose"));
         topPanel.add(instrLbl1);
 
         JLabel instrLbl2 = new JLabel(
-                "The columns in grey have already been included, and selecting them will generate duplicate columns.");
+                MessageProvider.getMessage("columns.addcopy.warninggrey"));
         topPanel.add(instrLbl2);
 
         okBtn.addActionListener(e -> {

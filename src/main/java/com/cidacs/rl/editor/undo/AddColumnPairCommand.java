@@ -1,5 +1,6 @@
 package com.cidacs.rl.editor.undo;
 
+import com.cidacs.rl.editor.lang.MessageProvider;
 import com.cidacs.rl.editor.pair.ColumnPairManager;
 
 public class AddColumnPairCommand extends Command {
@@ -34,7 +35,7 @@ public class AddColumnPairCommand extends Command {
 
     @Override
     public String getSummary() {
-        return "add column";
+        return MessageProvider.getMessage("columns.add.summary");
     }
 
 }

@@ -41,6 +41,7 @@ import com.cidacs.rl.editor.gui.LinkageColumnEditingPanel;
 import com.cidacs.rl.editor.gui.cellrendering.NameColumnPairCellRenderer;
 import com.cidacs.rl.editor.gui.cellrendering.NumberColumnPairCellRenderer;
 import com.cidacs.rl.editor.gui.cellrendering.RenameColumnPairCellRenderer;
+import com.cidacs.rl.editor.lang.MessageProvider;
 import com.cidacs.rl.editor.listener.ColumnPairInclusionExclusionListener;
 import com.cidacs.rl.editor.listener.ColumnPairSelectionListener;
 import com.cidacs.rl.editor.listener.ColumnPairValueChangeListener;
@@ -136,7 +137,8 @@ public class ColumnPairManager {
 
                         @Override
                         public String getSummary() {
-                            return "add columns to be copied";
+                            return MessageProvider
+                                    .getMessage("columns.addcopy.summary");
                         }
                     });
             }
