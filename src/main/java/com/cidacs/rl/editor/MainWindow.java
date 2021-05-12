@@ -88,6 +88,7 @@ import com.cidacs.rl.editor.undo.UndoHistory;
 public class MainWindow {
 
     /* Non-GUI attributes */
+    public final String PROGRAM_NAME = "CIDACS RL SIM Editor";
     UndoHistory history = new UndoHistory();
     ConfigurationFile cf = new ConfigurationFile();
     String currentFileName = null;
@@ -305,6 +306,8 @@ public class MainWindow {
                                 : ""));
                     }
                 });
+
+        updateConfigFileLabel();
 
         frame.setVisible(true);
 
@@ -1258,6 +1261,10 @@ public class MainWindow {
         currentFileLbl.setText((dirty ? "[*] " : "")
                 + (currentFileName == null ? "[Unsaved file]"
                         : currentFileName));
+        frame.setTitle((dirty ? "[*] " : "")
+                + (currentFileName == null ? "[Unsaved file]"
+                        : new File(currentFileName).getName())
+                + " - " + PROGRAM_NAME);
     }
 
     private void fillEncodings(JComboBox<String>[] comboboxes) {
