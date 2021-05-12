@@ -138,7 +138,6 @@ public class MainWindow {
     private JPanel linkageColsTabPanel;
 
     private ColumnPairManager manager;
-    private JButton checkBtn;
 
     /**
      * Launch the application.
@@ -944,14 +943,6 @@ public class MainWindow {
         gbc_secondDatasetRowNumColWarningLbl.gridy = 5;
         datasetsTabPanel.add(secondDatasetRowNumColWarningLbl,
                 gbc_secondDatasetRowNumColWarningLbl);
-
-        checkBtn = new JButton("Check files and encodings");
-        GridBagConstraints gbc_checkBtn = new GridBagConstraints();
-        gbc_checkBtn.fill = GridBagConstraints.HORIZONTAL;
-        gbc_checkBtn.insets = new Insets(0, 0, 5, 5);
-        gbc_checkBtn.gridx = 2;
-        gbc_checkBtn.gridy = 6;
-        datasetsTabPanel.add(checkBtn, gbc_checkBtn);
 
         Component datasetsTabBottomMargin = Box.createVerticalGlue();
         GridBagConstraints gbc_datasetsTabBottomMargin = new GridBagConstraints();
