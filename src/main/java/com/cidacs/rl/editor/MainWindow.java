@@ -284,6 +284,7 @@ public class MainWindow {
 
         // Menus
 
+        newFileMenuItem.addActionListener(e -> doNew());
         exitMenuItem.addActionListener(e -> doExit());
         openFileMenuItem.addActionListener(e -> doOpen());
         saveFileMenuItem.addActionListener(e -> doSave());
@@ -595,6 +596,23 @@ public class MainWindow {
             history.redo();
     }
 
+    protected void doNew() {
+        if (dirty) {
+            int ans = promptToSaveChanges();
+            if (ans == JOptionPane.YES_OPTION)
+                doSave();
+            else if (ans == JOptionPane.CANCEL_OPTION
+                    || ans == JOptionPane.CLOSED_OPTION)
+                return;
+        }
+        clearAllFields();
+        currentFileName = null;
+        dirty = false;
+        updateConfigFileLabel();
+        history.clearAll();
+        manager.resetDefaultNumbers();
+    }
+
     protected void doOpen() {
         if (dirty) {
             int ans = promptToSaveChanges();
@@ -619,7 +637,6 @@ public class MainWindow {
                 currentFileName = newConfigFileName;
                 dirty = false;
                 updateConfigFileLabel();
-                validateAllTabs();
                 history.clearAll();
                 manager.resetDefaultNumbers();
             } else {

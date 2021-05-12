@@ -149,6 +149,8 @@ public class ConfigurationFile {
                 String type = (String) c.getOrDefault("type", "");
                 for (Entry<String, Object> entry : c.entrySet()) {
                     String key = entry.getKey();
+                    if ("number".equals(key))
+                        continue;
                     Object value = entry.getValue();
                     if (value == null || "".equals(value))
                         continue; // don't save empty values
