@@ -347,11 +347,10 @@ public class MainWindow {
 
     }
 
-    public void validateDatasetsTabTopPart() {
+    public int validateDatasetsTabTopPart() {
         if (skipValidation)
-            return;
+            return -1;
 
-        @SuppressWarnings("unused")
         int errorCount = 0;
 
         @SuppressWarnings("rawtypes")
@@ -405,13 +404,13 @@ public class MainWindow {
             secondDatasetWarningLbl.setVisible(false);
         manager.setSecondDatasetColumnNames(p.getColumnNames());
         validateLinkageColsTab();
+        return errorCount;
     }
 
-    public void validateDatasetsTabBottomPart() {
+    public int validateDatasetsTabBottomPart() {
         if (skipValidation)
-            return;
+            return -1;
 
-        @SuppressWarnings("unused")
         int errorCount = 0;
         @SuppressWarnings("rawtypes")
         Map<String, SettingItem> items = cf.getSettingItems();
@@ -458,17 +457,19 @@ public class MainWindow {
             firstDatasetRowNumColWarningLbl.setVisible(false);
             secondDatasetRowNumColWarningLbl.setVisible(false);
         }
-
+        return errorCount;
     }
 
-    public void validateOptionsTab() {
+    public int validateOptionsTab() {
         if (skipValidation)
-            return;
+            return -1;
+        return 0;
     }
 
-    public void validateLinkageColsTab(int rowIndex, String key) {
+    public int validateLinkageColsTab(int rowIndex, String key) {
         if (skipValidation)
-            return;
+            return -1;
+        int errorCount = 0;
         Object value = rowIndex >= 0
                 ? columnPairTableModel.getValue(rowIndex, key)
                 : null;
@@ -489,6 +490,8 @@ public class MainWindow {
             lbl.setToolTipText(
                     error ? MessageProvider.getMessage("columns.badcolumn")
                             : "");
+            if (error)
+                errorCount++;
             break;
         case "index_b":
             allowed = manager.getSecondDatasetColumnNames();
@@ -499,6 +502,8 @@ public class MainWindow {
             lbl.setToolTipText(
                     error ? MessageProvider.getMessage("columns.badcolumn")
                             : "");
+            if (error)
+                errorCount++;
             break;
         case "type":
             allowed = LinkageColumnEditingPanel.getTypes();
@@ -507,6 +512,8 @@ public class MainWindow {
             lbl.setVisible(error);
             lbl.setToolTipText(
                     error ? MessageProvider.getMessage("columns.badtype") : "");
+            if (error)
+                errorCount++;
             break;
         case "weight":
         case "phon_weight":
@@ -516,24 +523,27 @@ public class MainWindow {
         default:
             break;
         }
+        return errorCount;
     }
 
-    public void validateLinkageColsTab(int index) {
+    public int validateLinkageColsTab(int index) {
         if (skipValidation)
-            return;
+            return -1;
+        int errorCount = 0;
         String[] keys = { "number", "index_a", "index_b", "type", "weight",
                 "phon_weight", "rename_a", "rename_b" };
         for (String key : keys)
-            validateLinkageColsTab(index, key);
+            errorCount += validateLinkageColsTab(index, key);
+        return errorCount;
     }
 
-    public void validateLinkageColsTab() {
+    public int validateLinkageColsTab() {
         if (skipValidation)
-            return;
+            return -1;
         int index = linkageColsTable.getSelectedRow();
         if (index >= 0)
             index = linkageColsTable.convertRowIndexToModel(index);
-        validateLinkageColsTab(index);
+        return validateLinkageColsTab(index);
     }
 
     public void validateAllTabs() {
@@ -571,6 +581,9 @@ public class MainWindow {
                     && ((JComboBox<String>) component).isEditable())
                 ((JComboBox<String>) item.getGuiComponent())
                         .setSelectedItem("");
+            else if (component instanceof JSpinnerWithBlankValue)
+                ((JSpinnerWithBlankValue) component).setValue(
+                        ((JSpinnerWithBlankValue) component).getBlankValue());
         }
         columnPairTableModel.setRowCount(0);
     }
@@ -610,7 +623,7 @@ public class MainWindow {
         dirty = false;
         updateConfigFileLabel();
         history.clearAll();
-        manager.resetDefaultNumbers();
+        manager.reset();
     }
 
     protected void doOpen() {
@@ -638,7 +651,8 @@ public class MainWindow {
                 dirty = false;
                 updateConfigFileLabel();
                 history.clearAll();
-                manager.resetDefaultNumbers();
+                manager.reset();
+                linkageColsTable.clearSelection();
             } else {
                 JOptionPane.showMessageDialog(frame,
                         MessageProvider.getMessage("menu.open.cantopen"),

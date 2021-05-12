@@ -639,9 +639,10 @@ public class ColumnPairManager {
                 numberToColIdx.getOrDefault(number, Collections.emptySet()));
     }
 
-    public void resetDefaultNumbers() {
+    public void reset() {
         nextNumber.set(FIRST_NUMBER);
         nextCopyNumber.set(FIRST_COPY_NUMBER);
+        numberToColIdx.clear();
     }
 
 }
