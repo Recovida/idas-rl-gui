@@ -10,6 +10,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
@@ -21,6 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -28,13 +31,14 @@ import java.util.stream.Collectors;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -73,6 +77,7 @@ import com.cidacs.rl.editor.gui.cellrendering.PhonWeightColumnPairCellRenderer;
 import com.cidacs.rl.editor.gui.cellrendering.RenameColumnPairCellRenderer;
 import com.cidacs.rl.editor.gui.cellrendering.TypeColumnPairCellRenderer;
 import com.cidacs.rl.editor.gui.cellrendering.WeightColumnPairCellRenderer;
+import com.cidacs.rl.editor.lang.MessageProvider;
 import com.cidacs.rl.editor.listener.ColumnPairInclusionExclusionListener;
 import com.cidacs.rl.editor.listener.ColumnPairSelectionListener;
 import com.cidacs.rl.editor.listener.ColumnPairValueChangeListener;
@@ -128,7 +133,7 @@ public class MainWindow {
     private JMenuItem redoMenuItem;
     private JMenu helpMenu;
     private JMenuItem aboutMenuItem;
-    private JComboBox<String> languageCbox;
+    private JComboBox<Locale> languageCbox;
     private JTabbedPane tabbedPane;
     private JPanel datasetsTabPanel;
     private JPanel optionsTabPanel;
@@ -138,6 +143,22 @@ public class MainWindow {
     private JPanel linkageColsTabPanel;
 
     private ColumnPairManager manager;
+    private JMenu editMenu;
+    private JMenu fileMenu;
+    private JButton firstDatasetBtn;
+    private JButton secondDatasetBtn;
+    private JLabel rowNumColLbl;
+    private JLabel suffixLbl;
+    private JLabel encodingLbl;
+    private JLabel fileNameLbl;
+    private JLabel firstDatasetLabel;
+    private JLabel secondDatasetLabel;
+    private JButton linkageDirBtn;
+    private JLabel indexDirLbl;
+    private JButton indexDirBtn;
+    private JLabel minScoreLbl;
+    private JLabel maxRowsLbl;
+    private JLabel linkageDirLbl;
 
     /**
      * Launch the application.
@@ -293,21 +314,31 @@ public class MainWindow {
 
                     @Override
                     public void undoSummaryChanged(String summary) {
-                        undoMenuItem.setText("Undo" + (summary != null
-                                ? String.format(" (%s)", summary)
-                                : ""));
+                        updateUndoMenuText(summary);
                     }
 
                     @Override
                     public void redoSummaryChanged(String summary) {
-                        redoMenuItem.setText("Redo" + (summary != null
-                                ? String.format(" (%s)", summary)
-                                : ""));
+                        updateRedoMenuText(summary);
                     }
                 });
 
-        updateConfigFileLabel();
+        // LANGUAGE
+        languageCbox.addItemListener(new ItemListener() {
 
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    MessageProvider.setLocale((Locale) e.getItem());
+                    updateLocalisedStrings();
+                }
+            }
+        });
+
+        updateConfigFileLabel();
+        updateLocalisedStrings();
+
+        // show frame
         frame.setVisible(true);
 
         // Initial validation
@@ -333,14 +364,16 @@ public class MainWindow {
         if (enc2 == null || enc2.isEmpty())
             enc2 = (String) items.get("encoding_b").getDefaultValue();
         if (!isValidEncoding(enc1)) {
-            firstEncodingWarningLbl.setToolTipText("Unsupported encoding.");
+            firstEncodingWarningLbl.setToolTipText(
+                    MessageProvider.getMessage("datasets.badencoding"));
             firstEncodingWarningLbl.setVisible(true);
             errorCount++;
         } else {
             firstEncodingWarningLbl.setVisible(false);
         }
         if (!isValidEncoding(enc2)) {
-            secondEncodingWarningLbl.setToolTipText("Unsupported encoding.");
+            secondEncodingWarningLbl.setToolTipText(
+                    MessageProvider.getMessage("datasets.badencoding"));
             secondEncodingWarningLbl.setVisible(true);
             errorCount++;
         } else {
@@ -391,7 +424,8 @@ public class MainWindow {
         if (s2 == null || s2.isEmpty())
             s2 = (String) items.get("suffix_b").getDefaultValue();
         if (s1.equals(s2)) {
-            String msg = "The prefixes should be different.";
+            String msg = MessageProvider
+                    .getMessage("datasets.identicalprefixes");
             firstDatasetSuffixWarningLbl.setToolTipText(msg);
             secondDatasetSuffixWarningLbl.setToolTipText(msg);
             firstDatasetSuffixWarningLbl.setVisible(true);
@@ -412,7 +446,8 @@ public class MainWindow {
         if (s2 == null || s2.isEmpty())
             s2 = (String) items.get("row_num_col_b").getDefaultValue();
         if (s1.equals(s2)) {
-            String msg = "The row number column names should be different.";
+            String msg = MessageProvider
+                    .getMessage("datasets.identicalrownumcolnames");
             firstDatasetRowNumColWarningLbl.setToolTipText(msg);
             secondDatasetRowNumColWarningLbl.setToolTipText(msg);
             firstDatasetRowNumColWarningLbl.setVisible(true);
@@ -450,9 +485,9 @@ public class MainWindow {
                     && !(isCopyType && "".equals(value == null ? "" : value));
             lbl = linkageColsEditingPanel.getFirstNameWarningLbl();
             lbl.setVisible(error);
-            lbl.setToolTipText(error
-                    ? "Non-existent column. Click the downwards arrow to see the list of columns."
-                    : "");
+            lbl.setToolTipText(
+                    error ? MessageProvider.getMessage("columns.badcolumn")
+                            : "");
             break;
         case "index_b":
             allowed = manager.getSecondDatasetColumnNames();
@@ -460,18 +495,17 @@ public class MainWindow {
                     && !(isCopyType && "".equals(value == null ? "" : value));
             lbl = linkageColsEditingPanel.getSecondNameWarningLbl();
             lbl.setVisible(error);
-            lbl.setToolTipText(error
-                    ? "Non-existent column. Click the downwards arrow to see the list of columns."
-                    : "");
+            lbl.setToolTipText(
+                    error ? MessageProvider.getMessage("columns.badcolumn")
+                            : "");
             break;
         case "type":
             allowed = LinkageColumnEditingPanel.getTypes();
             error = rowIndex >= 0 && !allowed.contains(value);
             lbl = linkageColsEditingPanel.getTypeWarningLbl();
             lbl.setVisible(error);
-            lbl.setToolTipText(error
-                    ? "Invalid type. Click the downwards arrow to see the valid types."
-                    : "");
+            lbl.setToolTipText(
+                    error ? MessageProvider.getMessage("columns.badtype") : "");
             break;
         case "weight":
         case "phon_weight":
@@ -512,15 +546,15 @@ public class MainWindow {
             String fileName) {
         switch (result) {
         case BLANK_NAME:
-            return "File name should not be blank.";
+            return MessageProvider.getMessage("datasets.blankfilename");
         case FILE_NOT_FOUND:
-            return "This file does not exist.";
+            return MessageProvider.getMessage("datasets.badfile");
         case IO_ERROR:
-            return "This file could not be read.";
+            return MessageProvider.getMessage("datasets.unreadablefile");
         case UNSUPPORTED_CONTENTS:
-            return "Either this file has a different encoding than the specified below or its contents are not supported.";
+            return MessageProvider.getMessage("datasets.badcontents");
         case UNSUPPORTED_FORMAT:
-            return "The format of this file is not supported.";
+            return MessageProvider.getMessage("datasets.badformat");
         default:
             return null;
         }
@@ -589,8 +623,10 @@ public class MainWindow {
                 history.clearAll();
                 manager.resetDefaultNumbers();
             } else {
-                JOptionPane.showMessageDialog(frame, "Could not open file.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame,
+                        MessageProvider.getMessage("menu.open.cantopen"),
+                        MessageProvider.getMessage("menu.open.error"),
+                        JOptionPane.ERROR_MESSAGE);
             }
             skipValidation = false;
         }
@@ -606,8 +642,10 @@ public class MainWindow {
             updateConfigFileLabel();
             history.setClean();
         } else {
-            JOptionPane.showMessageDialog(frame, "Could not save file.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame,
+                    MessageProvider.getMessage("menu.save.cantsave"),
+                    MessageProvider.getMessage("menu.save.error"),
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -633,10 +671,12 @@ public class MainWindow {
 
     protected int promptToSaveChanges() {
         String msg = (currentFileName == null
-                ? "Save the contents of this currently unsaved file?"
-                : String.format("Save the changes made to the file “%s”?",
+                ? MessageProvider.getMessage("menu.save.savechangesnofile")
+                : String.format(
+                        MessageProvider.getMessage("menu.save.savechangesfile"),
                         currentFileName));
-        return JOptionPane.showOptionDialog(this.frame, msg, "Save changes?",
+        return JOptionPane.showOptionDialog(this.frame, msg,
+                MessageProvider.getMessage("menu.save.savechanges"),
                 JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, null, null);
     }
@@ -656,7 +696,7 @@ public class MainWindow {
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
         datasetsTabPanel = new JPanel();
-        tabbedPane.addTab("Datasets", null, datasetsTabPanel, null);
+        tabbedPane.addTab("_Datasets", null, datasetsTabPanel, null);
         GridBagLayout gbl_datasetsTabPanel = new GridBagLayout();
         gbl_datasetsTabPanel.columnWidths = new int[] { 35, 150, 150, 150, 35 };
         gbl_datasetsTabPanel.rowHeights = new int[] { 10, 20, 30, 0, 30, 30, 0,
@@ -675,7 +715,7 @@ public class MainWindow {
         gbc_datasetsTabTopMargin.gridy = 0;
         datasetsTabPanel.add(datasetsTabTopMargin, gbc_datasetsTabTopMargin);
 
-        JLabel firstDatasetLabel = new JLabel("Dataset A");
+        firstDatasetLabel = new JLabel("_Dataset A");
         firstDatasetLabel
                 .setFont(firstDatasetLabel.getFont().deriveFont(Font.BOLD));
         GridBagConstraints gbc_firstDatasetLabel = new GridBagConstraints();
@@ -685,7 +725,7 @@ public class MainWindow {
         gbc_firstDatasetLabel.gridy = 1;
         datasetsTabPanel.add(firstDatasetLabel, gbc_firstDatasetLabel);
 
-        JLabel secondDatasetLabel = new JLabel("Dataset B");
+        secondDatasetLabel = new JLabel("_Dataset B");
         secondDatasetLabel
                 .setFont(secondDatasetLabel.getFont().deriveFont(Font.BOLD));
         GridBagConstraints gbc_secondDatasetLabel = new GridBagConstraints();
@@ -719,7 +759,7 @@ public class MainWindow {
         firstDatasetContainer.add(firstDatasetField);
         firstDatasetField.setColumns(10);
 
-        JButton firstDatasetBtn = new JButton("Select...");
+        firstDatasetBtn = new JButton("_Select...");
         firstDatasetBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -732,7 +772,7 @@ public class MainWindow {
         });
         firstDatasetContainer.add(firstDatasetBtn);
 
-        JLabel fileNameLbl = new JLabel("File");
+        fileNameLbl = new JLabel("_File name");
         GridBagConstraints gbc_fileNameLbl = new GridBagConstraints();
         gbc_fileNameLbl.insets = new Insets(0, 0, 5, 5);
         gbc_fileNameLbl.gridx = 2;
@@ -750,7 +790,7 @@ public class MainWindow {
         secondDatasetContainer.setLayout(
                 new BoxLayout(secondDatasetContainer, BoxLayout.X_AXIS));
 
-        JButton secondDatasetBtn = new JButton("Select...");
+        secondDatasetBtn = new JButton("_Select...");
         secondDatasetBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -802,7 +842,7 @@ public class MainWindow {
         new JComboBoxSuggestionProvider(firstEncodingField);
         firstEncodingContainer.add(firstEncodingField);
 
-        JLabel encodingLbl = new JLabel("Encoding");
+        encodingLbl = new JLabel("_Encoding");
         GridBagConstraints gbc_encodingLbl = new GridBagConstraints();
         gbc_encodingLbl.insets = new Insets(0, 0, 5, 5);
         gbc_encodingLbl.gridx = 2;
@@ -858,7 +898,7 @@ public class MainWindow {
         firstDatasetSuffixContainer.add(firstDatasetSuffixField);
         firstDatasetSuffixField.setColumns(10);
 
-        JLabel suffixLbl = new JLabel("Suffix");
+        suffixLbl = new JLabel("_Suffix");
         GridBagConstraints gbc_suffixLbl = new GridBagConstraints();
         gbc_suffixLbl.insets = new Insets(0, 0, 5, 5);
         gbc_suffixLbl.gridx = 2;
@@ -913,7 +953,7 @@ public class MainWindow {
         firstDatasetRowNumColContainer.add(firstDatasetRowNumColField);
         firstDatasetRowNumColField.setColumns(10);
 
-        JLabel rowNumColLbl = new JLabel("Row number column name");
+        rowNumColLbl = new JLabel("_Row number column name");
         GridBagConstraints gbc_rowNumColLbl = new GridBagConstraints();
         gbc_rowNumColLbl.insets = new Insets(0, 0, 5, 5);
         gbc_rowNumColLbl.gridx = 2;
@@ -954,12 +994,11 @@ public class MainWindow {
                 gbc_datasetsTabBottomMargin);
 
         optionsTabPanel = new JPanel();
-        tabbedPane.addTab("Options", null, optionsTabPanel, null);
+        tabbedPane.addTab("_Options", null, optionsTabPanel, null);
         GridBagLayout gbl_optionsTabPanel = new GridBagLayout();
-        gbl_optionsTabPanel.columnWidths = new int[] { 0, 0, 0 };
+        gbl_optionsTabPanel.columnWidths = new int[] { 200, 500 };
         gbl_optionsTabPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
-        gbl_optionsTabPanel.columnWeights = new double[] { 0.0, 1.0,
-                Double.MIN_VALUE };
+        gbl_optionsTabPanel.columnWeights = new double[] { 0.0, 1.0 };
         gbl_optionsTabPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0,
                 Double.MIN_VALUE };
         optionsTabPanel.setLayout(gbl_optionsTabPanel);
@@ -972,7 +1011,7 @@ public class MainWindow {
         gbc_optionsTabTopMargin.gridy = 0;
         optionsTabPanel.add(optionsTabTopMargin, gbc_optionsTabTopMargin);
 
-        JLabel linkageDirLbl = new JLabel("Linkage location");
+        linkageDirLbl = new JLabel("_Linkage location");
         linkageDirLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         GridBagConstraints gbc_linkageDirLbl = new GridBagConstraints();
         gbc_linkageDirLbl.insets = new Insets(0, 0, 5, 5);
@@ -999,7 +1038,7 @@ public class MainWindow {
         linkageDirContainer.add(linkageDirField);
         linkageDirField.setColumns(10);
 
-        JButton linkageDirBtn = new JButton("Select...");
+        linkageDirBtn = new JButton("_Select...");
         linkageDirBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1013,7 +1052,7 @@ public class MainWindow {
         SpinnerNumberModel maxRowsModel = new SpinnerNumberModel(
                 Integer.MAX_VALUE, 0, Integer.MAX_VALUE, 1);
 
-        JLabel indexDirLbl = new JLabel("Index location");
+        indexDirLbl = new JLabel("_Index location");
         indexDirLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         GridBagConstraints gbc_indexDirLbl = new GridBagConstraints();
         gbc_indexDirLbl.anchor = GridBagConstraints.EAST;
@@ -1040,10 +1079,10 @@ public class MainWindow {
         indexDirContainer.add(indexDirField);
         indexDirField.setColumns(10);
 
-        JButton indexDirBtn = new JButton("Select...");
+        indexDirBtn = new JButton("_Select...");
         indexDirContainer.add(indexDirBtn);
 
-        JLabel minScoreLbl = new JLabel("Minimum score");
+        minScoreLbl = new JLabel("_Minimum score");
         minScoreLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         GridBagConstraints gbc_minScoreLbl = new GridBagConstraints();
         gbc_minScoreLbl.fill = GridBagConstraints.HORIZONTAL;
@@ -1067,10 +1106,11 @@ public class MainWindow {
         ne_minScoreField.setRequestFocusEnabled(false);
         minScoreField.setEditor(ne_minScoreField);
 
-        JLabel maxRowsLbl = new JLabel("Only read first rows (A)");
+        maxRowsLbl = new JLabel("_Only read first rows (A)");
         maxRowsLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         maxRowsLbl.setPreferredSize(new Dimension(150, 17));
         GridBagConstraints gbc_maxRowsLbl = new GridBagConstraints();
+        gbc_maxRowsLbl.fill = GridBagConstraints.HORIZONTAL;
         gbc_maxRowsLbl.insets = new Insets(0, 0, 0, 5);
         gbc_maxRowsLbl.gridx = 0;
         gbc_maxRowsLbl.gridy = 4;
@@ -1089,7 +1129,7 @@ public class MainWindow {
         maxRowsField.setEditor(ne_maxRowsField);
 
         linkageColsTabPanel = new JPanel();
-        tabbedPane.addTab("Columns", null, linkageColsTabPanel, null);
+        tabbedPane.addTab("_Columns", null, linkageColsTabPanel, null);
 
         linkageColsTable = new JTable();
         linkageColsTable.getTableHeader().setReorderingAllowed(false);
@@ -1144,60 +1184,80 @@ public class MainWindow {
         JMenuBar menuBar = new JMenuBar();
         frame.setJMenuBar(menuBar);
 
-        JMenu fileMenu = new JMenu("File");
+        fileMenu = new JMenu("_File");
         menuBar.add(fileMenu);
 
-        newFileMenuItem = new JMenuItem("New");
+        newFileMenuItem = new JMenuItem("_New");
         fileMenu.add(newFileMenuItem);
 
         JSeparator separator_1 = new JSeparator();
         fileMenu.add(separator_1);
 
-        openFileMenuItem = new JMenuItem("Open...");
+        openFileMenuItem = new JMenuItem("_Open...");
         fileMenu.add(openFileMenuItem);
 
         JSeparator separator_2 = new JSeparator();
         fileMenu.add(separator_2);
 
-        saveFileMenuItem = new JMenuItem("Save");
+        saveFileMenuItem = new JMenuItem("_Save");
         fileMenu.add(saveFileMenuItem);
 
-        saveAsFileMenuItem = new JMenuItem("Save as...");
+        saveAsFileMenuItem = new JMenuItem("_Save as...");
         fileMenu.add(saveAsFileMenuItem);
 
         JSeparator separator = new JSeparator();
         fileMenu.add(separator);
 
-        exitMenuItem = new JMenuItem("Exit");
+        exitMenuItem = new JMenuItem("_Exit");
         fileMenu.add(exitMenuItem);
 
-        JMenu editMenu = new JMenu("Edit");
+        editMenu = new JMenu("_Edit");
         menuBar.add(editMenu);
 
-        undoMenuItem = new JMenuItem("Undo");
+        undoMenuItem = new JMenuItem("_Undo");
         undoMenuItem.setEnabled(false);
         editMenu.add(undoMenuItem);
 
-        redoMenuItem = new JMenuItem("Redo");
+        redoMenuItem = new JMenuItem("_Redo");
         redoMenuItem.setEnabled(false);
         editMenu.add(redoMenuItem);
 
-        helpMenu = new JMenu("Help");
+        helpMenu = new JMenu("_Help");
         menuBar.add(helpMenu);
 
-        aboutMenuItem = new JMenuItem("About");
+        aboutMenuItem = new JMenuItem("_About");
         helpMenu.add(aboutMenuItem);
 
         languageCbox = new JComboBox<>();
         languageCbox.setMaximumSize(new Dimension(1000, 32767));
-        languageCbox.setModel(
-                new DefaultComboBoxModel<>(new String[] { "English" }));
+        languageCbox.setRenderer(new DefaultListCellRenderer() {
+
+            private static final long serialVersionUID = 3504291023159861529L;
+
+            @Override
+            public Component getListCellRendererComponent(JList<?> list,
+                    Object value, int index, boolean isSelected,
+                    boolean cellHasFocus) {
+                if (value instanceof Locale) {
+                    String lang = ((Locale) value)
+                            .getDisplayName((Locale) value);
+                    value = lang.substring(0, 1).toUpperCase()
+                            + lang.substring(1);
+                }
+                super.getListCellRendererComponent(list, value, index,
+                        isSelected, cellHasFocus);
+                return this;
+            }
+
+        });
+        for (String l : MessageProvider.SUPPORTED_LANGUAGES)
+            languageCbox.addItem(new Locale(l));
         menuBar.add(languageCbox);
 
         Component menuGlue = Box.createGlue();
         menuBar.add(menuGlue);
 
-        currentFileLbl = new JLabel("[Unsaved file]");
+        currentFileLbl = new JLabel("_unsaved file");
         currentFileLbl
                 .setFont(currentFileLbl.getFont().deriveFont(Font.ITALIC));
         currentFileLbl.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -1219,7 +1279,8 @@ public class MainWindow {
                 ? new File(currentFileName).getParentFile()
                 : new File(".").getAbsoluteFile());
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "Supported datasets (csv, dbf)", "csv", "dbf");
+                MessageProvider.getMessage("datasets.supportedformats"), "csv",
+                "dbf");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
@@ -1239,7 +1300,9 @@ public class MainWindow {
                 fileName != null ? new File(fileName).getParentFile()
                         : new File(".").getAbsoluteFile());
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "Properties file (properties)", "properties", "ini");
+                MessageProvider.getMessage(save ? "menu.save.propertiesfile"
+                        : "menu.open.propertiesfile"),
+                "properties", "ini");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
         int result = save ? chooser.showSaveDialog(frame)
@@ -1254,11 +1317,11 @@ public class MainWindow {
     }
 
     private void updateConfigFileLabel() {
+        String unsaved = MessageProvider.getMessage("menu.unsavedfile");
         currentFileLbl.setText((dirty ? "[*] " : "")
-                + (currentFileName == null ? "[Unsaved file]"
-                        : currentFileName));
+                + (currentFileName == null ? unsaved : currentFileName));
         frame.setTitle((dirty ? "[*] " : "")
-                + (currentFileName == null ? "[Unsaved file]"
+                + (currentFileName == null ? unsaved
                         : new File(currentFileName).getName())
                 + " - " + PROGRAM_NAME);
     }
@@ -1288,6 +1351,80 @@ public class MainWindow {
         for (JComboBox<String> cb : comboboxes)
             for (String enc : sortedEncodings)
                 cb.addItem(enc);
-
     }
+
+    public void updateUndoMenuText(String summary) {
+        undoMenuItem.setText(MessageProvider.getMessage("menu.edit.undo")
+                + (summary != null ? String.format(" (%s)", summary) : ""));
+    }
+
+    public void updateRedoMenuText(String summary) {
+        redoMenuItem.setText(MessageProvider.getMessage("menu.edit.redo")
+                + (summary != null ? String.format(" (%s)", summary) : ""));
+    }
+
+    public void updateLocalisedStrings() {
+        // menu - file
+        fileMenu.setText(MessageProvider.getMessage("menu.file"));
+        newFileMenuItem.setText(MessageProvider.getMessage("menu.file.new"));
+        openFileMenuItem.setText(MessageProvider.getMessage("menu.file.open"));
+        saveFileMenuItem.setText(MessageProvider.getMessage("menu.file.save"));
+        saveAsFileMenuItem
+                .setText(MessageProvider.getMessage("menu.file.saveas"));
+        exitMenuItem.setText(MessageProvider.getMessage("menu.file.exit"));
+
+        // menu - edit
+        editMenu.setText(MessageProvider.getMessage("menu.edit"));
+        updateUndoMenuText(history.getUndoSummary());
+        updateRedoMenuText(history.getRedoSummary());
+
+        // menu - help
+        helpMenu.setText(MessageProvider.getMessage("menu.help"));
+        aboutMenuItem.setText(MessageProvider.getMessage("menu.help.about"));
+
+        // menu - current file name
+        updateConfigFileLabel();
+
+        // tab - datasets
+        tabbedPane.setTitleAt(tabbedPane.indexOfComponent(datasetsTabPanel),
+                MessageProvider.getMessage("datasets"));
+        firstDatasetLabel
+                .setText(MessageProvider.getMessage("datasets.dataseta"));
+        secondDatasetLabel
+                .setText(MessageProvider.getMessage("datasets.datasetb"));
+        firstDatasetBtn.setText(MessageProvider.getMessage("datasets.select"));
+        secondDatasetBtn.setText(MessageProvider.getMessage("datasets.select"));
+        fileNameLbl.setText(MessageProvider.getMessage("datasets.filename"));
+        encodingLbl.setText(MessageProvider.getMessage("datasets.encoding"));
+        suffixLbl.setText(MessageProvider.getMessage("datasets.suffix"));
+        rowNumColLbl
+                .setText(MessageProvider.getMessage("datasets.rownumcolname"));
+
+        // tab - options
+        tabbedPane.setTitleAt(tabbedPane.indexOfComponent(optionsTabPanel),
+                MessageProvider.getMessage("options"));
+        indexDirLbl
+                .setText(MessageProvider.getMessage("options.indexlocation"));
+        indexDirBtn.setText(
+                MessageProvider.getMessage("options.indexlocation.select"));
+        linkageDirLbl
+                .setText(MessageProvider.getMessage("options.linkagelocation"));
+        linkageDirBtn.setText(
+                MessageProvider.getMessage("options.linkagelocation.select"));
+        maxRowsLbl.setText(MessageProvider.getMessage("options.maxrows"));
+        minScoreLbl.setText(MessageProvider.getMessage("options.minscore"));
+
+        // tab - columns
+        tabbedPane.setTitleAt(tabbedPane.indexOfComponent(linkageColsTabPanel),
+                MessageProvider.getMessage("columns"));
+        linkageColsEditingPanel.updateLocalisedStrings();
+        linkageColsButtonPanel.updateLocalisedStrings();
+        ColumnPairTableModel model = (ColumnPairTableModel) linkageColsTable
+                .getModel();
+        model.updateLocalisedStrings(linkageColsTable.getColumnModel());
+
+        // re-create validation messages
+        validateAllTabs();
+    }
+
 }

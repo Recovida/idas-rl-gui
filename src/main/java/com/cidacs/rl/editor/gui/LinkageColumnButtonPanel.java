@@ -9,6 +9,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import com.cidacs.rl.editor.lang.MessageProvider;
+
 public class LinkageColumnButtonPanel extends JPanel {
 
     private static final long serialVersionUID = 3447357352169636148L;
@@ -31,14 +33,14 @@ public class LinkageColumnButtonPanel extends JPanel {
     public LinkageColumnButtonPanel() {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-        addCopyColsBtn = new JButton("Add columns to be copied");
+        addCopyColsBtn = new JButton("_Add columns to be copied");
         addCopyColsBtn.setEnabled(false);
         add(addCopyColsBtn);
 
         Component horizontalGlue_2 = Box.createHorizontalGlue();
         add(horizontalGlue_2);
 
-        addPairBtn = new JButton("Add column pair");
+        addPairBtn = new JButton("_Add column pair");
         add(addPairBtn);
 
         Component horizontalGlue_1 = Box.createHorizontalGlue();
@@ -48,7 +50,7 @@ public class LinkageColumnButtonPanel extends JPanel {
         Component horizontalGlue = Box.createHorizontalGlue();
         add(horizontalGlue);
 
-        deletePairBtn = new JButton("Delete selected pair");
+        deletePairBtn = new JButton("_Delete selected pair");
         deletePairBtn.setEnabled(false);
         add(deletePairBtn);
 
@@ -58,6 +60,12 @@ public class LinkageColumnButtonPanel extends JPanel {
 
         setBorder(BorderFactory.createRaisedSoftBevelBorder());
 
+    }
+
+    public void updateLocalisedStrings() {
+        deletePairBtn.setText(MessageProvider.getMessage("columns.delete"));
+        addPairBtn.setText(MessageProvider.getMessage("columns.add"));
+        addCopyColsBtn.setText(MessageProvider.getMessage("columns.addcopy"));
     }
 
 }

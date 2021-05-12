@@ -20,6 +20,8 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
+import com.cidacs.rl.editor.lang.MessageProvider;
+
 public class LinkageColumnEditingPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
@@ -47,6 +49,18 @@ public class LinkageColumnEditingPanel extends JPanel {
     private JLabel weightLbl;
 
     private WarningIcon phonWeightWarningLbl;
+
+    private JLabel typeLbl;
+
+    private JLabel renameSecondLbl;
+
+    private JLabel nameSecondLbl;
+
+    private JLabel renameFirstLbl;
+
+    private JLabel nameFirstLbl;
+
+    private JLabel numberLbl;
 
     public JTextFieldWithPlaceholder getFirstRenameField() {
         return firstRenameField;
@@ -102,7 +116,7 @@ public class LinkageColumnEditingPanel extends JPanel {
         gbc_topVerticalGlue.gridy = 0;
         panel.add(topVerticalGlue, gbc_topVerticalGlue);
 
-        JLabel numberLbl = new JLabel("Number");
+        numberLbl = new JLabel("_Number");
         numberLbl.setPreferredSize(new Dimension(25, 17));
         numberLbl.setHorizontalAlignment(SwingConstants.CENTER);
         numberLbl.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -115,7 +129,7 @@ public class LinkageColumnEditingPanel extends JPanel {
         gbc_numberLbl.gridy = 1;
         panel.add(numberLbl, gbc_numberLbl);
 
-        JLabel nameFirstLbl = new JLabel("Column name (A)");
+        nameFirstLbl = new JLabel("_Column name (A)");
         nameFirstLbl.setPreferredSize(new Dimension(123, 17));
         nameFirstLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         GridBagConstraints gbc_nameFirstLbl = new GridBagConstraints();
@@ -150,7 +164,7 @@ public class LinkageColumnEditingPanel extends JPanel {
         gbc_firstNameWarningLbl.gridy = 1;
         panel.add(firstNameWarningLbl, gbc_firstNameWarningLbl);
 
-        JLabel renameFirstLbl = new JLabel("rename to");
+        renameFirstLbl = new JLabel("_rename to");
         renameFirstLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         GridBagConstraints gbc_renameFirstLbl = new GridBagConstraints();
         gbc_renameFirstLbl.fill = GridBagConstraints.HORIZONTAL;
@@ -193,7 +207,7 @@ public class LinkageColumnEditingPanel extends JPanel {
         gbc_numberWarningLbl.gridy = 2;
         panel.add(numberWarningLbl, gbc_numberWarningLbl);
 
-        JLabel nameSecondLbl = new JLabel("Column name (B)");
+        nameSecondLbl = new JLabel("_Column name (B)");
         nameSecondLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         nameSecondLbl.setPreferredSize(new Dimension(123, 17));
         GridBagConstraints gbc_nameSecondLbl = new GridBagConstraints();
@@ -228,11 +242,11 @@ public class LinkageColumnEditingPanel extends JPanel {
         gbc_secondNameWarningLbl.gridy = 2;
         panel.add(secondNameWarningLbl, gbc_secondNameWarningLbl);
 
-        JLabel renameSecondLbl = new JLabel("rename to");
+        renameSecondLbl = new JLabel("_rename to");
         renameSecondLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         renameSecondLbl.setPreferredSize(new Dimension(80, 17));
         GridBagConstraints gbc_renameSecondLbl = new GridBagConstraints();
-        gbc_renameSecondLbl.anchor = GridBagConstraints.EAST;
+        gbc_renameSecondLbl.fill = GridBagConstraints.HORIZONTAL;
         gbc_renameSecondLbl.insets = new Insets(0, 0, 5, 5);
         gbc_renameSecondLbl.gridx = 8;
         gbc_renameSecondLbl.gridy = 2;
@@ -247,20 +261,20 @@ public class LinkageColumnEditingPanel extends JPanel {
         panel.add(secondRenameField, gbc_secondRenameField);
         secondRenameField.setColumns(10);
 
-        JLabel typeLbl = new JLabel("Type");
+        typeLbl = new JLabel("_Type");
         typeLbl.setVerticalAlignment(SwingConstants.BOTTOM);
         typeLbl.setPreferredSize(new Dimension(29, 25));
         typeLbl.setVerticalTextPosition(SwingConstants.BOTTOM);
         typeLbl.setHorizontalTextPosition(SwingConstants.CENTER);
         typeLbl.setHorizontalAlignment(SwingConstants.CENTER);
         GridBagConstraints gbc_typeLbl = new GridBagConstraints();
-        gbc_typeLbl.fill = GridBagConstraints.VERTICAL;
+        gbc_typeLbl.fill = GridBagConstraints.BOTH;
         gbc_typeLbl.insets = new Insets(0, 0, 5, 5);
         gbc_typeLbl.gridx = 3;
         gbc_typeLbl.gridy = 3;
         panel.add(typeLbl, gbc_typeLbl);
 
-        weightLbl = new JLabel("Weight");
+        weightLbl = new JLabel("_Weight");
         weightLbl.setVerticalAlignment(SwingConstants.BOTTOM);
         weightLbl.setVerticalTextPosition(SwingConstants.BOTTOM);
         weightLbl.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -273,7 +287,7 @@ public class LinkageColumnEditingPanel extends JPanel {
         gbc_weightLbl.gridy = 3;
         panel.add(weightLbl, gbc_weightLbl);
 
-        phonWeightLbl = new JLabel("Phon. weight");
+        phonWeightLbl = new JLabel("_Phon. weight");
         phonWeightLbl.setVerticalAlignment(SwingConstants.BOTTOM);
         phonWeightLbl.setVerticalTextPosition(SwingConstants.BOTTOM);
         phonWeightLbl.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -436,6 +450,22 @@ public class LinkageColumnEditingPanel extends JPanel {
 
     public JLabel getWeightLbl() {
         return weightLbl;
+    }
+
+    public void updateLocalisedStrings() {
+        numberLbl.setText(MessageProvider.getMessage("columns.editing.number"));
+        nameFirstLbl
+                .setText(MessageProvider.getMessage("columns.editing.indexa"));
+        renameFirstLbl
+                .setText(MessageProvider.getMessage("columns.editing.renamea"));
+        nameSecondLbl
+                .setText(MessageProvider.getMessage("columns.editing.indexb"));
+        renameSecondLbl
+                .setText(MessageProvider.getMessage("columns.editing.renameb"));
+        typeLbl.setText(MessageProvider.getMessage("columns.editing.type"));
+        weightLbl.setText(MessageProvider.getMessage("columns.editing.weight"));
+        phonWeightLbl.setText(
+                MessageProvider.getMessage("columns.editing.phonweight"));
     }
 
 }

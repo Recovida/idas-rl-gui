@@ -7,6 +7,8 @@ import java.util.Collection;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+import com.cidacs.rl.editor.lang.MessageProvider;
+
 public class NumberColumnPairCellRenderer extends ColumnPairCellRenderer
         implements TableCellRenderer {
 
@@ -30,7 +32,7 @@ public class NumberColumnPairCellRenderer extends ColumnPairCellRenderer
         if (value == null || (int) value < 0) {
             invalid = true;
             italic = true;
-            value = "  " + "[blank]";
+            value = "  " + MessageProvider.getMessage("columns.table.blank");
         } else {
             if (colIdxProvider != null) {
                 if (colIdxProvider.getColIdxWithNumber((int) value)

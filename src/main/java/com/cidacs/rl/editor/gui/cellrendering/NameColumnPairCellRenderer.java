@@ -8,6 +8,8 @@ import java.util.Collections;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+import com.cidacs.rl.editor.lang.MessageProvider;
+
 public class NameColumnPairCellRenderer extends ColumnPairCellRenderer
         implements TableCellRenderer {
 
@@ -46,7 +48,7 @@ public class NameColumnPairCellRenderer extends ColumnPairCellRenderer
     public String getBlankText(JTable table, int viewRowIndex) {
         if ("copy".equals(getValue(table, viewRowIndex, "type")))
             return "";
-        return "  " + "[blank]";
+        return "  " + MessageProvider.getMessage("columns.table.blank");
     }
 
     public Collection<String> getValidNames() {

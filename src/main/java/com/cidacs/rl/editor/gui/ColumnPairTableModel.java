@@ -5,6 +5,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+
+import com.cidacs.rl.editor.lang.MessageProvider;
 
 public class ColumnPairTableModel extends DefaultTableModel {
 
@@ -17,15 +20,10 @@ public class ColumnPairTableModel extends DefaultTableModel {
             String.class, String.class };
     private Map<String, Integer> indexFromKey = new HashMap<>();
 
-    // TODO: i18n
-    private final String[] displayNames = { "Number", "Type", "Weight",
-            "Phon. weight", "Column (A)", "Renamed (A)", "Column (B)",
-            "Renamed (B)" };
-
     public ColumnPairTableModel() {
         for (int i = 0; i < keys.length; i++)
             indexFromKey.put(keys[i], i);
-        setColumnIdentifiers(displayNames);
+        setColumnIdentifiers(keys); // temporary
     }
 
     @Override
@@ -90,6 +88,15 @@ public class ColumnPairTableModel extends DefaultTableModel {
 
     public int getColumnIndex(String key) {
         return indexFromKey.get(key);
+    }
+
+    public void updateLocalisedStrings(TableColumnModel cm) {
+        String[] displayNames = new String[keys.length];
+        for (int i = 0; i < displayNames.length; i++)
+            cm.getColumn(i).setHeaderValue(MessageProvider.getMessage(
+                    "columns.table." + keys[i].replaceAll("_", "")));
+        if (getRowCount() > 0)
+            fireTableRowsUpdated(0, getRowCount() - 1);
     }
 
 }
