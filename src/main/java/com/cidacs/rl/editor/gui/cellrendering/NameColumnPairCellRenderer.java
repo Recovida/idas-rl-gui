@@ -41,7 +41,8 @@ public class NameColumnPairCellRenderer extends ColumnPairCellRenderer
 
     public boolean isValid(JTable table, int viewRowIndex, Object value) {
         return validNames == null
-                || "copy".equals(getValue(table, viewRowIndex, "type"))
+                || ("copy".equals(getValue(table, viewRowIndex, "type"))
+                        && "".equals(value))
                 || validNames.contains(value);
     }
 

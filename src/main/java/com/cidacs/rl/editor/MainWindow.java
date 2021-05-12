@@ -403,6 +403,9 @@ public class MainWindow {
         } else
             secondDatasetWarningLbl.setVisible(false);
         manager.setSecondDatasetColumnNames(p.getColumnNames());
+        if (manager.getColumnPairCount() > 0)
+            manager.getTableModel().fireTableRowsUpdated(0,
+                    manager.getColumnPairCount() - 1);
         validateLinkageColsTab();
         return errorCount;
     }
