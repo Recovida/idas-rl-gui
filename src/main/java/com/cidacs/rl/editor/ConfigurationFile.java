@@ -71,7 +71,7 @@ public class ConfigurationFile {
         Properties props = new Properties();
         try (FileInputStream in = new FileInputStream(fileName)) {
             props.load(in);
-        } catch (IOException e1) {
+        } catch (Exception e1) {
             return false;
         }
         // number --> row index in the table

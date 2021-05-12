@@ -589,6 +589,9 @@ public class MainWindow {
                 validateAllTabs();
                 history.clearAll();
                 manager.resetDefaultNumbers();
+            } else {
+                JOptionPane.showMessageDialog(frame, "Could not open file.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
             skipValidation = false;
         }
@@ -599,11 +602,13 @@ public class MainWindow {
             doSaveAs();
             return;
         }
-
         if (cf.save(currentFileName)) {
             dirty = false;
             updateConfigFileLabel();
             history.setClean();
+        } else {
+            JOptionPane.showMessageDialog(frame, "Could not save file.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

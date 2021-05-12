@@ -151,8 +151,10 @@ public class DatasetPeek {
                 case FINAL:
                     break;
                 }
-                if (++readChars > 10000)
-                    break;
+                if (currentColumnName.length() > 10000) {
+                    this.columnNames = null;
+                    return DatasetPeekResult.UNSUPPORTED_CONTENTS;
+                }
             }
             if (currentColumnName.length() > 0) {
                 columnNames.add(currentColumnName.toString());

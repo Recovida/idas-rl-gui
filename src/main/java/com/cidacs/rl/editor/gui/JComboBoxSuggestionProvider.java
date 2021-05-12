@@ -111,7 +111,6 @@ public class JComboBoxSuggestionProvider {
         for (String v : list1) {
             JMenuItem item = new JMenuItem(v);
             item.addActionListener(e -> {
-                System.out.println("CLICOU " + v);
                 field.setSelectedIndex(-1);
                 field.setSelectedItem(v);
             });
