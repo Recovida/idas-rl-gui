@@ -17,6 +17,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -100,6 +101,7 @@ public class MainWindow {
     private JLabel currentFileLbl;
     boolean dirty = false;
     boolean skipValidation = false; // while filling in values read from file
+    FileChangeWatcher currentFileChangeWatcher = null;
 
     /* Non-GUI components */
     private JFrame frame;
@@ -347,7 +349,7 @@ public class MainWindow {
 
     }
 
-    public int validateDatasetsTabTopPart() {
+    public synchronized int validateDatasetsTabTopPart() {
         if (skipValidation)
             return -1;
 
@@ -410,7 +412,7 @@ public class MainWindow {
         return errorCount;
     }
 
-    public int validateDatasetsTabBottomPart() {
+    public synchronized int validateDatasetsTabBottomPart() {
         if (skipValidation)
             return -1;
 
@@ -463,13 +465,13 @@ public class MainWindow {
         return errorCount;
     }
 
-    public int validateOptionsTab() {
+    public synchronized int validateOptionsTab() {
         if (skipValidation)
             return -1;
         return 0;
     }
 
-    public int validateLinkageColsTab(int rowIndex, String key) {
+    public synchronized int validateLinkageColsTab(int rowIndex, String key) {
         if (skipValidation)
             return -1;
         int errorCount = 0;
@@ -529,7 +531,7 @@ public class MainWindow {
         return errorCount;
     }
 
-    public int validateLinkageColsTab(int index) {
+    public synchronized int validateLinkageColsTab(int index) {
         if (skipValidation)
             return -1;
         int errorCount = 0;
@@ -540,7 +542,7 @@ public class MainWindow {
         return errorCount;
     }
 
-    public int validateLinkageColsTab() {
+    public synchronized int validateLinkageColsTab() {
         if (skipValidation)
             return -1;
         int index = linkageColsTable.getSelectedRow();
@@ -612,7 +614,7 @@ public class MainWindow {
             history.redo();
     }
 
-    protected void doNew() {
+    protected synchronized void doNew() {
         if (dirty) {
             int ans = promptToSaveChanges();
             if (ans == JOptionPane.YES_OPTION)
@@ -622,14 +624,12 @@ public class MainWindow {
                 return;
         }
         clearAllFields();
-        currentFileName = null;
-        dirty = false;
-        updateConfigFileLabel();
+        updateConfigFileName(null);
         history.clearAll();
         manager.reset();
     }
 
-    protected void doOpen() {
+    protected synchronized void doOpen() {
         if (dirty) {
             int ans = promptToSaveChanges();
             if (ans == JOptionPane.YES_OPTION)
@@ -642,48 +642,51 @@ public class MainWindow {
                 ? null
                 : Paths.get(currentFileName).toAbsolutePath().toString());
         if (newConfigFileName != null) {
-            skipValidation = true;
-            clearAllFields();
-            Component selectedComponent = tabbedPane.getSelectedComponent();
-            if (cf.load(newConfigFileName)) {
-                if (selectedComponent != null)
-                    SwingUtilities.invokeLater(() -> {
-                        tabbedPane.setSelectedComponent(selectedComponent);
-                    });
-                currentFileName = newConfigFileName;
-                dirty = false;
-                updateConfigFileLabel();
-                history.clearAll();
-                manager.reset();
-                linkageColsTable.clearSelection();
-            } else {
-                JOptionPane.showMessageDialog(frame,
-                        MessageProvider.getMessage("menu.open.cantopen"),
-                        MessageProvider.getMessage("menu.open.error"),
-                        JOptionPane.ERROR_MESSAGE);
-            }
-            skipValidation = false;
+            doOpen(newConfigFileName);
         }
     }
 
-    protected void doSave() {
+    protected void doOpen(String newConfigFileName) {
+        skipValidation = true;
+        clearAllFields();
+        Component selectedComponent = tabbedPane.getSelectedComponent();
+        if (cf.load(newConfigFileName)) {
+            if (selectedComponent != null)
+                SwingUtilities.invokeLater(() -> {
+                    tabbedPane.setSelectedComponent(selectedComponent);
+                });
+            updateConfigFileName(newConfigFileName);
+            history.clearAll();
+            manager.reset();
+            linkageColsTable.clearSelection();
+        } else {
+            JOptionPane.showMessageDialog(frame,
+                    MessageProvider.getMessage("menu.file.open.cantopen"),
+                    MessageProvider.getMessage("menu.file.open.error"),
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        skipValidation = false;
+    }
+
+    protected synchronized void doSave() {
         if (currentFileName == null) {
             doSaveAs();
             return;
         }
+        if (currentFileChangeWatcher != null)
+            currentFileChangeWatcher.disable();
         if (cf.save(currentFileName)) {
-            dirty = false;
-            updateConfigFileLabel();
+            updateConfigFileName(currentFileName);
             history.setClean();
         } else {
             JOptionPane.showMessageDialog(frame,
-                    MessageProvider.getMessage("menu.save.cantsave"),
-                    MessageProvider.getMessage("menu.save.error"),
+                    MessageProvider.getMessage("menu.file.save.cantsave"),
+                    MessageProvider.getMessage("menu.file.save.error"),
                     JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    protected void doSaveAs() {
+    protected synchronized void doSaveAs() {
         String fn = selectConfigFile(currentFileName, true);
         if (fn != null) {
             currentFileName = fn;
@@ -703,16 +706,59 @@ public class MainWindow {
         frame.dispose();
     }
 
+    protected synchronized void updateConfigFileName(String fn) {
+        if (currentFileChangeWatcher != null)
+            currentFileChangeWatcher.disable();
+        if (fn != null) {
+            if (!fn.equals(currentFileName))
+                currentFileChangeWatcher = new FileChangeWatcher(Paths.get(fn),
+                        () -> {
+                            int result = promptToSaveChangesAfterChangeOnDisk();
+                            if (result == JOptionPane.YES_OPTION)
+                                doSave();
+                            else if (result == JOptionPane.NO_OPTION)
+                                doOpen(currentFileName);
+                        });
+            currentFileChangeWatcher.enable();
+        } else
+            currentFileChangeWatcher = null;
+        currentFileName = fn;
+        dirty = false;
+        updateConfigFileLabel();
+    }
+
     protected int promptToSaveChanges() {
         String msg = (currentFileName == null
-                ? MessageProvider.getMessage("menu.save.savechangesnofile")
-                : String.format(
-                        MessageProvider.getMessage("menu.save.savechangesfile"),
+                ? MessageProvider.getMessage("menu.file.save.savechangesnofile")
+                : MessageFormat.format(
+                        MessageProvider
+                                .getMessage("menu.file.save.savechangesfile"),
                         currentFileName));
         return JOptionPane.showOptionDialog(this.frame, msg,
-                MessageProvider.getMessage("menu.save.savechanges"),
+                MessageProvider.getMessage("menu.file.save.savechanges"),
                 JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, null, null);
+    }
+
+    protected int promptToSaveChangesAfterChangeOnDisk() {
+        String[] opt = new String[] {
+                MessageProvider.getMessage("menu.file.save."
+                        + (dirty ? "saveandoverwrite" : "overwrite")),
+                MessageProvider.getMessage("menu.file.save."
+                        + (dirty ? "discardandreload" : "reload")) };
+        String msg = MessageFormat.format(
+                MessageProvider.getMessage("menu.file.save.changedondisk"),
+                currentFileName == null ? ""
+                        : Paths.get(currentFileName).getFileName());
+        String title = MessageProvider
+                .getMessage("menu.file.save.changedexternally");
+        int result;
+        do {
+            result = JOptionPane.showOptionDialog(this.frame, msg, title,
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, opt, null);
+        } while (result == JOptionPane.CLOSED_OPTION);
+        return result;
     }
 
     /**
@@ -1334,8 +1380,9 @@ public class MainWindow {
                 fileName != null ? new File(fileName).getParentFile()
                         : new File(".").getAbsoluteFile());
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                MessageProvider.getMessage(save ? "menu.save.propertiesfile"
-                        : "menu.open.propertiesfile"),
+                MessageProvider
+                        .getMessage(save ? "menu.file.save.propertiesfile"
+                                : "menu.file.open.propertiesfile"),
                 "properties", "ini");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
