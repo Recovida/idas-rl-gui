@@ -669,6 +669,10 @@ public class MainWindow {
     }
 
     protected synchronized void doSave() {
+        if (manager.hasDuplicateNumbers()) {
+            showDuplicateNumbersWarning();
+            return;
+        }
         if (currentFileName == null) {
             doSaveAs();
             return;
@@ -687,11 +691,22 @@ public class MainWindow {
     }
 
     protected synchronized void doSaveAs() {
+        if (manager.hasDuplicateNumbers()) {
+            showDuplicateNumbersWarning();
+            return;
+        }
         String fn = selectConfigFile(currentFileName, true);
         if (fn != null) {
             currentFileName = fn;
             doSave();
         }
+    }
+
+    protected void showDuplicateNumbersWarning() {
+        JOptionPane.showMessageDialog(frame,
+                MessageProvider.getMessage("menu.file.save.duplicatenumbers"),
+                MessageProvider.getMessage("menu.file.save.error"),
+                JOptionPane.ERROR_MESSAGE);
     }
 
     protected void doExit() {

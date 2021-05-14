@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -249,10 +250,13 @@ public class ColumnPairManager {
         return selectionModel;
     }
 
-    public int addColumnPair(int index, Object[] contents) {
+    public synchronized int addColumnPair(int index, Object[] contents) {
         int numberIndex = model.getColumnIndex("number");
         if (contents != null && numberIndex < contents.length) {
             int number = (int) contents[numberIndex];
+            numberToColIdx.replaceAll(
+                    (num, set) -> set.stream().map(x -> x < index ? x : (x + 1))
+                            .collect(Collectors.toSet()));
             if (!numberToColIdx.containsKey(number))
                 numberToColIdx.put(number, new HashSet<>());
             numberToColIdx.get(number).add(index);
@@ -312,17 +316,20 @@ public class ColumnPairManager {
         return n;
     }
 
-    public Object[] deleteColumnPair(int index) {
+    public synchronized Object[] deleteColumnPair(int index) {
         Integer number = (Integer) model.getValue(index, "number");
         if (number != null) {
             numberToColIdx.getOrDefault(number, Collections.emptySet())
                     .remove(index);
+            numberToColIdx.replaceAll(
+                    (num, set) -> set.stream().map(x -> x < index ? x : (x - 1))
+                            .collect(Collectors.toSet()));
             updateCellsWithNumber(number);
         }
         Object[] r = model.getRowAsArray(index);
+        int viewIndex = table.convertRowIndexToView(index);
         model.removeRow(index);
         int n = model.getRowCount();
-        int viewIndex = table.convertColumnIndexToView(index);
         if (viewIndex < n)
             table.setRowSelectionInterval(viewIndex, viewIndex);
         else if (n > 0)
@@ -333,7 +340,8 @@ public class ColumnPairManager {
         return r;
     }
 
-    public void onChange(int rowIndex, String key, Object newValue) {
+    public synchronized void onChange(int rowIndex, String key,
+            Object newValue) {
         if ("number".equals(key)) {
             Integer oldNumber = (Integer) model.getValue(rowIndex, "number");
             Integer newNumber = (Integer) newValue;
@@ -639,6 +647,10 @@ public class ColumnPairManager {
     public Collection<Integer> getColIdxWithNumber(int number) {
         return Collections.unmodifiableCollection(
                 numberToColIdx.getOrDefault(number, Collections.emptySet()));
+    }
+
+    public boolean hasDuplicateNumbers() {
+        return numberToColIdx.values().stream().anyMatch(x -> x.size() > 1);
     }
 
     public void reset() {
