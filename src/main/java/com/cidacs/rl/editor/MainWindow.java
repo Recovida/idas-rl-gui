@@ -649,6 +649,7 @@ public class MainWindow {
     protected void doOpen(String newConfigFileName) {
         skipValidation = true;
         clearAllFields();
+        manager.reset();
         Component selectedComponent = tabbedPane.getSelectedComponent();
         if (cf.load(newConfigFileName)) {
             if (selectedComponent != null)
@@ -657,7 +658,6 @@ public class MainWindow {
                 });
             updateConfigFileName(newConfigFileName);
             history.clearAll();
-            manager.reset();
             linkageColsTable.clearSelection();
         } else {
             JOptionPane.showMessageDialog(frame,
