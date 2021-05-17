@@ -24,6 +24,7 @@ public class DatasetPeek {
     private String fileName;
     private String encoding;
     Set<String> columnNames;
+    DatasetPeekResult result = null;
 
     public DatasetPeek(String fileName, String encoding) {
         this.fileName = fileName;
@@ -35,6 +36,11 @@ public class DatasetPeek {
     }
 
     public DatasetPeekResult peek() {
+        result = peek0();
+        return result;
+    }
+
+    protected synchronized DatasetPeekResult peek0() {
         if (fileName == null || fileName.isEmpty())
             return DatasetPeekResult.BLANK_NAME;
         File f = new File(fileName);
@@ -91,7 +97,6 @@ public class DatasetPeek {
             int c;
             CsvLineParseState state = CsvLineParseState.START;
             StringBuilder currentColumnName = new StringBuilder();
-            int readChars = 0;
             while (-1 != (c = reader.read())
                     && state != CsvLineParseState.FINAL) {
                 char ch = (char) c;
@@ -217,5 +222,9 @@ public class DatasetPeek {
     public Set<String> getColumnNames() {
         return columnNames == null ? null
                 : Collections.unmodifiableSet(columnNames);
+    }
+
+    public DatasetPeekResult getResult() {
+        return result;
     }
 }

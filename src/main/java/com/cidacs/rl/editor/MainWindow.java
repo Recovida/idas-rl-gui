@@ -28,6 +28,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 import javax.swing.Box;
@@ -102,6 +104,8 @@ public class MainWindow {
     boolean dirty = false;
     boolean skipValidation = false; // while filling in values read from file
     FileChangeWatcher currentFileChangeWatcher = null;
+    private ColumnPairManager manager;
+    ConcurrentMap<String, ConcurrentMap<String, DatasetPeek>> peekFromFileNameAndEncoding = new ConcurrentHashMap<>();
 
     /* Non-GUI components */
     private JFrame frame;
@@ -144,7 +148,6 @@ public class MainWindow {
     private ColumnPairTableModel columnPairTableModel;
     private JPanel linkageColsTabPanel;
 
-    private ColumnPairManager manager;
     private JMenu editMenu;
     private JMenu fileMenu;
     private JButton firstDatasetBtn;
@@ -385,8 +388,27 @@ public class MainWindow {
         // File names
         String fn1 = (String) items.get("db_a").getCurrentValue();
         String fn2 = (String) items.get("db_b").getCurrentValue();
-        DatasetPeek p = new DatasetPeek(fn1, enc1);
-        DatasetPeekResult result = p.peek();
+        DatasetPeek p;
+        if (!peekFromFileNameAndEncoding.containsKey(fn1))
+            peekFromFileNameAndEncoding.put(fn1,
+                    new ConcurrentHashMap<String, DatasetPeek>());
+        ConcurrentMap<String, DatasetPeek> m = peekFromFileNameAndEncoding
+                .get(fn1);
+        if (m.containsKey(enc1)) {
+            p = m.get(enc1);
+        } else {
+            p = new DatasetPeek(fn1, enc1);
+            p.peek();
+            if (fn1 != null && !fn1.isEmpty()) {
+                m.put(enc1, p);
+                new FileChangeWatcher(Paths.get(fn1), () -> {
+                    peekFromFileNameAndEncoding.remove(fn1);
+                    System.out.format("PARANDO      (%s)%n", fn1);
+                    validateDatasetsTabTopPart();
+                }, true).enable();
+            }
+        }
+        DatasetPeekResult result = p.getResult();
         if (result != DatasetPeekResult.SUCCESS) {
             errorCount++;
             firstDatasetWarningLbl
@@ -395,8 +417,24 @@ public class MainWindow {
         } else
             firstDatasetWarningLbl.setVisible(false);
         manager.setFirstDatasetColumnNames(p.getColumnNames());
-        p = new DatasetPeek(fn2, enc2);
-        result = p.peek();
+        if (!peekFromFileNameAndEncoding.containsKey(fn2))
+            peekFromFileNameAndEncoding.put(fn2,
+                    new ConcurrentHashMap<String, DatasetPeek>());
+        m = peekFromFileNameAndEncoding.get(fn2);
+        if (m.containsKey(enc2)) {
+            p = m.get(enc2);
+        } else {
+            p = new DatasetPeek(fn2, enc2);
+            p.peek();
+            if (fn2 != null && !fn2.isEmpty()) {
+                m.put(enc2, p);
+                new FileChangeWatcher(Paths.get(fn2), () -> {
+                    peekFromFileNameAndEncoding.remove(fn2);
+                    validateDatasetsTabTopPart();
+                }, true).enable();
+            }
+        }
+        result = p.getResult();
         if (result != DatasetPeekResult.SUCCESS) {
             errorCount++;
             secondDatasetWarningLbl

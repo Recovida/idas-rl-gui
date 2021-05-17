@@ -18,34 +18,46 @@ public class FileChangeWatcher {
     Thread t;
     boolean enabled = false;
     private Runnable callback;
+    private boolean stopAfterCallback = false;
 
-    public FileChangeWatcher(Path p, Runnable callback) {
+    public FileChangeWatcher(Path p, Runnable callback,
+            boolean stopAfterCallback) {
         file = p.toAbsolutePath();
         dir = file.getParent();
         this.callback = callback;
+        this.stopAfterCallback = stopAfterCallback;
+    }
+
+    public FileChangeWatcher(Path p, Runnable callback) {
+        this(p, callback, false);
     }
 
     protected void createThread(Runnable callback) {
         t = new Thread(() -> {
-            try {
-                watchService = FileSystems.getDefault().newWatchService();
-                registeredKey = dir.register(watchService,
-                        StandardWatchEventKinds.ENTRY_CREATE,
-                        StandardWatchEventKinds.ENTRY_DELETE,
-                        StandardWatchEventKinds.ENTRY_MODIFY);
-                WatchKey key;
-                while ((key = watchService.take()) != null) {
-                    for (WatchEvent<?> event : key.pollEvents()) {
-                        if (enabled && dir.resolve((Path) event.context())
-                                .toAbsolutePath().equals(file))
-                            callback.run();
+            synchronized (FileChangeWatcher.this) {
+                try {
+                    watchService = FileSystems.getDefault().newWatchService();
+                    registeredKey = dir.register(watchService,
+                            StandardWatchEventKinds.ENTRY_CREATE,
+                            StandardWatchEventKinds.ENTRY_DELETE,
+                            StandardWatchEventKinds.ENTRY_MODIFY);
+                    WatchKey key;
+                    while (enabled && (key = watchService.take()) != null) {
+                        for (WatchEvent<?> event : key.pollEvents()) {
+                            if (enabled && dir.resolve((Path) event.context())
+                                    .toAbsolutePath().equals(file)) {
+                                callback.run();
+                                if (stopAfterCallback)
+                                    disable();
+                            }
+                        }
+                        if (!key.reset()) {
+                            break;
+                        }
                     }
-                    if (!key.reset()) {
-                        break;
-                    }
+                } catch (InterruptedException | ClosedWatchServiceException
+                        | IOException e) {
                 }
-            } catch (InterruptedException | ClosedWatchServiceException
-                    | IOException e) {
             }
         });
     }
