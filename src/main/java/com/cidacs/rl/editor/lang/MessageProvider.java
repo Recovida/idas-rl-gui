@@ -20,8 +20,7 @@ public class MessageProvider {
     }
 
     protected static ResourceBundle createBundle(Locale locale) {
-        return ResourceBundle.getBundle("com.cidacs.rl.editor.lang.messages",
-                locale);
+        return ResourceBundle.getBundle("lang.messages", locale);
     }
 
     public static String getMessage(String key) {
