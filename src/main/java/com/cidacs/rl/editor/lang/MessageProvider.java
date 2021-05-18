@@ -11,7 +11,10 @@ public class MessageProvider {
 
     public final static List<String> SUPPORTED_LANGUAGES = Collections
             .unmodifiableList(Arrays.asList(new String[] { "en", "es", "pt" }));
-    public static final String DEFAULT_LANGUAGE = SUPPORTED_LANGUAGES.get(0);
+    public static final String DEFAULT_LANGUAGE = SUPPORTED_LANGUAGES
+            .get(Math.max(0, SUPPORTED_LANGUAGES
+                    .indexOf(Locale.getDefault().getLanguage())));
+
     protected static Locale currentLocale = new Locale(DEFAULT_LANGUAGE);
     protected static ResourceBundle bundle = createBundle(currentLocale);
 

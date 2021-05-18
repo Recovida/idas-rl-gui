@@ -1385,6 +1385,8 @@ public class MainWindow {
         });
         for (String l : MessageProvider.SUPPORTED_LANGUAGES)
             languageCbox.addItem(new Locale(l));
+        languageCbox
+                .setSelectedItem(new Locale(MessageProvider.DEFAULT_LANGUAGE));
         menuBar.add(languageCbox);
 
         Component menuGlue = Box.createGlue();
