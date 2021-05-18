@@ -763,7 +763,7 @@ public class MainWindow {
         if (currentFileChangeWatcher != null)
             currentFileChangeWatcher.disable();
         if (fn != null) {
-            if (!fn.equals(currentFileName))
+            if (!fn.equals(currentFileName) || currentFileChangeWatcher == null)
                 currentFileChangeWatcher = new FileChangeWatcher(Paths.get(fn),
                         () -> {
                             int result = promptToSaveChangesAfterChangeOnDisk();

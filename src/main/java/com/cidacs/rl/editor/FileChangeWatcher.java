@@ -34,30 +34,28 @@ public class FileChangeWatcher {
 
     protected void createThread(Runnable callback) {
         t = new Thread(() -> {
-            synchronized (FileChangeWatcher.this) {
-                try {
-                    watchService = FileSystems.getDefault().newWatchService();
-                    registeredKey = dir.register(watchService,
-                            StandardWatchEventKinds.ENTRY_CREATE,
-                            StandardWatchEventKinds.ENTRY_DELETE,
-                            StandardWatchEventKinds.ENTRY_MODIFY);
-                    WatchKey key;
-                    while (enabled && (key = watchService.take()) != null) {
-                        for (WatchEvent<?> event : key.pollEvents()) {
-                            if (enabled && dir.resolve((Path) event.context())
-                                    .toAbsolutePath().equals(file)) {
-                                callback.run();
-                                if (stopAfterCallback)
-                                    disable();
-                            }
-                        }
-                        if (!key.reset()) {
-                            break;
+            try {
+                watchService = FileSystems.getDefault().newWatchService();
+                registeredKey = dir.register(watchService,
+                        StandardWatchEventKinds.ENTRY_CREATE,
+                        StandardWatchEventKinds.ENTRY_DELETE,
+                        StandardWatchEventKinds.ENTRY_MODIFY);
+                WatchKey key;
+                while (enabled && (key = watchService.take()) != null) {
+                    for (WatchEvent<?> event : key.pollEvents()) {
+                        if (enabled && dir.resolve((Path) event.context())
+                                .toAbsolutePath().equals(file)) {
+                            callback.run();
+                            if (stopAfterCallback)
+                                disable();
                         }
                     }
-                } catch (InterruptedException | ClosedWatchServiceException
-                        | IOException e) {
+                    if (!key.reset()) {
+                        break;
+                    }
                 }
+            } catch (InterruptedException | ClosedWatchServiceException
+                    | IOException e) {
             }
         });
     }
