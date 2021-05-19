@@ -66,6 +66,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableRowSorter;
 
 import com.cidacs.rl.editor.DatasetPeek.DatasetPeekResult;
+import com.cidacs.rl.editor.gui.AboutWindow;
 import com.cidacs.rl.editor.gui.ColumnPairTableModel;
 import com.cidacs.rl.editor.gui.JComboBoxSuggestionProvider;
 import com.cidacs.rl.editor.gui.JComboBoxWithPlaceholder;
@@ -96,7 +97,7 @@ import com.cidacs.rl.editor.undo.UndoHistory;
 public class MainWindow {
 
     /* Non-GUI attributes */
-    public final String PROGRAM_NAME = "CIDACS RL SIM Editor";
+    public final static String PROGRAM_NAME = "CIDACS RL SIM Editor";
     UndoHistory history = new UndoHistory();
     ConfigurationFile cf = new ConfigurationFile();
     String currentFileName = null;
@@ -296,6 +297,7 @@ public class MainWindow {
         saveAsFileMenuItem.addActionListener(e -> doSaveAs());
         redoMenuItem.addActionListener(e -> doRedo());
         undoMenuItem.addActionListener(e -> doUndo());
+        aboutMenuItem.addActionListener(e -> doAbout());
 
         // Undo - changed state
 
@@ -759,6 +761,10 @@ public class MainWindow {
         frame.dispose();
     }
 
+    protected void doAbout() {
+        new AboutWindow(frame).setVisible(true);
+    }
+
     protected synchronized void updateConfigFileName(String fn) {
         if (currentFileChangeWatcher != null)
             currentFileChangeWatcher.disable();
@@ -1129,7 +1135,7 @@ public class MainWindow {
         optionsTabPanel = new JPanel();
         tabbedPane.addTab("_Options", null, optionsTabPanel, null);
         GridBagLayout gbl_optionsTabPanel = new GridBagLayout();
-        gbl_optionsTabPanel.columnWidths = new int[] { 200, 500 };
+        gbl_optionsTabPanel.columnWidths = new int[] { 250, 500 };
         gbl_optionsTabPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
         gbl_optionsTabPanel.columnWeights = new double[] { 0.0, 1.0 };
         gbl_optionsTabPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0,
