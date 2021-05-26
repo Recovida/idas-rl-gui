@@ -8,6 +8,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,6 +37,8 @@ import java.util.stream.Collectors;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -98,7 +101,7 @@ import recovida.idas.rl.editor.undo.UndoHistory;
 public class MainWindow {
 
     /* Non-GUI attributes */
-    public final static String PROGRAM_NAME = "IDaS-RL Editor";
+    public final static String PROGRAM_NAME = "IDaS-RL";
     UndoHistory history = new UndoHistory();
     ConfigurationFile cf = new ConfigurationFile();
     String currentFileName = null;
@@ -109,7 +112,7 @@ public class MainWindow {
     private ColumnPairManager manager;
     ConcurrentMap<String, ConcurrentMap<String, DatasetPeek>> peekFromFileNameAndEncoding = new ConcurrentHashMap<>();
 
-    /* Non-GUI components */
+    /* GUI components */
     private JFrame frame;
     private JTextFieldWithPlaceholder firstDatasetSuffixField;
     private JTextFieldWithPlaceholder secondDatasetSuffixField;
@@ -369,6 +372,11 @@ public class MainWindow {
 
     }
 
+    protected Icon getTabErrorIcon() {
+        return new ImageIcon(WarningIcon.BUFFERED_IMAGE.getScaledInstance(15,
+                15, Image.SCALE_SMOOTH));
+    }
+
     public synchronized int validateDatasetsTabTopPart() {
         if (skipValidation)
             return -1;
@@ -464,6 +472,8 @@ public class MainWindow {
             manager.getTableModel().fireTableRowsUpdated(0,
                     manager.getColumnPairCount() - 1);
         validateLinkageColsTab();
+        tabbedPane.setIconAt(tabbedPane.indexOfComponent(datasetsTabPanel),
+                errorCount == 0 ? null : getTabErrorIcon());
         return errorCount;
     }
 

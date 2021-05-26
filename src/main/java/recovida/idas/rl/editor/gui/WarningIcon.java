@@ -17,17 +17,17 @@ public class WarningIcon extends JLabel {
 
     private boolean ready = false;
 
-    private static final Icon icon = UIManager.getIcon("OptionPane.errorIcon");
-    private static final BufferedImage bufferedImage = new BufferedImage(
-            icon.getIconWidth(), icon.getIconHeight(),
+    public static final Icon ICON = UIManager.getIcon("OptionPane.errorIcon");
+    public static final BufferedImage BUFFERED_IMAGE = new BufferedImage(
+            ICON.getIconWidth(), ICON.getIconHeight(),
             BufferedImage.TYPE_INT_ARGB);
 
     public WarningIcon() {
         super();
         setText("!");
         setForeground(Color.RED);
-        Graphics2D g = bufferedImage.createGraphics();
-        icon.paintIcon(null, g, 0, 0);
+        Graphics2D g = BUFFERED_IMAGE.createGraphics();
+        ICON.paintIcon(null, g, 0, 0);
         g.dispose();
         setVisible(false);
     }
@@ -47,7 +47,7 @@ public class WarningIcon extends JLabel {
     }
 
     public static void applyIconToLabel(JLabel label, int size) {
-        label.setIcon(new ImageIcon(bufferedImage.getScaledInstance(size, size,
+        label.setIcon(new ImageIcon(BUFFERED_IMAGE.getScaledInstance(size, size,
                 Image.SCALE_SMOOTH)));
     }
 

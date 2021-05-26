@@ -1,5 +1,6 @@
 package recovida.idas.rl.editor.gui;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -97,6 +98,54 @@ public class ColumnPairTableModel extends DefaultTableModel {
                     "columns.table." + keys[i].replaceAll("_", "")));
         if (getRowCount() > 0)
             fireTableRowsUpdated(0, getRowCount() - 1);
+    }
+
+    public boolean validate() {
+        for (int i = 0; i < getRowCount(); i++)
+            if (!validateRow(i))
+                return false;
+        return true;
+    }
+
+    public boolean validateRow(int rowIndex) {
+        for (String key : keys)
+            if (!validateCell(rowIndex, key))
+                return false;
+        return true;
+    }
+
+    protected Collection<String> firstDatasetColumnNames = null;
+    protected Collection<String> secondDatasetColumnNames = null;
+
+    public synchronized boolean validateCell(int rowIndex, String key) {
+        Object value = getValue(rowIndex, key);
+        switch (key) {
+        case "type":
+            return LinkageColumnEditingPanel.getTypes().contains(value);
+        case "weight":
+            return "copy".equals(getValue(rowIndex, "type"))
+                    || value instanceof Double && (Double) value >= 0;
+        case "phon_weight":
+            return !"name".equals(getValue(rowIndex, "type"))
+                    || value instanceof Double && (Double) value >= 0;
+        case "index_a":
+            return firstDatasetColumnNames == null
+                    || ("copy".equals(getValue(rowIndex, "type"))
+                            && "".equals(value))
+                    || firstDatasetColumnNames.contains(value);
+        case "index_b":
+            return secondDatasetColumnNames == null
+                    || ("copy".equals(getValue(rowIndex, "type"))
+                            && "".equals(value))
+                    || secondDatasetColumnNames.contains(value);
+        case "rename_a":
+        case "rename_b":
+            return true;
+        case "number":
+            return false;
+        default:
+            return false;
+        }
     }
 
 }
