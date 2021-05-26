@@ -128,8 +128,11 @@ public class ConfigurationFile {
                 if ("max_rows".equals(key)
                         && Integer.valueOf(Integer.MAX_VALUE).equals(value))
                     continue; // don't save default value
-                if ("min_score".equals(key)
+                else if ("min_score".equals(key)
                         && Double.valueOf(0.0).equals(value))
+                    continue; // don't save default value
+                else if ("num_threads".equals(key)
+                        && Integer.valueOf(0).equals(value))
                     continue; // don't save default value
                 String valueStr = value == null ? null : value.toString();
                 p.put(key, valueStr);
@@ -138,7 +141,6 @@ public class ConfigurationFile {
                 skipTimestampOutput.ignoreNextLine(true);
             }
             output.write(new byte[] { '\n' });
-            int n = pairManager.getColumnPairCount();
             for (int number = 0; number <= MAX_NUMBER; number++) {
                 Collection<Integer> idx = pairManager
                         .getColIdxWithNumber(number);

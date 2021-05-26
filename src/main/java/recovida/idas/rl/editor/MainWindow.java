@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -165,6 +166,11 @@ public class MainWindow {
     private JLabel minScoreLbl;
     private JLabel maxRowsLbl;
     private JLabel linkageDirLbl;
+    private JSpinnerWithBlankValue threadsField;
+    private JLabel threadsLbl;
+    private JPanel threadsPanel;
+    private JLabel coresLabel;
+    private Component horizontalStrut;
 
     /**
      * Launch the application.
@@ -174,7 +180,7 @@ public class MainWindow {
             @Override
             public void run() {
                 try {
-                    MainWindow window = new MainWindow();
+                    new MainWindow();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -241,12 +247,21 @@ public class MainWindow {
                 indexDirField, optionsTabEventListener));
         cf.addSettingItem("linkage_folder", new StringSettingItem(history, "",
                 "", linkageDirField, optionsTabEventListener));
+        cf.addSettingItem("min_score", new NumberSettingItem(history, 0.0, 0.0,
+                minScoreField, optionsTabEventListener));
+        cf.addSettingItem("num_threads",
+                new NumberSettingItem(history, 0, 0, threadsField));
+
+        horizontalStrut = Box.createHorizontalStrut(20);
+        threadsPanel.add(horizontalStrut);
+
+        coresLabel = new JLabel(
+                "_On this computer, this number should ideally be at most n.");
+        threadsPanel.add(coresLabel);
         cf.addSettingItem("max_rows",
                 new NumberSettingItem(history, Integer.MAX_VALUE,
                         Integer.MAX_VALUE, maxRowsField,
                         optionsTabEventListener));
-        cf.addSettingItem("min_score", new NumberSettingItem(history, 0.0, 0.0,
-                minScoreField, optionsTabEventListener));
 
         // Tab: COLUMNS
         ColumnPairValueChangeListener linkageColsTabAddDelEventListener = (
@@ -1136,10 +1151,10 @@ public class MainWindow {
         tabbedPane.addTab("_Options", null, optionsTabPanel, null);
         GridBagLayout gbl_optionsTabPanel = new GridBagLayout();
         gbl_optionsTabPanel.columnWidths = new int[] { 250, 500 };
-        gbl_optionsTabPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
+        gbl_optionsTabPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
         gbl_optionsTabPanel.columnWeights = new double[] { 0.0, 1.0 };
         gbl_optionsTabPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0,
-                Double.MIN_VALUE };
+                0.0, Double.MIN_VALUE };
         optionsTabPanel.setLayout(gbl_optionsTabPanel);
 
         Component optionsTabTopMargin = Box
@@ -1190,6 +1205,8 @@ public class MainWindow {
 
         SpinnerNumberModel maxRowsModel = new SpinnerNumberModel(
                 Integer.MAX_VALUE, 0, Integer.MAX_VALUE, 1);
+
+        SpinnerNumberModel threadsModel = new SpinnerNumberModel(0, 0, 256, 1);
 
         indexDirLbl = new JLabel("_Index location");
         indexDirLbl.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -1245,6 +1262,36 @@ public class MainWindow {
         ne_minScoreField.setRequestFocusEnabled(false);
         minScoreField.setEditor(ne_minScoreField);
 
+        threadsLbl = new JLabel("_Number of threads");
+        threadsLbl.setHorizontalAlignment(SwingConstants.TRAILING);
+        GridBagConstraints gbc_threadsLbl = new GridBagConstraints();
+        gbc_threadsLbl.anchor = GridBagConstraints.EAST;
+        gbc_threadsLbl.insets = new Insets(0, 0, 5, 5);
+        gbc_threadsLbl.gridx = 0;
+        gbc_threadsLbl.gridy = 4;
+        optionsTabPanel.add(threadsLbl, gbc_threadsLbl);
+
+        threadsPanel = new JPanel();
+        threadsPanel.setBorder(null);
+        GridBagConstraints gbc_threadsPanel = new GridBagConstraints();
+        gbc_threadsPanel.anchor = GridBagConstraints.WEST;
+        gbc_threadsPanel.fill = GridBagConstraints.VERTICAL;
+        gbc_threadsPanel.insets = new Insets(0, 0, 5, 0);
+        gbc_threadsPanel.gridx = 1;
+        gbc_threadsPanel.gridy = 4;
+        optionsTabPanel.add(threadsPanel, gbc_threadsPanel);
+        threadsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
+
+        threadsField = new JSpinnerWithBlankValue(threadsModel);
+        threadsPanel.add(threadsField);
+        threadsField.setBlankValue(Integer.valueOf(0));
+
+        JSpinner.NumberEditor ne_threadsField = new JSpinner.NumberEditor(
+                threadsField, "0");
+        ne_threadsField.setPreferredSize(new Dimension(122, 29));
+        ne_threadsField.setRequestFocusEnabled(false);
+        threadsField.setEditor(ne_threadsField);
+
         maxRowsLbl = new JLabel("_Only read first rows (A)");
         maxRowsLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         maxRowsLbl.setPreferredSize(new Dimension(150, 17));
@@ -1252,7 +1299,7 @@ public class MainWindow {
         gbc_maxRowsLbl.fill = GridBagConstraints.HORIZONTAL;
         gbc_maxRowsLbl.insets = new Insets(0, 0, 0, 5);
         gbc_maxRowsLbl.gridx = 0;
-        gbc_maxRowsLbl.gridy = 4;
+        gbc_maxRowsLbl.gridy = 5;
         optionsTabPanel.add(maxRowsLbl, gbc_maxRowsLbl);
         maxRowsField = new JSpinnerWithBlankValue(maxRowsModel);
         ((JSpinnerWithBlankValue) maxRowsField)
@@ -1260,7 +1307,7 @@ public class MainWindow {
         GridBagConstraints gbc_maxRowsField = new GridBagConstraints();
         gbc_maxRowsField.anchor = GridBagConstraints.WEST;
         gbc_maxRowsField.gridx = 1;
-        gbc_maxRowsField.gridy = 4;
+        gbc_maxRowsField.gridy = 5;
         optionsTabPanel.add(maxRowsField, gbc_maxRowsField);
 
         JSpinner.NumberEditor ne_maxRowsField = new JSpinner.NumberEditor(
@@ -1555,6 +1602,10 @@ public class MainWindow {
                 MessageProvider.getMessage("options.linkagelocation.select"));
         maxRowsLbl.setText(MessageProvider.getMessage("options.maxrows"));
         minScoreLbl.setText(MessageProvider.getMessage("options.minscore"));
+        threadsLbl.setText(MessageProvider.getMessage("options.threads"));
+        coresLabel.setText(MessageFormat.format(
+                MessageProvider.getMessage("options.threads.cores"),
+                Runtime.getRuntime().availableProcessors()));
 
         // tab - columns
         tabbedPane.setTitleAt(tabbedPane.indexOfComponent(linkageColsTabPanel),
