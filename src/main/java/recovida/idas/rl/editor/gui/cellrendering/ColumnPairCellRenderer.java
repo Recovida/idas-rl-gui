@@ -51,7 +51,7 @@ public abstract class ColumnPairCellRenderer extends JLabel
 
     protected boolean isValid(JTable table, int viewRowIndex,
             int viewColIndex) {
-        return getModel(table).validateCell(
+        return getModel(table).isCellValid(
                 table.convertRowIndexToModel(viewRowIndex),
                 table.convertColumnIndexToModel(viewColIndex));
     }

@@ -21,7 +21,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -269,33 +268,24 @@ public class MainWindow {
         // Tab: COLUMNS
         ColumnPairValueChangeListener linkageColsTabAddDelEventListener = (
                 int index, String key, Object newValue) -> {
-            System.out
-                    .println("CHANGE: " + key + "=" + newValue + " @" + index);
             tabbedPane.setSelectedComponent(linkageColsTabPanel);
-            if (index >= 0) {
-                if ("type".equals(key))
-                    validateLinkageColsTab(index); // type affects
-                                                   // validation of other fields
-                else
-                    validateLinkageColsTab(index, key);
-            }
+            validateLinkageColsTab();
         };
         ColumnPairInclusionExclusionListener linkageColsTabValueChangeEventListener = new ColumnPairInclusionExclusionListener() {
 
             @Override
             public void insertedColumnPair(int index, Object[] columnPairData) {
-                System.out.println("INSERT: " + columnPairData + " @" + index);
+                validateLinkageColsTab();
             }
 
             @Override
             public void deletedColumnPair(int index, Object[] columnPairData) {
-                System.out.println("DELETE: " + columnPairData + " @" + index);
+                validateLinkageColsTab();
             }
         };
         ColumnPairSelectionListener linkageColsTabSelChangeEventListener = (
                 int index) -> {
-            System.out.println("SELECT: " + index);
-            validateLinkageColsTab(index);
+            validateLinkageColsTabSelectedRow(index);
         };
         manager = new ColumnPairManager(history, linkageColsButtonPanel,
                 linkageColsEditingPanel, linkageColsTable);
@@ -428,7 +418,6 @@ public class MainWindow {
                 m.put(enc1, p);
                 new FileChangeWatcher(Paths.get(fn1), () -> {
                     peekFromFileNameAndEncoding.remove(fn1);
-                    System.out.format("PARANDO      (%s)%n", fn1);
                     validateDatasetsTabTopPart();
                 }, true).enable();
             }
@@ -536,54 +525,33 @@ public class MainWindow {
         return 0;
     }
 
-    public synchronized int validateLinkageColsTab(int rowIndex, String key) {
+    public synchronized int validateLinkageColsTabSelectedRow(int rowIndex,
+            String key) {
         if (skipValidation)
             return -1;
-        int errorCount = 0;
-        Object value = rowIndex >= 0
-                ? columnPairTableModel.getValue(rowIndex, key)
-                : null;
-        Collection<String> allowed;
-        boolean error;
+        boolean error = rowIndex >= 0
+                && !columnPairTableModel.isCellValid(rowIndex, key);
         JLabel lbl;
-        String type = rowIndex >= 0
-                ? columnPairTableModel.getStringValue(rowIndex, "type")
-                : "";
-        boolean isCopyType = "copy".equals(type);
         switch (key) {
         case "index_a":
-            allowed = manager.getFirstDatasetColumnNames();
-            error = rowIndex >= 0 && allowed != null && !allowed.contains(value)
-                    && !(isCopyType && "".equals(value == null ? "" : value));
             lbl = linkageColsEditingPanel.getFirstNameWarningLbl();
             lbl.setVisible(error);
             lbl.setToolTipText(
                     error ? MessageProvider.getMessage("columns.badcolumn")
                             : "");
-            if (error)
-                errorCount++;
             break;
         case "index_b":
-            allowed = manager.getSecondDatasetColumnNames();
-            error = rowIndex >= 0 && allowed != null && !allowed.contains(value)
-                    && !(isCopyType && "".equals(value == null ? "" : value));
             lbl = linkageColsEditingPanel.getSecondNameWarningLbl();
             lbl.setVisible(error);
             lbl.setToolTipText(
                     error ? MessageProvider.getMessage("columns.badcolumn")
                             : "");
-            if (error)
-                errorCount++;
             break;
         case "type":
-            allowed = LinkageColumnEditingPanel.getTypes();
-            error = rowIndex >= 0 && !allowed.contains(value);
             lbl = linkageColsEditingPanel.getTypeWarningLbl();
             lbl.setVisible(error);
             lbl.setToolTipText(
                     error ? MessageProvider.getMessage("columns.badtype") : "");
-            if (error)
-                errorCount++;
             break;
         case "weight":
         case "phon_weight":
@@ -593,17 +561,17 @@ public class MainWindow {
         default:
             break;
         }
-        return errorCount;
+        return error ? 1 : 0;
     }
 
-    public synchronized int validateLinkageColsTab(int index) {
+    public synchronized int validateLinkageColsTabSelectedRow(int index) {
         if (skipValidation)
             return -1;
         int errorCount = 0;
         String[] keys = { "number", "index_a", "index_b", "type", "weight",
                 "phon_weight", "rename_a", "rename_b" };
         for (String key : keys)
-            errorCount += validateLinkageColsTab(index, key);
+            errorCount += validateLinkageColsTabSelectedRow(index, key);
         return errorCount;
     }
 
@@ -613,14 +581,16 @@ public class MainWindow {
         int index = linkageColsTable.getSelectedRow();
         if (index >= 0)
             index = linkageColsTable.convertRowIndexToModel(index);
-        return validateLinkageColsTab(index);
+        validateLinkageColsTabSelectedRow(index);
+        int errorCount = columnPairTableModel.isValid() ? 0 : 1;
+        tabbedPane.setIconAt(tabbedPane.indexOfComponent(linkageColsTabPanel),
+                errorCount == 0 ? null : getTabErrorIcon());
+        return errorCount;
     }
 
-    public void validateAllTabs() {
-        validateDatasetsTabTopPart();
-        validateDatasetsTabBottomPart();
-        validateOptionsTab();
-        validateLinkageColsTab();
+    public int validateAllTabs() {
+        return validateDatasetsTabTopPart() + validateDatasetsTabBottomPart()
+                + validateOptionsTab() + validateLinkageColsTab();
     }
 
     public static String getDatasetHeaderErrorMessage(DatasetPeekResult result,
@@ -747,6 +717,12 @@ public class MainWindow {
         if (cf.save(currentFileName)) {
             updateConfigFileName(currentFileName);
             history.setClean();
+            if (validateAllTabs() > 0)
+                JOptionPane.showMessageDialog(frame,
+                        MessageProvider
+                                .getMessage("menu.file.save.containserrors"),
+                        MessageProvider.getMessage("menu.file.save.warning"),
+                        JOptionPane.WARNING_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(frame,
                     MessageProvider.getMessage("menu.file.save.cantsave"),

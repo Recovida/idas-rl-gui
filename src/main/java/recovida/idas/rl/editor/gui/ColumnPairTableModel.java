@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Vector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -29,6 +30,8 @@ public class ColumnPairTableModel extends DefaultTableModel {
 
     protected Collection<String> firstDatasetColumnNames = null;
     protected Collection<String> secondDatasetColumnNames = null;
+
+    protected Vector<boolean[]> valid = new Vector<>();
 
     public ColumnPairTableModel() {
         for (int i = 0; i < keys.length; i++)
@@ -122,62 +125,77 @@ public class ColumnPairTableModel extends DefaultTableModel {
             fireTableRowsUpdated(0, getRowCount() - 1);
     }
 
-    public boolean validate() {
-        for (int i = 0; i < getRowCount(); i++)
-            if (!validateRow(i))
-                return false;
-        return true;
+    public void updateRowValidation(int rowIndex) {
+        if (valid.get(rowIndex) == null)
+            valid.set(rowIndex, new boolean[keys.length]);
+        boolean[] v = valid.get(rowIndex);
+        Object value;
+        Object type = getValue(rowIndex, "type");
+        // validate type
+        value = type;
+        v[indexFromKey.get("type")] = LinkageColumnEditingPanel.getTypes()
+                .contains(value);
+        // validate weight
+        value = getValue(rowIndex, "weight");
+        v[indexFromKey.get("weight")] = "copy".equals(type) || value != null
+                && value instanceof Double && (Double) value >= 0;
+        // validate phon weight
+        value = getValue(rowIndex, "phon_weight");
+        v[indexFromKey.get("phon_weight")] = value == null
+                || !"name".equals(type)
+                || value instanceof Double && (Double) value >= 0;
+        // validate index_a
+        value = getValue(rowIndex, "index_a");
+        v[indexFromKey.get("index_a")] = firstDatasetColumnNames == null
+                || ("copy".equals(getValue(rowIndex, "type"))
+                        && "".equals(value))
+                || firstDatasetColumnNames.contains(value);
+        // validate index_b
+        value = getValue(rowIndex, "index_b");
+        v[indexFromKey.get("index_b")] = secondDatasetColumnNames == null
+                || ("copy".equals(getValue(rowIndex, "type"))
+                        && "".equals(value))
+                || secondDatasetColumnNames.contains(value);
+        // validate rename_a and rename_b
+        v[indexFromKey.get("rename_a")] = true;
+        v[indexFromKey.get("rename_b")] = true;
+        // validate number
+        value = getValue(rowIndex, "number");
+        v[indexFromKey.get("number")] = numberToColIdx
+                .getOrDefault(value, Collections.emptySet()).size() == 1;
     }
 
-    public boolean validateRow(int rowIndex) {
-        for (String key : keys)
-            if (!validateCell(rowIndex, key))
-                return false;
-        return true;
+    public boolean isValid() {
+        return valid.stream().allMatch(v -> v != null
+                && IntStream.range(0, v.length).allMatch(i -> v[i]));
     }
 
-    public boolean validateCell(int rowIndex, int colIndex) {
-        if (colIndex < 0 || colIndex >= keys.length)
+    public boolean isRowValid(int rowIndex) {
+        if (rowIndex < 0 || rowIndex >= getRowCount())
             return false;
-        return validateCell(rowIndex, keys[colIndex]);
+        boolean[] v = valid.get(rowIndex);
+        return v != null && IntStream.range(0, v.length).allMatch(i -> v[i]);
     }
 
-    public synchronized boolean validateCell(int rowIndex, String key) {
-        Object value = getValue(rowIndex, key);
-        switch (key) {
-        case "type":
-            return LinkageColumnEditingPanel.getTypes().contains(value);
-        case "weight":
-            return "copy".equals(getValue(rowIndex, "type"))
-                    || value instanceof Double && (Double) value >= 0;
-        case "phon_weight":
-            return !"name".equals(getValue(rowIndex, "type"))
-                    || value instanceof Double && (Double) value >= 0;
-        case "index_a":
-            return firstDatasetColumnNames == null
-                    || ("copy".equals(getValue(rowIndex, "type"))
-                            && "".equals(value))
-                    || firstDatasetColumnNames.contains(value);
-        case "index_b":
-            return secondDatasetColumnNames == null
-                    || ("copy".equals(getValue(rowIndex, "type"))
-                            && "".equals(value))
-                    || secondDatasetColumnNames.contains(value);
-        case "rename_a":
-        case "rename_b":
-            return true;
-        case "number":
-            return numberToColIdx.getOrDefault(value, Collections.emptySet())
-                    .size() == 1;
-        default:
+    public boolean isCellValid(int rowIndex, int colIndex) {
+        if (rowIndex < 0 || rowIndex >= getRowCount() || colIndex < 0
+                || colIndex >= keys.length)
             return false;
-        }
+        boolean[] v = valid.get(rowIndex);
+        return v != null && v[colIndex];
+    }
+
+    public boolean isCellValid(int rowIndex, String key) {
+        return isCellValid(rowIndex, indexFromKey.getOrDefault(key, -1));
     }
 
     public void updateCellsWithNumber(int number) {
         for (int i = 0; i < getRowCount(); i++)
-            if (Objects.equals(Integer.valueOf(number), getValue(i, "number")))
+            if (Objects.equals(Integer.valueOf(number),
+                    getValue(i, "number"))) {
+                updateRowValidation(i);
                 fireTableRowsUpdated(i, i);
+            }
     }
 
     @Override
@@ -207,6 +225,7 @@ public class ColumnPairTableModel extends DefaultTableModel {
             }
         }
         super.setValueAt(value, rowIndex, colIndex);
+        updateRowValidation(rowIndex);
         if (colIndex == getColumnIndex("type"))
             fireTableRowsUpdated(rowIndex, rowIndex);
         else if (colIndex == getColumnIndex("index_a"))
@@ -231,6 +250,7 @@ public class ColumnPairTableModel extends DefaultTableModel {
                     (num, set) -> set.stream().map(x -> x < row ? x : (x - 1))
                             .collect(Collectors.toSet()));
         }
+        valid.remove(row);
         super.removeRow(row);
         if (number != null)
             updateCellsWithNumber(number);
@@ -250,7 +270,9 @@ public class ColumnPairTableModel extends DefaultTableModel {
                 numberToColIdx.put(number, new HashSet<>());
             numberToColIdx.get(number).add(row);
         }
+        valid.insertElementAt(null, row);
         super.insertRow(row, rowData);
+        updateRowValidation(row);
         updateCellsWithNumber(number);
     }
 
@@ -263,6 +285,7 @@ public class ColumnPairTableModel extends DefaultTableModel {
         if (rowCount < getRowCount())
             numberToColIdx.replaceAll((num, set) -> set.stream()
                     .filter(x -> x < rowCount).collect(Collectors.toSet()));
+        valid.setSize(rowCount);
         super.setRowCount(rowCount);
     }
 
