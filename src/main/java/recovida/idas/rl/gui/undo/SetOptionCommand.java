@@ -42,6 +42,9 @@ public class SetOptionCommand<T> extends Command {
             return false;
         if (this.settingItem != ((SetOptionCommand<T>) that).settingItem)
             return false;
+        if (Objects.equals(this.oldValue,
+                ((SetOptionCommand<T>) that).newValue))
+            return false;
         this.newValue = ((SetOptionCommand<T>) that).newValue;
         return true;
     }

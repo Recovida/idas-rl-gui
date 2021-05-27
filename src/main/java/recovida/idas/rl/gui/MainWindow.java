@@ -173,6 +173,7 @@ public class MainWindow {
     private JPanel threadsPanel;
     private JLabel coresLabel;
     private Component horizontalStrut;
+    private JPanel executionTabPanel;
 
     /**
      * Launch the application.
@@ -289,6 +290,9 @@ public class MainWindow {
         };
         manager = new ColumnPairManager(history, linkageColsButtonPanel,
                 linkageColsEditingPanel, linkageColsTable);
+
+        executionTabPanel = new JPanel();
+        tabbedPane.addTab("_Execution", null, executionTabPanel, null);
         manager.addInclusionExclusionListener(
                 linkageColsTabValueChangeEventListener);
         manager.addSelectionListener(linkageColsTabSelChangeEventListener);
@@ -1601,6 +1605,10 @@ public class MainWindow {
         ColumnPairTableModel model = (ColumnPairTableModel) linkageColsTable
                 .getModel();
         model.updateLocalisedStrings(linkageColsTable.getColumnModel());
+
+        // tab - execution
+        tabbedPane.setTitleAt(tabbedPane.indexOfComponent(executionTabPanel),
+                " " + MessageProvider.getMessage("execution") + " ");
 
         // re-create validation messages
         validateAllTabs();
