@@ -3,7 +3,6 @@ package recovida.idas.rl.editor.gui.cellrendering;
 import java.awt.Component;
 import java.awt.Font;
 import java.util.Collection;
-import java.util.Collections;
 
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
@@ -22,7 +21,7 @@ public class NameColumnPairCellRenderer extends ColumnPairCellRenderer
             boolean isSelected, boolean hasFocus, int row, int column) {
         if (value == null)
             value = "";
-        boolean invalid = !isValid(table, row, value);
+        boolean invalid = !isValid(table, row, column);
         boolean italic = false;
         if (invalid && "".equals(value)) {
             value = getBlankText(table, row);
@@ -39,25 +38,10 @@ public class NameColumnPairCellRenderer extends ColumnPairCellRenderer
         return c;
     }
 
-    public boolean isValid(JTable table, int viewRowIndex, Object value) {
-        return validNames == null
-                || ("copy".equals(getValue(table, viewRowIndex, "type"))
-                        && "".equals(value))
-                || validNames.contains(value);
-    }
-
     public String getBlankText(JTable table, int viewRowIndex) {
         if ("copy".equals(getValue(table, viewRowIndex, "type")))
             return "";
         return "  " + MessageProvider.getMessage("columns.table.blank");
-    }
-
-    public Collection<String> getValidNames() {
-        return Collections.unmodifiableCollection(validNames);
-    }
-
-    public void setValidNames(Collection<String> validNames) {
-        this.validNames = validNames;
     }
 
 }

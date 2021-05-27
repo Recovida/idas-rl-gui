@@ -734,7 +734,7 @@ public class MainWindow {
     }
 
     protected synchronized void doSave() {
-        if (manager.hasDuplicateNumbers()) {
+        if (columnPairTableModel.hasDuplicateNumbers()) {
             showDuplicateNumbersWarning();
             return;
         }
@@ -756,7 +756,7 @@ public class MainWindow {
     }
 
     protected synchronized void doSaveAs() {
-        if (manager.hasDuplicateNumbers()) {
+        if (columnPairTableModel.hasDuplicateNumbers()) {
             showDuplicateNumbersWarning();
             return;
         }

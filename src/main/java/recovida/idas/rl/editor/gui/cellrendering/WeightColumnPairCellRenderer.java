@@ -17,7 +17,7 @@ public class WeightColumnPairCellRenderer extends ColumnPairCellRenderer
             value = "";
         Component c = getDefaultRenderer(table, value, isSelected, hasFocus,
                 row, column);
-        if (value instanceof Double && ((Double) value) < 0) {
+        if (!isValid(table, row, column)) {
             c.setForeground(getErrorColour(isSelected));
             showErrorIcon(table, c);
         }

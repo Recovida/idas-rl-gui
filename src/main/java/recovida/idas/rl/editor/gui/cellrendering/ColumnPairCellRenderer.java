@@ -49,4 +49,11 @@ public abstract class ColumnPairCellRenderer extends JLabel
             showErrorIcon(table, (JLabel) c);
     }
 
+    protected boolean isValid(JTable table, int viewRowIndex,
+            int viewColIndex) {
+        return getModel(table).validateCell(
+                table.convertRowIndexToModel(viewRowIndex),
+                table.convertColumnIndexToModel(viewColIndex));
+    }
+
 }

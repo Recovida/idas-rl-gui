@@ -1,9 +1,14 @@
 package recovida.idas.rl.editor.gui;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -20,11 +25,39 @@ public class ColumnPairTableModel extends DefaultTableModel {
             Double.class, Double.class, String.class, String.class,
             String.class, String.class };
     private Map<String, Integer> indexFromKey = new HashMap<>();
+    protected Map<Integer, Collection<Integer>> numberToColIdx = new HashMap<>();
+
+    protected Collection<String> firstDatasetColumnNames = null;
+    protected Collection<String> secondDatasetColumnNames = null;
 
     public ColumnPairTableModel() {
         for (int i = 0; i < keys.length; i++)
             indexFromKey.put(keys[i], i);
         setColumnIdentifiers(keys); // temporary
+    }
+
+    public void setFirstDatasetColumnNames(
+            Collection<String> firstDatasetColumnNames) {
+        this.firstDatasetColumnNames = firstDatasetColumnNames;
+        if (getRowCount() > 0)
+            fireTableRowsUpdated(0, getRowCount() - 1);
+    }
+
+    public Collection<String> getFirstDatasetColumnNames() {
+        return firstDatasetColumnNames == null ? null
+                : Collections.unmodifiableCollection(firstDatasetColumnNames);
+    }
+
+    public void setSecondDatasetColumnNames(
+            Collection<String> secondDatasetColumnNames) {
+        this.secondDatasetColumnNames = secondDatasetColumnNames;
+        if (getRowCount() > 0)
+            fireTableRowsUpdated(0, getRowCount() - 1);
+    }
+
+    public Collection<String> getSecondDatasetColumnNames() {
+        return secondDatasetColumnNames == null ? null
+                : Collections.unmodifiableCollection(secondDatasetColumnNames);
     }
 
     @Override
@@ -46,17 +79,6 @@ public class ColumnPairTableModel extends DefaultTableModel {
 
     public Double getDoubleValue(int rowIndex, String key) {
         return (Double) getValue(rowIndex, key);
-    }
-
-    @Override
-    public void setValueAt(Object value, int rowIndex, int colIndex) {
-        super.setValueAt(value, rowIndex, colIndex);
-        if (colIndex == getColumnIndex("type"))
-            fireTableRowsUpdated(rowIndex, rowIndex);
-        else if (colIndex == getColumnIndex("index_a"))
-            fireTableCellUpdated(rowIndex, getColumnIndex("rename_a"));
-        else if (colIndex == getColumnIndex("index_b"))
-            fireTableCellUpdated(rowIndex, getColumnIndex("rename_b"));
     }
 
     public void setValue(int rowIndex, String key, Object value) {
@@ -114,8 +136,11 @@ public class ColumnPairTableModel extends DefaultTableModel {
         return true;
     }
 
-    protected Collection<String> firstDatasetColumnNames = null;
-    protected Collection<String> secondDatasetColumnNames = null;
+    public boolean validateCell(int rowIndex, int colIndex) {
+        if (colIndex < 0 || colIndex >= keys.length)
+            return false;
+        return validateCell(rowIndex, keys[colIndex]);
+    }
 
     public synchronized boolean validateCell(int rowIndex, String key) {
         Object value = getValue(rowIndex, key);
@@ -142,10 +167,108 @@ public class ColumnPairTableModel extends DefaultTableModel {
         case "rename_b":
             return true;
         case "number":
-            return false;
+            return numberToColIdx.getOrDefault(value, Collections.emptySet())
+                    .size() == 1;
         default:
             return false;
         }
+    }
+
+    public void updateCellsWithNumber(int number) {
+        for (int i = 0; i < getRowCount(); i++)
+            if (Objects.equals(Integer.valueOf(number), getValue(i, "number")))
+                fireTableRowsUpdated(i, i);
+    }
+
+    @Override
+    public void moveRow(int start, int end, int to) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void addColumn(Object columnName,
+            @SuppressWarnings("rawtypes") Vector columnData) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setValueAt(Object value, int rowIndex, int colIndex) {
+        int numberIndex = getColumnIndex("number");
+        Integer oldNumber = null, newNumber = null;
+        if (colIndex == numberIndex) {
+            oldNumber = (Integer) getValue(rowIndex, "number");
+            newNumber = (Integer) value;
+            if (!Objects.equals(oldNumber, newNumber)) {
+                if (oldNumber != null)
+                    numberToColIdx.get(oldNumber).remove(rowIndex);
+                if (!numberToColIdx.containsKey(newNumber))
+                    numberToColIdx.put(newNumber, new HashSet<>());
+                numberToColIdx.get(newNumber).add(rowIndex);
+            }
+        }
+        super.setValueAt(value, rowIndex, colIndex);
+        if (colIndex == getColumnIndex("type"))
+            fireTableRowsUpdated(rowIndex, rowIndex);
+        else if (colIndex == getColumnIndex("index_a"))
+            fireTableCellUpdated(rowIndex, getColumnIndex("rename_a"));
+        else if (colIndex == getColumnIndex("index_b"))
+            fireTableCellUpdated(rowIndex, getColumnIndex("rename_b"));
+        else if (colIndex == getColumnIndex("number")) {
+            if (oldNumber != null)
+                updateCellsWithNumber(oldNumber);
+            if (newNumber != null)
+                updateCellsWithNumber(newNumber);
+        }
+    }
+
+    @Override
+    public void removeRow(int row) {
+        Integer number = (Integer) getValue(row, "number");
+        if (number != null) {
+            numberToColIdx.getOrDefault(number, Collections.emptySet())
+                    .remove(row);
+            numberToColIdx.replaceAll(
+                    (num, set) -> set.stream().map(x -> x < row ? x : (x - 1))
+                            .collect(Collectors.toSet()));
+        }
+        super.removeRow(row);
+        if (number != null)
+            updateCellsWithNumber(number);
+    }
+
+    @Override
+    public void insertRow(int row,
+            @SuppressWarnings("rawtypes") Vector rowData) {
+        int numberIndex = getColumnIndex("number");
+        int number = Integer.MAX_VALUE;
+        if (rowData != null && numberIndex < rowData.size()) {
+            number = (Integer) rowData.get(numberIndex);
+            numberToColIdx.replaceAll(
+                    (num, set) -> set.stream().map(x -> x < row ? x : (x + 1))
+                            .collect(Collectors.toSet()));
+            if (!numberToColIdx.containsKey(number))
+                numberToColIdx.put(number, new HashSet<>());
+            numberToColIdx.get(number).add(row);
+        }
+        super.insertRow(row, rowData);
+        updateCellsWithNumber(number);
+    }
+
+    public boolean hasDuplicateNumbers() {
+        return numberToColIdx.values().stream().anyMatch(x -> x.size() > 1);
+    }
+
+    @Override
+    public void setRowCount(int rowCount) {
+        if (rowCount < getRowCount())
+            numberToColIdx.replaceAll((num, set) -> set.stream()
+                    .filter(x -> x < rowCount).collect(Collectors.toSet()));
+        super.setRowCount(rowCount);
+    }
+
+    public Collection<Integer> getColIdxWithNumber(int number) {
+        return Collections.unmodifiableCollection(
+                numberToColIdx.getOrDefault(number, Collections.emptySet()));
     }
 
 }
