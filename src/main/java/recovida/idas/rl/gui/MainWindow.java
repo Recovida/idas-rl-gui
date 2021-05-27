@@ -1562,7 +1562,7 @@ public class MainWindow {
 
         // tab - datasets
         tabbedPane.setTitleAt(tabbedPane.indexOfComponent(datasetsTabPanel),
-                MessageProvider.getMessage("datasets"));
+                " " + MessageProvider.getMessage("datasets") + " ");
         firstDatasetLabel
                 .setText(MessageProvider.getMessage("datasets.dataseta"));
         secondDatasetLabel
@@ -1577,7 +1577,7 @@ public class MainWindow {
 
         // tab - options
         tabbedPane.setTitleAt(tabbedPane.indexOfComponent(optionsTabPanel),
-                MessageProvider.getMessage("options"));
+                " " + MessageProvider.getMessage("options") + " ");
         indexDirLbl
                 .setText(MessageProvider.getMessage("options.indexlocation"));
         indexDirBtn.setText(
@@ -1595,7 +1595,7 @@ public class MainWindow {
 
         // tab - columns
         tabbedPane.setTitleAt(tabbedPane.indexOfComponent(linkageColsTabPanel),
-                MessageProvider.getMessage("columns"));
+                " " + MessageProvider.getMessage("columns") + " ");
         linkageColsEditingPanel.updateLocalisedStrings();
         linkageColsButtonPanel.updateLocalisedStrings();
         ColumnPairTableModel model = (ColumnPairTableModel) linkageColsTable
