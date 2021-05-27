@@ -7,7 +7,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 
 import recovida.idas.rl.gui.listener.SettingItemChangeListener;
-import recovida.idas.rl.gui.ui.FieldWithPlaceholder;
+import recovida.idas.rl.gui.ui.field.FieldWithPlaceholder;
 import recovida.idas.rl.gui.undo.SetOptionCommand;
 import recovida.idas.rl.gui.undo.UndoHistory;
 

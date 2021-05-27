@@ -1,4 +1,4 @@
-package recovida.idas.rl.gui.ui;
+package recovida.idas.rl.gui.ui.field;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;

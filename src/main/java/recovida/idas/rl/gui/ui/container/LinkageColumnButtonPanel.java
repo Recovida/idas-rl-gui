@@ -1,4 +1,4 @@
-package recovida.idas.rl.gui.ui;
+package recovida.idas.rl.gui.ui.container;
 
 import java.awt.Component;
 import java.awt.Dimension;

@@ -15,6 +15,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
+import recovida.idas.rl.gui.ui.container.LinkageColumnEditingPanel;
 
 public class ColumnPairTableModel extends DefaultTableModel {
 

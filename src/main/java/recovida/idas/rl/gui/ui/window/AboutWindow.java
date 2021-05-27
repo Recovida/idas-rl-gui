@@ -1,4 +1,4 @@
-package recovida.idas.rl.gui.ui;
+package recovida.idas.rl.gui.ui.window;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

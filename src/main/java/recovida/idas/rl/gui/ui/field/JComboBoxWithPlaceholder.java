@@ -1,4 +1,4 @@
-package recovida.idas.rl.gui.ui;
+package recovida.idas.rl.gui.ui.field;
 
 import java.awt.Component;
 import java.awt.event.ActionListener;

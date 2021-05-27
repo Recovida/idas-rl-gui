@@ -1,4 +1,4 @@
-package recovida.idas.rl.gui.ui;
+package recovida.idas.rl.gui.ui.container;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -21,6 +21,10 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
+import recovida.idas.rl.gui.ui.JComboBoxSuggestionProvider;
+import recovida.idas.rl.gui.ui.WarningIcon;
+import recovida.idas.rl.gui.ui.field.JSpinnerWithBlankValue;
+import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
 
 public class LinkageColumnEditingPanel extends JPanel {
 
