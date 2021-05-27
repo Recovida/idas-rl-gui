@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>recovida</groupId>
-	<artifactId>idas-rl-config-editor</artifactId>
+	<artifactId>idas-rl-gui</artifactId>
 	<version>1.0.3</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,7 +33,7 @@
 							<archive>
 								<manifest>
 									<mainClass>
-										recovida.idas.rl.editor.MainWindow
+										recovida.idas.rl.gui.MainWindow
 									</mainClass>
 								</manifest>
 								<manifestEntries>
