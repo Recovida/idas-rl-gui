@@ -30,6 +30,7 @@ public class ExecutionPanel extends JPanel {
 
     public ExecutionInnerPanel addExecutionPanel(String title) {
         ExecutionInnerPanel p = new ExecutionInnerPanel();
+        p.updateLocalisedStrings();
         tabbedPane.addTab(title, p);
         if (tabbedPane.getTabCount() == 1)
             updateLocalisedStrings();
@@ -44,6 +45,11 @@ public class ExecutionPanel extends JPanel {
             if (p instanceof ExecutionInnerPanel)
                 ((ExecutionInnerPanel) p).updateLocalisedStrings();
         }
+    }
+
+    public void clear() {
+        tabbedPane.removeAll();
+        updateLocalisedStrings();
     }
 
 }

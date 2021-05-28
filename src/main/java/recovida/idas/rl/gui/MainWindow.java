@@ -15,7 +15,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Path;
@@ -69,7 +68,6 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableRowSorter;
 
-import recovida.idas.rl.Main;
 import recovida.idas.rl.gui.DatasetPeek.DatasetPeekResult;
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.listener.ColumnPairInclusionExclusionListener;
@@ -672,6 +670,7 @@ public class MainWindow {
                 return;
         }
         clearAllFields();
+        executionTabPanel.clear();
         updateConfigFileName(null);
         history.clearAll();
         manager.reset();
@@ -698,6 +697,7 @@ public class MainWindow {
         skipValidation = true;
         clearAllFields();
         manager.reset();
+        executionTabPanel.clear();
         Component selectedComponent = tabbedPane.getSelectedComponent();
         if (cf.load(newConfigFileName)) {
             if (selectedComponent != null)
@@ -776,11 +776,14 @@ public class MainWindow {
     }
 
     protected void doRun() {
-        try {
-            Main.execute(currentFileName);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        runMenuItem.setEnabled(false);
+        Execution ex = new Execution(
+                executionTabPanel.addExecutionPanel("AGORA"), currentFileName);
+        ex.start().whenComplete((Boolean success, Throwable t) -> {
+            SwingUtilities.invokeLater(() -> {
+                runMenuItem.setEnabled(true);
+            });
+        });
     }
 
     protected void doAbout() {
