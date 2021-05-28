@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -21,13 +23,15 @@ public class DatasetPeek {
         UNSUPPORTED_CONTENTS, SUCCESS
     }
 
+    private Path directory;
     private String fileName;
     private String encoding;
     Set<String> columnNames;
     DatasetPeekResult result = null;
 
-    public DatasetPeek(String fileName, String encoding) {
+    public DatasetPeek(Path directory, String fileName, String encoding) {
         this.fileName = fileName;
+        this.directory = directory;
         if (encoding != null && encoding.toUpperCase()
                 .replaceAll("[^A-Z0-9]", "").equals("ANSI"))
             encoding = "Cp1252";
@@ -43,7 +47,14 @@ public class DatasetPeek {
     protected synchronized DatasetPeekResult peek0() {
         if (fileName == null || fileName.isEmpty())
             return DatasetPeekResult.BLANK_NAME;
-        File f = new File(fileName);
+        File f;
+        if (directory != null) {
+            f = directory.resolve(fileName).toFile();
+        } else if (!Paths.get(fileName).isAbsolute()) {
+            // without a directory, we must have an absolute path
+            return DatasetPeekResult.FILE_NOT_FOUND;
+        } else
+            f = new File(fileName);
         if (!f.isFile())
             return DatasetPeekResult.FILE_NOT_FOUND;
         String nameLower = fileName.toLowerCase();

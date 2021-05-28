@@ -412,8 +412,18 @@ public class MainWindow {
         }
 
         // File names
-        String fn1 = (String) items.get("db_a").getCurrentValue();
-        String fn2 = (String) items.get("db_b").getCurrentValue();
+        Path dir = currentFileName == null ? null
+                : Paths.get(currentFileName).getParent();
+        String f1 = (String) items.get("db_a").getCurrentValue();
+        String f2 = (String) items.get("db_b").getCurrentValue();
+        String fn1, fn2;
+        if (dir != null) {
+            fn1 = dir.resolve(f1).toAbsolutePath().toString();
+            fn2 = dir.resolve(f2).toAbsolutePath().toString();
+        } else {
+            fn1 = f1;
+            fn2 = f2;
+        }
         DatasetPeek p;
         if (!peekFromFileNameAndEncoding.containsKey(fn1))
             peekFromFileNameAndEncoding.put(fn1,
@@ -423,7 +433,7 @@ public class MainWindow {
         if (m.containsKey(enc1)) {
             p = m.get(enc1);
         } else {
-            p = new DatasetPeek(fn1, enc1);
+            p = new DatasetPeek(dir, fn1, enc1);
             p.peek();
             if (fn1 != null && !fn1.isEmpty()) {
                 m.put(enc1, p);
@@ -449,7 +459,7 @@ public class MainWindow {
         if (m.containsKey(enc2)) {
             p = m.get(enc2);
         } else {
-            p = new DatasetPeek(fn2, enc2);
+            p = new DatasetPeek(dir, fn2, enc2);
             p.peek();
             if (fn2 != null && !fn2.isEmpty()) {
                 m.put(enc2, p);
@@ -1484,20 +1494,23 @@ public class MainWindow {
 
     }
 
-    private String selectDatasetFile(String currentFileName) {
+    private String selectDatasetFile(String currentName) {
         JFileChooser chooser = new JFileChooser();
-        chooser.setCurrentDirectory(currentFileName != null
-                ? new File(currentFileName).getParentFile()
-                : new File(".").getAbsoluteFile());
+        chooser.setCurrentDirectory(
+                (currentName != null ? new File(currentName).getParentFile()
+                        : currentFileName == null ? new File(".")
+                                : new File(currentFileName).getParentFile())
+                                        .getAbsoluteFile());
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 MessageProvider.getMessage("datasets.supportedformats"), "csv",
                 "dbf");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            Path here = Paths.get(".").toAbsolutePath().getParent();
+            Path here = currentFileName == null ? null
+                    : Paths.get(currentFileName).toAbsolutePath().getParent();
             String f = chooser.getSelectedFile().getAbsolutePath();
-            if (f.startsWith(here.toString() + File.separator))
+            if (here != null && f.startsWith(here.toString() + File.separator))
                 return here.relativize(Paths.get(f)).toString();
             else
                 return f;
