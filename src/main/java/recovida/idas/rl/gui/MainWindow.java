@@ -739,9 +739,10 @@ public class MainWindow {
         if (currentFileChangeWatcher != null)
             currentFileChangeWatcher.disable();
         if (cf.save(currentFileName)) {
+            boolean wasDirty = dirty;
             updateConfigFileName(currentFileName);
             history.setClean();
-            if (validateAllTabs() > 0)
+            if (validateAllTabs() > 0 && wasDirty)
                 JOptionPane.showMessageDialog(frame,
                         MessageProvider
                                 .getMessage("menu.file.save.containserrors"),
@@ -762,6 +763,8 @@ public class MainWindow {
         }
         String fn = selectConfigFile(currentFileName, true);
         if (fn != null) {
+            if (currentFileName != null)
+                dirty = true;
             currentFileName = fn;
             doSave();
         }
@@ -1496,11 +1499,11 @@ public class MainWindow {
 
     private String selectDatasetFile(String currentName) {
         JFileChooser chooser = new JFileChooser();
-        chooser.setCurrentDirectory(
-                (currentName != null ? new File(currentName).getParentFile()
-                        : currentFileName == null ? new File(".")
-                                : new File(currentFileName).getParentFile())
-                                        .getAbsoluteFile());
+        Path dir = currentFileName == null ? Paths.get(".").toAbsolutePath()
+                : Paths.get(currentFileName).toAbsolutePath().getParent();
+        chooser.setCurrentDirectory(currentName != null
+                ? dir.resolve(currentName).getParent().toFile()
+                : dir.toFile());
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 MessageProvider.getMessage("datasets.supportedformats"), "csv",
                 "dbf");
