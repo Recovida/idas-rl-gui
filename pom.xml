@@ -50,4 +50,11 @@
 			</plugin>
 		</plugins>
 	</build>
+	<dependencies>
+		<dependency>
+			<groupId>recovida</groupId>
+			<artifactId>idas-rl</artifactId>
+			<version>[1.0.4,)</version>
+		</dependency>
+	</dependencies>
 </project>

@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Path;
@@ -68,6 +69,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableRowSorter;
 
+import recovida.idas.rl.Main;
 import recovida.idas.rl.gui.DatasetPeek.DatasetPeekResult;
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.listener.ColumnPairInclusionExclusionListener;
@@ -88,6 +90,7 @@ import recovida.idas.rl.gui.ui.cellrendering.PhonWeightColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.cellrendering.RenameColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.cellrendering.TypeColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.cellrendering.WeightColumnPairCellRenderer;
+import recovida.idas.rl.gui.ui.container.ExecutionPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnButtonPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnEditingPanel;
 import recovida.idas.rl.gui.ui.field.JComboBoxWithPlaceholder;
@@ -173,7 +176,10 @@ public class MainWindow {
     private JPanel threadsPanel;
     private JLabel coresLabel;
     private Component horizontalStrut;
-    private JPanel executionTabPanel;
+    private ExecutionPanel executionTabPanel;
+    private JMenu runMenu;
+    private JMenuItem runMenuItem;
+    private Component horizontalStrut_1;
 
     /**
      * Launch the application.
@@ -291,7 +297,7 @@ public class MainWindow {
         manager = new ColumnPairManager(history, linkageColsButtonPanel,
                 linkageColsEditingPanel, linkageColsTable);
 
-        executionTabPanel = new JPanel();
+        executionTabPanel = new ExecutionPanel();
         tabbedPane.addTab("_Execution", null, executionTabPanel, null);
         manager.addInclusionExclusionListener(
                 linkageColsTabValueChangeEventListener);
@@ -310,6 +316,7 @@ public class MainWindow {
         redoMenuItem.addActionListener(e -> doRedo());
         undoMenuItem.addActionListener(e -> doUndo());
         aboutMenuItem.addActionListener(e -> doAbout());
+        runMenuItem.addActionListener(e -> doRun());
 
         // Undo - changed state
 
@@ -350,6 +357,8 @@ public class MainWindow {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     MessageProvider.setLocale((Locale) e.getItem());
+                    recovida.idas.rl.lang.MessageProvider
+                            .setLocale((Locale) e.getItem());
                     updateLocalisedStrings();
                 }
             }
@@ -766,6 +775,14 @@ public class MainWindow {
         frame.dispose();
     }
 
+    protected void doRun() {
+        try {
+            Main.execute(currentFileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     protected void doAbout() {
         new AboutWindow(frame).setVisible(true);
     }
@@ -788,6 +805,7 @@ public class MainWindow {
             currentFileChangeWatcher = null;
         currentFileName = fn;
         dirty = false;
+        runMenuItem.setEnabled(fn != null);
         updateConfigFileLabel();
     }
 
@@ -1398,6 +1416,13 @@ public class MainWindow {
         redoMenuItem.setEnabled(false);
         editMenu.add(redoMenuItem);
 
+        runMenu = new JMenu("_Run");
+        menuBar.add(runMenu);
+
+        runMenuItem = new JMenuItem("_Run using this configuration");
+        runMenuItem.setEnabled(false);
+        runMenu.add(runMenuItem);
+
         helpMenu = new JMenu("_Help");
         menuBar.add(helpMenu);
 
@@ -1428,6 +1453,9 @@ public class MainWindow {
         });
         for (String l : MessageProvider.SUPPORTED_LANGUAGES)
             languageCbox.addItem(new Locale(l));
+
+        horizontalStrut_1 = Box.createHorizontalStrut(20);
+        menuBar.add(horizontalStrut_1);
         languageCbox
                 .setSelectedItem(new Locale(MessageProvider.DEFAULT_LANGUAGE));
         menuBar.add(languageCbox);
@@ -1557,6 +1585,10 @@ public class MainWindow {
         updateUndoMenuText(history.getUndoSummary());
         updateRedoMenuText(history.getRedoSummary());
 
+        // menu - run
+        runMenu.setText(MessageProvider.getMessage("menu.run"));
+        runMenuItem.setText(MessageProvider.getMessage("menu.run.run"));
+
         // menu - help
         helpMenu.setText(MessageProvider.getMessage("menu.help"));
         aboutMenuItem.setText(MessageProvider.getMessage("menu.help.about"));
@@ -1609,6 +1641,7 @@ public class MainWindow {
         // tab - execution
         tabbedPane.setTitleAt(tabbedPane.indexOfComponent(executionTabPanel),
                 " " + MessageProvider.getMessage("execution") + " ");
+        executionTabPanel.updateLocalisedStrings();
 
         // re-create validation messages
         validateAllTabs();
