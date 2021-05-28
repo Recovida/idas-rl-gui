@@ -780,6 +780,7 @@ public class MainWindow {
         runMenuItem.setEnabled(false);
         Execution ex = new Execution(
                 executionTabPanel.addExecutionPanel("AGORA"), currentFileName);
+        tabbedPane.setSelectedComponent(executionTabPanel);
         ex.start().whenComplete((Boolean success, Throwable t) -> {
             SwingUtilities.invokeLater(() -> {
                 runMenuItem.setEnabled(true);

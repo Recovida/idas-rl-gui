@@ -28,6 +28,12 @@ public class Execution {
                 SwingUtilities.invokeLater(() -> panel.setProgress(done));
             }
 
+            @Override
+            public void infoCompleted(String resultPath) {
+                super.infoCompleted(resultPath);
+                panel.success(resultPath);
+            }
+
         };
         reporter.setLogger(panel);
         StatusReporter.set(reporter);

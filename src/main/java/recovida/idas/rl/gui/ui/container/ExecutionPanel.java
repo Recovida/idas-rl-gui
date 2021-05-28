@@ -32,6 +32,7 @@ public class ExecutionPanel extends JPanel {
         ExecutionInnerPanel p = new ExecutionInnerPanel();
         p.updateLocalisedStrings();
         tabbedPane.addTab(title, p);
+        tabbedPane.setSelectedComponent(p);
         if (tabbedPane.getTabCount() == 1)
             updateLocalisedStrings();
         return p;

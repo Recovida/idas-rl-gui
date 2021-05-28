@@ -1,12 +1,17 @@
 package recovida.idas.rl.gui.ui.container;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.LayoutManager;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.function.Supplier;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -26,6 +31,8 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
     private JButton saveLogBtn;
     private DefaultTableModel model;
     private JProgressBar progressBar;
+    private JButton openDirBtn;
+    private Component horizontalStrut;
 
     public ExecutionInnerPanel() {
         setLayout(new BorderLayout(0, 0));
@@ -38,6 +45,13 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
 
         saveLogBtn = new JButton("_Save log");
         topPanel.add(saveLogBtn);
+
+        horizontalStrut = Box.createHorizontalStrut(20);
+        topPanel.add(horizontalStrut);
+
+        openDirBtn = new JButton("_Show result");
+        openDirBtn.setEnabled(false);
+        topPanel.add(openDirBtn);
 
         JPanel bottomPanel = new JPanel();
         add(bottomPanel, BorderLayout.SOUTH);
@@ -60,6 +74,7 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
 
         };
         table = new JTable(model);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         add(new JScrollPane(table), BorderLayout.CENTER);
     }
 
@@ -70,10 +85,15 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
     public void updateLocalisedStrings() {
         copyLogBtn.setText(MessageProvider.getMessage("execution.copylog"));
         saveLogBtn.setText(MessageProvider.getMessage("execution.savelog"));
+        openDirBtn.setText(MessageProvider.getMessage("execution.showresult"));
         model.setColumnIdentifiers(new String[] {
                 MessageProvider.getMessage("execution.table.time"),
                 MessageProvider.getMessage("execution.table.type"),
                 MessageProvider.getMessage("execution.table.message") });
+        table.getColumnModel().getColumn(0).setMinWidth(70);
+        table.getColumnModel().getColumn(0).setMaxWidth(100);
+        table.getColumnModel().getColumn(1).setMinWidth(100);
+        table.getColumnModel().getColumn(1).setMaxWidth(200);
     }
 
     public void setProgress(float progress) {
@@ -85,6 +105,16 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
 
     public void showProgress(boolean show) {
         progressBar.setVisible(show);
+    }
+
+    public void success(String resultDir) {
+        openDirBtn.addActionListener(l -> {
+            try {
+                Desktop.getDesktop().open(new File(resultDir));
+            } catch (IOException e) {
+            }
+        });
+        openDirBtn.setEnabled(true);
     }
 
     protected Object getTime() {
