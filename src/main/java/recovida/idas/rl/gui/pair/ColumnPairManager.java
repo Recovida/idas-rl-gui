@@ -540,8 +540,6 @@ public class ColumnPairManager {
                 .setEnabled(firstDatasetColumnNames != null
                         || secondDatasetColumnNames != null);
         model.setSecondDatasetColumnNames(secondDatasetColumnNames);
-        if (model.getRowCount() > 0)
-            model.fireTableRowsUpdated(0, model.getRowCount() - 1);
     }
 
     public void setComboBoxItems(JComboBox<String> field,

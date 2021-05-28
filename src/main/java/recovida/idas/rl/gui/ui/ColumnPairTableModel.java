@@ -43,8 +43,10 @@ public class ColumnPairTableModel extends DefaultTableModel {
     public void setFirstDatasetColumnNames(
             Collection<String> firstDatasetColumnNames) {
         this.firstDatasetColumnNames = firstDatasetColumnNames;
-        if (getRowCount() > 0)
+        if (getRowCount() > 0) {
+            updateValidation();
             fireTableRowsUpdated(0, getRowCount() - 1);
+        }
     }
 
     public Collection<String> getFirstDatasetColumnNames() {
@@ -55,8 +57,10 @@ public class ColumnPairTableModel extends DefaultTableModel {
     public void setSecondDatasetColumnNames(
             Collection<String> secondDatasetColumnNames) {
         this.secondDatasetColumnNames = secondDatasetColumnNames;
-        if (getRowCount() > 0)
+        if (getRowCount() > 0) {
+            updateValidation();
             fireTableRowsUpdated(0, getRowCount() - 1);
+        }
     }
 
     public Collection<String> getSecondDatasetColumnNames() {
@@ -126,6 +130,11 @@ public class ColumnPairTableModel extends DefaultTableModel {
             fireTableRowsUpdated(0, getRowCount() - 1);
     }
 
+    public void updateValidation() {
+        for (int i = 0; i < getRowCount(); i++)
+            updateRowValidation(i);
+    }
+
     public void updateRowValidation(int rowIndex) {
         if (valid.get(rowIndex) == null)
             valid.set(rowIndex, new boolean[keys.length]);
@@ -149,13 +158,13 @@ public class ColumnPairTableModel extends DefaultTableModel {
         value = getValue(rowIndex, "index_a");
         v[indexFromKey.get("index_a")] = firstDatasetColumnNames == null
                 || ("copy".equals(getValue(rowIndex, "type"))
-                        && "".equals(value))
+                        && (value == null || "".equals(value)))
                 || firstDatasetColumnNames.contains(value);
         // validate index_b
         value = getValue(rowIndex, "index_b");
         v[indexFromKey.get("index_b")] = secondDatasetColumnNames == null
                 || ("copy".equals(getValue(rowIndex, "type"))
-                        && "".equals(value))
+                        && (value == null || "".equals(value)))
                 || secondDatasetColumnNames.contains(value);
         // validate rename_a and rename_b
         v[indexFromKey.get("rename_a")] = true;

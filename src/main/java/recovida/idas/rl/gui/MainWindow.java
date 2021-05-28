@@ -714,6 +714,7 @@ public class MainWindow {
                     JOptionPane.ERROR_MESSAGE);
         }
         skipValidation = false;
+        validateAllTabs();
     }
 
     protected synchronized void doSave() {
