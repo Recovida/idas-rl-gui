@@ -215,11 +215,13 @@ public class MainWindow {
                 secondEncodingField };
         fillEncodings(encodingCboxes);
         SettingItemChangeListener datasetsTabEventListenerTop = (o) -> {
-            tabbedPane.setSelectedComponent(datasetsTabPanel);
+            if (!skipValidation)
+                tabbedPane.setSelectedComponent(datasetsTabPanel);
             validateDatasetsTabTopPart();
         };
         SettingItemChangeListener datasetsTabEventListenerBottom = (o) -> {
-            tabbedPane.setSelectedComponent(datasetsTabPanel);
+            if (!skipValidation)
+                tabbedPane.setSelectedComponent(datasetsTabPanel);
             validateDatasetsTabBottomPart();
         };
 
@@ -247,7 +249,8 @@ public class MainWindow {
 
         // Tab: OPTIONS
         SettingItemChangeListener optionsTabEventListener = (o) -> {
-            tabbedPane.setSelectedComponent(optionsTabPanel);
+            if (!skipValidation)
+                tabbedPane.setSelectedComponent(optionsTabPanel);
             validateOptionsTab();
         };
         cf.addSettingItem("db_index", new StringSettingItem(history, "", "",
@@ -273,7 +276,8 @@ public class MainWindow {
         // Tab: COLUMNS
         ColumnPairValueChangeListener linkageColsTabAddDelEventListener = (
                 int index, String key, Object newValue) -> {
-            tabbedPane.setSelectedComponent(linkageColsTabPanel);
+            if (!skipValidation)
+                tabbedPane.setSelectedComponent(linkageColsTabPanel);
             validateLinkageColsTab();
         };
         ColumnPairInclusionExclusionListener linkageColsTabValueChangeEventListener = new ColumnPairInclusionExclusionListener() {
@@ -791,6 +795,8 @@ public class MainWindow {
 
     protected void doRun() {
         runMenuItem.setEnabled(false);
+        if (dirty)
+            doSave();
         Execution ex = new Execution(
                 executionTabPanel.addExecutionPanel("AGORA"), currentFileName);
         tabbedPane.setSelectedComponent(executionTabPanel);
