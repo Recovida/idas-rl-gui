@@ -726,12 +726,7 @@ public class MainWindow {
         clearAllFields();
         manager.reset();
         executionTabPanel.clear();
-        Component selectedComponent = tabbedPane.getSelectedComponent();
         if (cf.load(newConfigFileName)) {
-            if (selectedComponent != null)
-                SwingUtilities.invokeLater(() -> {
-                    tabbedPane.setSelectedComponent(selectedComponent);
-                });
             updateConfigFileName(newConfigFileName);
             history.clearAll();
             linkageColsTable.clearSelection();
@@ -741,8 +736,10 @@ public class MainWindow {
                     MessageProvider.getMessage("menu.file.open.error"),
                     JOptionPane.ERROR_MESSAGE);
         }
-        skipValidation = false;
-        validateAllTabs();
+        SwingUtilities.invokeLater(() -> {
+            skipValidation = false;
+            validateAllTabs();
+        });
     }
 
     protected synchronized void doSave() {
