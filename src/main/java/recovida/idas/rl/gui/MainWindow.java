@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
@@ -813,9 +814,11 @@ public class MainWindow {
         Execution ex = new Execution(
                 executionTabPanel.addExecutionPanel("AGORA"), currentFileName);
         tabbedPane.setSelectedComponent(executionTabPanel);
-        ex.start().whenComplete((Boolean success, Throwable t) -> {
+        CompletableFuture<Boolean> f = ex.start();
+        f.whenComplete((Boolean success, Throwable t) -> {
             SwingUtilities.invokeLater(() -> {
                 runMenuItem.setEnabled(true);
+                f.join();
             });
         });
     }
