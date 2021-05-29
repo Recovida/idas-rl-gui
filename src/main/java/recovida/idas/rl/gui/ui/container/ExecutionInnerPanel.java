@@ -4,12 +4,17 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.LayoutManager;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -18,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
@@ -74,8 +80,16 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
 
         };
         table = new JTable(model);
+        table.setShowVerticalLines(true);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         add(new JScrollPane(table), BorderLayout.CENTER);
+
+        copyLogBtn.addActionListener(
+                e -> Toolkit.getDefaultToolkit().getSystemClipboard()
+                        .setContents(new StringSelection(String.join(
+                                System.lineSeparator(), getLogRowsAsText())),
+                                null));
     }
 
     public ExecutionInnerPanel(LayoutManager layout) {
@@ -146,8 +160,23 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
     }
 
     protected void addMessageRow(String type, Supplier<String> message) {
-        SwingUtilities.invokeLater(() -> model.addRow(new Object[] { getTime(),
-                getLogEntryTypeObject(type), getMessageObject(message) }));
+        SwingUtilities.invokeLater(() -> {
+            model.addRow(new Object[] { getTime(), getLogEntryTypeObject(type),
+                    getMessageObject(message) });
+            table.setRowSelectionInterval(table.getRowCount() - 1,
+                    table.getRowCount() - 1);
+        }
+
+        );
+    }
+
+    public String[] getLogRowsAsText() {
+        String[] lines = new String[table.getRowCount()];
+        Arrays.setAll(lines,
+                i -> IntStream.range(0, table.getColumnCount())
+                        .mapToObj(j -> table.getValueAt(i, j).toString())
+                        .collect(Collectors.joining("\t")));
+        return lines;
     }
 
     @Override
