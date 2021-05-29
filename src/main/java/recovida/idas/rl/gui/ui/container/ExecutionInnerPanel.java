@@ -21,8 +21,8 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
+import recovida.idas.rl.core.util.StatusReporter.StatusLogger;
 import recovida.idas.rl.gui.lang.MessageProvider;
-import recovida.idas.rl.util.StatusReporter.StatusLogger;
 
 public class ExecutionInnerPanel extends JPanel implements StatusLogger {
     private static final long serialVersionUID = -1501370560575937471L;

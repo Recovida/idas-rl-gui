@@ -359,7 +359,7 @@ public class MainWindow {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     MessageProvider.setLocale((Locale) e.getItem());
-                    recovida.idas.rl.lang.MessageProvider
+                    recovida.idas.rl.core.lang.MessageProvider
                             .setLocale((Locale) e.getItem());
                     updateLocalisedStrings();
                 }

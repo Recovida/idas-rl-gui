@@ -4,6 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>recovida</groupId>
 	<artifactId>idas-rl-gui</artifactId>
+	<name>IDaS-RL GUI</name>
 	<version>1.0.3</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -53,7 +54,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>recovida</groupId>
-			<artifactId>idas-rl</artifactId>
+			<artifactId>idas-rl-core</artifactId>
 			<version>[1.0.4,)</version>
 		</dependency>
 	</dependencies>

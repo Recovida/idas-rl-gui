@@ -4,9 +4,9 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.swing.SwingUtilities;
 
-import recovida.idas.rl.Main;
+import recovida.idas.rl.core.Main;
+import recovida.idas.rl.core.util.StatusReporter;
 import recovida.idas.rl.gui.ui.container.ExecutionInnerPanel;
-import recovida.idas.rl.util.StatusReporter;
 
 public class Execution {
 
