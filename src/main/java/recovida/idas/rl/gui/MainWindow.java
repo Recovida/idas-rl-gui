@@ -272,6 +272,18 @@ public class MainWindow {
                 new NumberSettingItem(history, Integer.MAX_VALUE,
                         Integer.MAX_VALUE, maxRowsField,
                         optionsTabEventListener));
+        linkageDirBtn.addActionListener(e -> {
+            String current = linkageDirField.getText();
+            String result = selectDir(current.isEmpty() ? null : current);
+            if (result != null)
+                linkageDirField.setText(result);
+        });
+        indexDirBtn.addActionListener(e -> {
+            String current = indexDirField.getText();
+            String result = selectDir(current.isEmpty() ? null : current);
+            if (result != null)
+                indexDirField.setText(result);
+        });
 
         // Tab: COLUMNS
         ColumnPairValueChangeListener linkageColsTabAddDelEventListener = (
@@ -946,15 +958,12 @@ public class MainWindow {
         firstDatasetField.setColumns(10);
 
         firstDatasetBtn = new JButton("_Select...");
-        firstDatasetBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String current = firstDatasetField.getText();
-                String result = selectDatasetFile(
-                        current.isEmpty() ? null : current);
-                if (result != null)
-                    firstDatasetField.setText(result);
-            }
+        firstDatasetBtn.addActionListener(e -> {
+            String current = firstDatasetField.getText();
+            String result = selectDatasetFile(
+                    current.isEmpty() ? null : current);
+            if (result != null)
+                firstDatasetField.setText(result);
         });
         firstDatasetContainer.add(firstDatasetBtn);
 
@@ -1225,11 +1234,6 @@ public class MainWindow {
         linkageDirField.setColumns(10);
 
         linkageDirBtn = new JButton("_Select...");
-        linkageDirBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            }
-        });
         linkageDirContainer.add(linkageDirBtn);
 
         SpinnerNumberModel minScoreModel = new SpinnerNumberModel(0.0, 0.0, 100,
@@ -1541,6 +1545,21 @@ public class MainWindow {
         chooser.setAcceptAllFileFilterUsed(false);
         int result = save ? chooser.showSaveDialog(frame)
                 : chooser.showOpenDialog(frame);
+        if (result == JFileChooser.APPROVE_OPTION)
+            return chooser.getSelectedFile().getAbsolutePath();
+        return null;
+    }
+
+    private String selectDir(String fileName) {
+        JFileChooser chooser = new JFileChooser();
+        Path dir = currentFileName == null ? Paths.get(".").toAbsolutePath()
+                : Paths.get(currentFileName).toAbsolutePath().getParent();
+        chooser.setCurrentDirectory(
+                fileName != null ? dir.resolve(fileName).getParent().toFile()
+                        : dir.toFile());
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(true);
+        int result = chooser.showSaveDialog(frame);
         if (result == JFileChooser.APPROVE_OPTION)
             return chooser.getSelectedFile().getAbsolutePath();
         return null;
