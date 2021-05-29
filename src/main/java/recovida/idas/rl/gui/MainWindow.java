@@ -81,6 +81,7 @@ import recovida.idas.rl.gui.settingitem.StringSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItemWithList;
 import recovida.idas.rl.gui.ui.ColumnPairTableModel;
 import recovida.idas.rl.gui.ui.JComboBoxSuggestionProvider;
+import recovida.idas.rl.gui.ui.JMenuWithBorder;
 import recovida.idas.rl.gui.ui.WarningIcon;
 import recovida.idas.rl.gui.ui.cellrendering.NameColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.cellrendering.NumberColumnPairCellRenderer;
@@ -896,7 +897,7 @@ public class MainWindow {
         datasetsTabPanel = new JPanel();
         tabbedPane.addTab("_Datasets", null, datasetsTabPanel, null);
         GridBagLayout gbl_datasetsTabPanel = new GridBagLayout();
-        gbl_datasetsTabPanel.columnWidths = new int[] { 35, 150, 150, 150, 35 };
+        gbl_datasetsTabPanel.columnWidths = new int[] { 35, 150, 180, 150, 35 };
         gbl_datasetsTabPanel.rowHeights = new int[] { 10, 20, 30, 0, 30, 30, 0,
                 30 };
         gbl_datasetsTabPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0,
@@ -1406,7 +1407,7 @@ public class MainWindow {
         JMenuBar menuBar = new JMenuBar();
         frame.setJMenuBar(menuBar);
 
-        fileMenu = new JMenu("_File");
+        fileMenu = new JMenuWithBorder("_File");
         menuBar.add(fileMenu);
 
         newFileMenuItem = new JMenuItem("_New");
@@ -1433,7 +1434,7 @@ public class MainWindow {
         exitMenuItem = new JMenuItem("_Exit");
         fileMenu.add(exitMenuItem);
 
-        editMenu = new JMenu("_Edit");
+        editMenu = new JMenuWithBorder("_Edit");
         menuBar.add(editMenu);
 
         undoMenuItem = new JMenuItem("_Undo");
@@ -1444,14 +1445,14 @@ public class MainWindow {
         redoMenuItem.setEnabled(false);
         editMenu.add(redoMenuItem);
 
-        runMenu = new JMenu("_Run");
+        runMenu = new JMenuWithBorder("_Run");
         menuBar.add(runMenu);
 
         runMenuItem = new JMenuItem("_Run using this configuration");
         runMenuItem.setEnabled(false);
         runMenu.add(runMenuItem);
 
-        helpMenu = new JMenu("_Help");
+        helpMenu = new JMenuWithBorder("_Help");
         menuBar.add(helpMenu);
 
         aboutMenuItem = new JMenuItem("_About");
