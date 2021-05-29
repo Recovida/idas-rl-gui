@@ -1476,12 +1476,12 @@ public class MainWindow {
 
         });
         for (String l : MessageProvider.SUPPORTED_LANGUAGES)
-            languageCbox.addItem(new Locale(l));
+            languageCbox.addItem(Locale.forLanguageTag(l));
 
         horizontalStrut_1 = Box.createHorizontalStrut(20);
         menuBar.add(horizontalStrut_1);
-        languageCbox
-                .setSelectedItem(new Locale(MessageProvider.DEFAULT_LANGUAGE));
+        languageCbox.setSelectedItem(
+                Locale.forLanguageTag(MessageProvider.DEFAULT_LANGUAGE));
         menuBar.add(languageCbox);
 
         Component menuGlue = Box.createGlue();
@@ -1669,6 +1669,9 @@ public class MainWindow {
         tabbedPane.setTitleAt(tabbedPane.indexOfComponent(executionTabPanel),
                 " " + MessageProvider.getMessage("execution") + " ");
         executionTabPanel.updateLocalisedStrings();
+
+        // Swing-provided buttons such as 'Ok', 'Open', 'Cancel'
+        JComponent.setDefaultLocale(MessageProvider.getLocale());
 
         // re-create validation messages
         validateAllTabs();
