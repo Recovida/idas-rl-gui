@@ -809,7 +809,7 @@ public class MainWindow {
         if (dirty)
             doSave();
         Execution ex = new Execution(
-                executionTabPanel.addExecutionPanel("AGORA"), currentFileName);
+                executionTabPanel.addExecutionPanel(), currentFileName);
         tabbedPane.setSelectedComponent(executionTabPanel);
         CompletableFuture<Boolean> f = ex.start();
         f.thenAccept((Boolean success) -> {

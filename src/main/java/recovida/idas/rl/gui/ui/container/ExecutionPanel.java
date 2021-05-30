@@ -2,6 +2,7 @@ package recovida.idas.rl.gui.ui.container;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -15,6 +16,7 @@ public class ExecutionPanel extends JPanel {
     private static final long serialVersionUID = -3897094344632347178L;
     private JLabel logWontBeSavedLbl;
     private JTabbedPane tabbedPane;
+    private AtomicInteger tabCounter = new AtomicInteger(0);
 
     public ExecutionPanel() {
         setLayout(new BorderLayout(0, 0));
@@ -28,10 +30,10 @@ public class ExecutionPanel extends JPanel {
 
     }
 
-    public ExecutionInnerPanel addExecutionPanel(String title) {
+    public ExecutionInnerPanel addExecutionPanel() {
         ExecutionInnerPanel p = new ExecutionInnerPanel();
         p.updateLocalisedStrings();
-        tabbedPane.addTab(title, p);
+        tabbedPane.addTab("" + tabCounter.incrementAndGet(), p);
         tabbedPane.setSelectedComponent(p);
         if (tabbedPane.getTabCount() == 1)
             updateLocalisedStrings();
