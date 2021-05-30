@@ -5,10 +5,9 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -18,10 +17,13 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import javax.swing.Box;
+import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -29,8 +31,12 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 
 import recovida.idas.rl.core.io.write.CSVDatasetWriter;
 import recovida.idas.rl.core.io.write.DatasetWriter;
@@ -38,6 +44,8 @@ import recovida.idas.rl.core.util.StatusReporter.StatusLogger;
 import recovida.idas.rl.gui.lang.MessageProvider;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics2D;
+import java.awt.Image;
 
 public class ExecutionInnerPanel extends JPanel implements StatusLogger {
     private static final long serialVersionUID = -1501370560575937471L;
@@ -47,14 +55,13 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
     private DefaultTableModel model;
     private JProgressBar progressBar;
     private JButton openDirBtn;
-    
+
     protected enum LogExportStatus {
         NONE, DOING, DONE, FAILED
     }
-    
+
     private LogExportStatus logCopyingStatus = LogExportStatus.NONE;
     private LogExportStatus logSavingStatus = LogExportStatus.NONE;
-    
 
     public ExecutionInnerPanel() {
         setLayout(new BorderLayout(0, 0));
@@ -102,11 +109,39 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
             }
 
         };
+        model.setColumnIdentifiers(new String[] { "", "", "" }); // temporary
         table = new JTable(model);
         table.setShowVerticalLines(true);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         table.setRowHeight(table.getRowHeight() * 18 / 10);
+        table.getColumnModel().getColumn(0).setMinWidth(70);
+        table.getColumnModel().getColumn(0).setMaxWidth(100);
+        table.getColumnModel().getColumn(1).setMinWidth(125);
+        table.getColumnModel().getColumn(1).setMaxWidth(200);
+        table.getColumnModel().getColumn(1).setCellRenderer(new TableCellRenderer() {
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+                String type = (String) value;
+                value = MessageProvider.getMessage("execution.table." + value);
+                Icon icon = UIManager.getIcon("OptionPane." + type + "Icon");
+                Component comp = renderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (icon != null && comp instanceof JLabel) {
+                    BufferedImage bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(),
+                            BufferedImage.TYPE_INT_ARGB);
+                    int d = table.getRowHeight() * 4 / 5;
+                    Graphics2D g = bi.createGraphics();
+                    icon.paintIcon(null, g, 0, 0);
+                    g.dispose();
+                    ((JLabel) comp).setIcon(new ImageIcon(bi.getScaledInstance(d, d, Image.SCALE_SMOOTH)));
+                }
+                return comp;
+            }
+
+        });
         add(new JScrollPane(table), BorderLayout.CENTER);
 
         copyLogBtn.addActionListener(e -> {
@@ -127,7 +162,7 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
                 t.start();
             });
         });
-        
+
         saveLogBtn.addActionListener(e -> {
             String fn = selectLogFile();
             saveLogBtn.setEnabled(false);
@@ -157,11 +192,11 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
             return false;
         }
     }
-    
+
     public static boolean copyLogToClipboard(String[] log) {
         return copyToClipboard(String.join(System.lineSeparator(), log));
     }
-    
+
     public static boolean saveLogToFile(String[] log, String fileName) {
         try (DatasetWriter writer = new CSVDatasetWriter(fileName, '\t')) {
             for (String l : log)
@@ -172,19 +207,18 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
         }
         return true;
     }
-    
+
     private String selectLogFile() {
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                MessageProvider.getMessage("execution.savelog.formats"), "log",
-                "txt");
+                MessageProvider.getMessage("execution.savelog.formats"), "log", "txt");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
         if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
             return chooser.getSelectedFile().getAbsolutePath();
         return null;
     }
-    
+
     protected void updateCopyBtnText() {
         String sfx;
         switch (logCopyingStatus) {
@@ -202,9 +236,10 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
             sfx = "";
             break;
         }
-        SwingUtilities.invokeLater(() -> copyLogBtn.setText(MessageProvider.getMessage("execution.copylog" + sfx)));;
+        SwingUtilities.invokeLater(() -> copyLogBtn.setText(MessageProvider.getMessage("execution.copylog" + sfx)));
+        ;
     }
-    
+
     protected void updateSaveBtnText() {
         String sfx;
         switch (logSavingStatus) {
@@ -222,20 +257,17 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
             sfx = "";
             break;
         }
-        SwingUtilities.invokeLater(() -> saveLogBtn.setText(MessageProvider.getMessage("execution.savelog" + sfx)));;
+        SwingUtilities.invokeLater(() -> saveLogBtn.setText(MessageProvider.getMessage("execution.savelog" + sfx)));
+        ;
     }
 
     public void updateLocalisedStrings() {
         updateCopyBtnText();
         saveLogBtn.setText(MessageProvider.getMessage("execution.savelog"));
         openDirBtn.setText(MessageProvider.getMessage("execution.showresult"));
-        model.setColumnIdentifiers(new String[] { MessageProvider.getMessage("execution.table.time"),
-                MessageProvider.getMessage("execution.table.type"),
-                MessageProvider.getMessage("execution.table.message") });
-        table.getColumnModel().getColumn(0).setMinWidth(70);
-        table.getColumnModel().getColumn(0).setMaxWidth(100);
-        table.getColumnModel().getColumn(1).setMinWidth(100);
-        table.getColumnModel().getColumn(1).setMaxWidth(200);
+        String[] headers = { "time", "type", "message" };
+        IntStream.range(0, 3).forEach(i -> table.getColumnModel().getColumn(i)
+                .setHeaderValue(MessageProvider.getMessage("execution.table." + headers[i])));
     }
 
     public void setProgress(float progress) {
@@ -269,15 +301,6 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
         };
     }
 
-    protected Object getLogEntryTypeObject(String type) {
-        return new Object() {
-            @Override
-            public String toString() {
-                return MessageProvider.getMessage("execution.table." + type);
-            }
-        };
-    }
-
     protected Object getMessageObject(Supplier<String> message) {
         return new Object() {
             @Override
@@ -289,7 +312,7 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
 
     protected void addMessageRow(String type, Supplier<String> message) {
         SwingUtilities.invokeLater(() -> {
-            model.addRow(new Object[] { getTime(), getLogEntryTypeObject(type), getMessageObject(message) });
+            model.addRow(new Object[] { getTime(), type, getMessageObject(message) });
             table.setRowSelectionInterval(table.getRowCount() - 1, table.getRowCount() - 1);
         }
 
