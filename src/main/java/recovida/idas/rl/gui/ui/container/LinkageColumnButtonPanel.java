@@ -10,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
+import javax.swing.ImageIcon;
 
 public class LinkageColumnButtonPanel extends JPanel {
 
@@ -35,6 +36,7 @@ public class LinkageColumnButtonPanel extends JPanel {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         addCopyColsBtn = new JButton("_Add columns to be copied");
+        addCopyColsBtn.setIcon(new ImageIcon(LinkageColumnButtonPanel.class.getResource("/toolbarButtonGraphics/general/AlignJustifyVertical24.gif")));
         addCopyColsBtn.setEnabled(false);
         add(addCopyColsBtn);
 
@@ -42,6 +44,7 @@ public class LinkageColumnButtonPanel extends JPanel {
         add(horizontalGlue_2);
 
         addPairBtn = new JButton("_Add column pair");
+        addPairBtn.setIcon(new ImageIcon(LinkageColumnButtonPanel.class.getResource("/toolbarButtonGraphics/table/RowInsertAfter24.gif")));
         add(addPairBtn);
 
         Component horizontalGlue_1 = Box.createHorizontalGlue();
@@ -52,6 +55,7 @@ public class LinkageColumnButtonPanel extends JPanel {
         add(horizontalGlue);
 
         deletePairBtn = new JButton("_Delete selected pair");
+        deletePairBtn.setIcon(new ImageIcon(LinkageColumnButtonPanel.class.getResource("/toolbarButtonGraphics/table/RowDelete24.gif")));
         deletePairBtn.setEnabled(false);
         add(deletePairBtn);
 

@@ -70,19 +70,22 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
         topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
         copyLogBtn = new JButton("_Copy log");
-        copyLogBtn.setPreferredSize(new Dimension(250, 30));
+        copyLogBtn.setIcon(new ImageIcon(ExecutionInnerPanel.class.getResource("/toolbarButtonGraphics/general/Copy24.gif")));
+        copyLogBtn.setPreferredSize(new Dimension(280, 30));
         copyLogBtn.setMaximumSize(new Dimension(500, 50));
         copyLogBtn.setMinimumSize(new Dimension(250, 30));
         topPanel.add(copyLogBtn);
 
         saveLogBtn = new JButton("_Save log");
-        saveLogBtn.setPreferredSize(new Dimension(250, 30));
+        saveLogBtn.setIcon(new ImageIcon(ExecutionInnerPanel.class.getResource("/toolbarButtonGraphics/general/Export24.gif")));
+        saveLogBtn.setPreferredSize(new Dimension(280, 30));
         saveLogBtn.setMaximumSize(new Dimension(500, 50));
         saveLogBtn.setMinimumSize(new Dimension(250, 30));
         topPanel.add(saveLogBtn);
 
         openDirBtn = new JButton("_Show result");
-        openDirBtn.setPreferredSize(new Dimension(250, 30));
+        openDirBtn.setIcon(new ImageIcon(ExecutionInnerPanel.class.getResource("/toolbarButtonGraphics/general/History24.gif")));
+        openDirBtn.setPreferredSize(new Dimension(280, 30));
         openDirBtn.setMaximumSize(new Dimension(500, 50));
         openDirBtn.setMinimumSize(new Dimension(250, 30));
         openDirBtn.setEnabled(false);
@@ -95,7 +98,6 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
         progressBar = new JProgressBar();
         progressBar.setStringPainted(true);
         progressBar.setVisible(false);
-        progressBar.setMaximum(10000);
         bottomPanel.add(progressBar);
 
         model = new DefaultTableModel() {
