@@ -1,18 +1,15 @@
 package recovida.idas.rl.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
@@ -26,11 +23,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -39,15 +33,12 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
@@ -80,11 +71,11 @@ import recovida.idas.rl.gui.ui.container.LinkageColumnButtonPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnEditingPanel;
 import recovida.idas.rl.gui.ui.container.MainMenuBar;
 import recovida.idas.rl.gui.ui.field.JSpinnerWithBlankValue;
-import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
 import recovida.idas.rl.gui.ui.window.AboutWindow;
 import recovida.idas.rl.gui.undo.HistoryPropertyChangeEventListener;
 import recovida.idas.rl.gui.undo.UndoHistory;
 import recovida.idas.rl.gui.ui.container.MainToolBar;
+import recovida.idas.rl.gui.ui.container.OptionsTabPanel;
 
 public class MainWindow {
 
@@ -102,29 +93,14 @@ public class MainWindow {
     /* GUI components */
     private JFrame frame;
     private JTable linkageColsTable;
-    private JTextFieldWithPlaceholder linkageDirField;
-    private JTextFieldWithPlaceholder indexDirField;
-    private JSpinner minScoreField;
-    private JSpinner maxRowsField;
     private JTabbedPane tabbedPane;
     private DatasetsTabPanel datasetsTabPanel;
-    private JPanel optionsTabPanel;
+    private OptionsTabPanel optionsTabPanel;
     private LinkageColumnEditingPanel linkageColsEditingPanel;
     private LinkageColumnButtonPanel linkageColsButtonPanel;
     private ColumnPairTableModel columnPairTableModel;
     private JPanel linkageColsTabPanel;
 
-    private JButton linkageDirBtn;
-    private JLabel indexDirLbl;
-    private JButton indexDirBtn;
-    private JLabel minScoreLbl;
-    private JLabel maxRowsLbl;
-    private JLabel linkageDirLbl;
-    private JSpinnerWithBlankValue threadsField;
-    private JLabel threadsLbl;
-    private JPanel threadsPanel;
-    private JLabel coresLabel;
-    private Component horizontalStrut;
     private ExecutionPanel executionTabPanel;
     private MainToolBar mainToolBar;
     private MainMenuBar menuBar;
@@ -196,32 +172,15 @@ public class MainWindow {
                 tabbedPane.setSelectedComponent(optionsTabPanel);
             validateOptionsTab();
         };
-        cf.addSettingItem("db_index", new StringSettingItem(history, "", "", indexDirField, optionsTabEventListener));
+        cf.addSettingItem("db_index",
+                new StringSettingItem(history, "", "", optionsTabPanel.getIndexDirField(), optionsTabEventListener));
         cf.addSettingItem("linkage_folder",
-                new StringSettingItem(history, "", "", linkageDirField, optionsTabEventListener));
+                new StringSettingItem(history, "", "", optionsTabPanel.getLinkageDirField(), optionsTabEventListener));
         cf.addSettingItem("min_score",
-                new NumberSettingItem(history, 0.0, 0.0, minScoreField, optionsTabEventListener));
-        cf.addSettingItem("num_threads", new NumberSettingItem(history, 0, 0, threadsField));
-
-        horizontalStrut = Box.createHorizontalStrut(20);
-        threadsPanel.add(horizontalStrut);
-
-        coresLabel = new JLabel("_On this computer, this number should ideally be at most n.");
-        threadsPanel.add(coresLabel);
-        cf.addSettingItem("max_rows", new NumberSettingItem(history, Integer.MAX_VALUE, Integer.MAX_VALUE, maxRowsField,
-                optionsTabEventListener));
-        linkageDirBtn.addActionListener(e -> {
-            String current = linkageDirField.getText();
-            String result = selectDir(current.isEmpty() ? null : current);
-            if (result != null)
-                linkageDirField.setText(result);
-        });
-        indexDirBtn.addActionListener(e -> {
-            String current = indexDirField.getText();
-            String result = selectDir(current.isEmpty() ? null : current);
-            if (result != null)
-                indexDirField.setText(result);
-        });
+                new NumberSettingItem(history, 0.0, 0.0, optionsTabPanel.getMinScoreField(), optionsTabEventListener));
+        cf.addSettingItem("num_threads", new NumberSettingItem(history, 0, 0, optionsTabPanel.getThreadsField()));
+        cf.addSettingItem("max_rows", new NumberSettingItem(history, Integer.MAX_VALUE, Integer.MAX_VALUE,
+                optionsTabPanel.getMaxRowsField(), optionsTabEventListener));
 
         // Tab: COLUMNS
         ColumnPairValueChangeListener linkageColsTabAddDelEventListener = (int index, String key, Object newValue) -> {
@@ -776,7 +735,12 @@ public class MainWindow {
         frame.setPreferredSize(new Dimension(900, 500));
         frame.setMinimumSize(new Dimension(900, 400));
         frame.setBounds(100, 100, 799, 481);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                doExit();
+            }
+        });
         frame.getContentPane().setLayout(new BorderLayout(0, 0));
 
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -801,156 +765,21 @@ public class MainWindow {
             }
         });
 
-        optionsTabPanel = new JPanel();
+        optionsTabPanel = new OptionsTabPanel();
         tabbedPane.addTab("_Options", null, optionsTabPanel, null);
-        GridBagLayout gbl_optionsTabPanel = new GridBagLayout();
-        gbl_optionsTabPanel.columnWidths = new int[] { 250, 500 };
-        gbl_optionsTabPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
-        gbl_optionsTabPanel.columnWeights = new double[] { 0.0, 1.0 };
-        gbl_optionsTabPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
-        optionsTabPanel.setLayout(gbl_optionsTabPanel);
 
-        Component optionsTabTopMargin = Box.createRigidArea(new Dimension(20, 20));
-        GridBagConstraints gbc_optionsTabTopMargin = new GridBagConstraints();
-        gbc_optionsTabTopMargin.insets = new Insets(0, 0, 5, 5);
-        gbc_optionsTabTopMargin.gridx = 0;
-        gbc_optionsTabTopMargin.gridy = 0;
-        optionsTabPanel.add(optionsTabTopMargin, gbc_optionsTabTopMargin);
-
-        linkageDirLbl = new JLabel("_Linkage location");
-        linkageDirLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-        GridBagConstraints gbc_linkageDirLbl = new GridBagConstraints();
-        gbc_linkageDirLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_linkageDirLbl.anchor = GridBagConstraints.EAST;
-        gbc_linkageDirLbl.gridx = 0;
-        gbc_linkageDirLbl.gridy = 1;
-        optionsTabPanel.add(linkageDirLbl, gbc_linkageDirLbl);
-
-        JPanel linkageDirContainer = new JPanel();
-        GridBagConstraints gbc_linkageDirContainer = new GridBagConstraints();
-        gbc_linkageDirContainer.fill = GridBagConstraints.BOTH;
-        gbc_linkageDirContainer.insets = new Insets(0, 0, 5, 0);
-        gbc_linkageDirContainer.gridx = 1;
-        gbc_linkageDirContainer.gridy = 1;
-        optionsTabPanel.add(linkageDirContainer, gbc_linkageDirContainer);
-        linkageDirContainer.setLayout(new BoxLayout(linkageDirContainer, BoxLayout.X_AXIS));
-
-        JLabel linkageDirWarningLbl = new WarningIcon();
-        linkageDirContainer.add(linkageDirWarningLbl);
-
-        linkageDirField = new JTextFieldWithPlaceholder();
-        linkageDirField.setHorizontalAlignment(SwingConstants.TRAILING);
-        linkageDirContainer.add(linkageDirField);
-        linkageDirField.setColumns(10);
-
-        linkageDirBtn = new JButton("_Select...");
-        linkageDirContainer.add(linkageDirBtn);
-
-        SpinnerNumberModel minScoreModel = new SpinnerNumberModel(0.0, 0.0, 100, 0.001);
-
-        SpinnerNumberModel maxRowsModel = new SpinnerNumberModel(Integer.MAX_VALUE, 0, Integer.MAX_VALUE, 1);
-
-        SpinnerNumberModel threadsModel = new SpinnerNumberModel(0, 0, 256, 1);
-
-        indexDirLbl = new JLabel("_Index location");
-        indexDirLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-        GridBagConstraints gbc_indexDirLbl = new GridBagConstraints();
-        gbc_indexDirLbl.anchor = GridBagConstraints.EAST;
-        gbc_indexDirLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_indexDirLbl.gridx = 0;
-        gbc_indexDirLbl.gridy = 2;
-        optionsTabPanel.add(indexDirLbl, gbc_indexDirLbl);
-
-        JPanel indexDirContainer = new JPanel();
-        GridBagConstraints gbc_indexDirContainer = new GridBagConstraints();
-        gbc_indexDirContainer.fill = GridBagConstraints.BOTH;
-        gbc_indexDirContainer.insets = new Insets(0, 0, 5, 0);
-        gbc_indexDirContainer.gridx = 1;
-        gbc_indexDirContainer.gridy = 2;
-        optionsTabPanel.add(indexDirContainer, gbc_indexDirContainer);
-        indexDirContainer.setLayout(new BoxLayout(indexDirContainer, BoxLayout.X_AXIS));
-
-        JLabel indexDirWarningLbl = new WarningIcon();
-        indexDirContainer.add(indexDirWarningLbl);
-
-        indexDirField = new JTextFieldWithPlaceholder();
-        indexDirField.setHorizontalAlignment(SwingConstants.TRAILING);
-        indexDirContainer.add(indexDirField);
-        indexDirField.setColumns(10);
-
-        indexDirBtn = new JButton("_Select...");
-        indexDirContainer.add(indexDirBtn);
-
-        minScoreLbl = new JLabel("_Minimum score");
-        minScoreLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-        GridBagConstraints gbc_minScoreLbl = new GridBagConstraints();
-        gbc_minScoreLbl.fill = GridBagConstraints.HORIZONTAL;
-        gbc_minScoreLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_minScoreLbl.gridx = 0;
-        gbc_minScoreLbl.gridy = 3;
-        optionsTabPanel.add(minScoreLbl, gbc_minScoreLbl);
-        minScoreField = new JSpinnerWithBlankValue(minScoreModel);
-        ((JSpinnerWithBlankValue) minScoreField).setBlankValue(Double.valueOf(0.0));
-        GridBagConstraints gbc_minScoreField = new GridBagConstraints();
-        gbc_minScoreField.anchor = GridBagConstraints.WEST;
-        gbc_minScoreField.insets = new Insets(0, 0, 5, 0);
-        gbc_minScoreField.gridx = 1;
-        gbc_minScoreField.gridy = 3;
-        optionsTabPanel.add(minScoreField, gbc_minScoreField);
-
-        JSpinner.NumberEditor ne_minScoreField = new JSpinner.NumberEditor(minScoreField, "0.000");
-        ne_minScoreField.setPreferredSize(new Dimension(122, 29));
-        ne_minScoreField.setRequestFocusEnabled(false);
-        minScoreField.setEditor(ne_minScoreField);
-
-        threadsLbl = new JLabel("_Number of threads");
-        threadsLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-        GridBagConstraints gbc_threadsLbl = new GridBagConstraints();
-        gbc_threadsLbl.anchor = GridBagConstraints.EAST;
-        gbc_threadsLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_threadsLbl.gridx = 0;
-        gbc_threadsLbl.gridy = 4;
-        optionsTabPanel.add(threadsLbl, gbc_threadsLbl);
-
-        threadsPanel = new JPanel();
-        threadsPanel.setBorder(null);
-        GridBagConstraints gbc_threadsPanel = new GridBagConstraints();
-        gbc_threadsPanel.anchor = GridBagConstraints.WEST;
-        gbc_threadsPanel.fill = GridBagConstraints.VERTICAL;
-        gbc_threadsPanel.insets = new Insets(0, 0, 5, 0);
-        gbc_threadsPanel.gridx = 1;
-        gbc_threadsPanel.gridy = 4;
-        optionsTabPanel.add(threadsPanel, gbc_threadsPanel);
-        threadsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
-
-        threadsField = new JSpinnerWithBlankValue(threadsModel);
-        threadsPanel.add(threadsField);
-        threadsField.setBlankValue(Integer.valueOf(0));
-
-        JSpinner.NumberEditor ne_threadsField = new JSpinner.NumberEditor(threadsField, "0");
-        ne_threadsField.setPreferredSize(new Dimension(122, 29));
-        ne_threadsField.setRequestFocusEnabled(false);
-        threadsField.setEditor(ne_threadsField);
-
-        maxRowsLbl = new JLabel("_Only read first rows (A)");
-        maxRowsLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-        maxRowsLbl.setPreferredSize(new Dimension(150, 17));
-        GridBagConstraints gbc_maxRowsLbl = new GridBagConstraints();
-        gbc_maxRowsLbl.fill = GridBagConstraints.HORIZONTAL;
-        gbc_maxRowsLbl.insets = new Insets(0, 0, 0, 5);
-        gbc_maxRowsLbl.gridx = 0;
-        gbc_maxRowsLbl.gridy = 5;
-        optionsTabPanel.add(maxRowsLbl, gbc_maxRowsLbl);
-        maxRowsField = new JSpinnerWithBlankValue(maxRowsModel);
-        ((JSpinnerWithBlankValue) maxRowsField).setBlankValue(Integer.MAX_VALUE);
-        GridBagConstraints gbc_maxRowsField = new GridBagConstraints();
-        gbc_maxRowsField.anchor = GridBagConstraints.WEST;
-        gbc_maxRowsField.gridx = 1;
-        gbc_maxRowsField.gridy = 5;
-        optionsTabPanel.add(maxRowsField, gbc_maxRowsField);
-
-        JSpinner.NumberEditor ne_maxRowsField = new JSpinner.NumberEditor(maxRowsField, "0");
-        maxRowsField.setEditor(ne_maxRowsField);
+        optionsTabPanel.getLinkageDirBtn().addActionListener(e -> {
+            String current = optionsTabPanel.getLinkageDirField().getText();
+            String result = selectDir(current.isEmpty() ? null : current);
+            if (result != null)
+                optionsTabPanel.getLinkageDirField().setText(result);
+        });
+        optionsTabPanel.getIndexDirBtn().addActionListener(e -> {
+            String current = optionsTabPanel.getIndexDirField().getText();
+            String result = selectDir(current.isEmpty() ? null : current);
+            if (result != null)
+                optionsTabPanel.getIndexDirField().setText(result);
+        });
 
         linkageColsTabPanel = new JPanel();
         tabbedPane.addTab("_Columns", null, linkageColsTabPanel, null);
@@ -1071,7 +900,6 @@ public class MainWindow {
                 + " - " + PROGRAM_NAME);
     }
 
-
     public void updateUndoMenuText(String summary) {
         String txt = MessageProvider.getMessage("menu.edit.undo")
                 + (summary != null ? String.format(" (%s)", summary) : "");
@@ -1104,15 +932,7 @@ public class MainWindow {
         // tab - options
         tabbedPane.setTitleAt(tabbedPane.indexOfComponent(optionsTabPanel),
                 " " + MessageProvider.getMessage("options") + " ");
-        indexDirLbl.setText(MessageProvider.getMessage("options.indexlocation"));
-        indexDirBtn.setText(MessageProvider.getMessage("options.indexlocation.select"));
-        linkageDirLbl.setText(MessageProvider.getMessage("options.linkagelocation"));
-        linkageDirBtn.setText(MessageProvider.getMessage("options.linkagelocation.select"));
-        maxRowsLbl.setText(MessageProvider.getMessage("options.maxrows"));
-        minScoreLbl.setText(MessageProvider.getMessage("options.minscore"));
-        threadsLbl.setText(MessageProvider.getMessage("options.threads"));
-        coresLabel.setText(MessageFormat.format(MessageProvider.getMessage("options.threads.cores"),
-                Runtime.getRuntime().availableProcessors()));
+        optionsTabPanel.updateLocalisedStrings();
 
         // tab - columns
         tabbedPane.setTitleAt(tabbedPane.indexOfComponent(linkageColsTabPanel),
