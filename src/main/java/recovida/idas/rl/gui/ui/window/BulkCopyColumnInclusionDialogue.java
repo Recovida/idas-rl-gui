@@ -20,6 +20,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
+import java.awt.Dimension;
+import javax.swing.SwingConstants;
+import java.awt.Component;
+import javax.swing.ImageIcon;
 
 public class BulkCopyColumnInclusionDialogue extends JDialog {
     private static final long serialVersionUID = 1609116129275788504L;
@@ -34,6 +38,8 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
 
     public BulkCopyColumnInclusionDialogue(Frame parent) {
         super(parent);
+        setFont(parent.getFont());
+        setMinimumSize(new Dimension(600, 300));
         setLocationByPlatform(true);
         setModalityType(ModalityType.APPLICATION_MODAL);
         setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
@@ -44,6 +50,7 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
 
         JButton okBtn = new JButton(
                 MessageProvider.getMessage("columns.addcopy.insert"));
+        okBtn.setIcon(new ImageIcon(BulkCopyColumnInclusionDialogue.class.getResource("/toolbarButtonGraphics/table/RowInsertAfter24.gif")));
         bottomPanel.add(okBtn);
         getContentPane().add(mainPanel, BorderLayout.CENTER);
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.X_AXIS));
@@ -90,10 +97,16 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
 
         JLabel instrLbl1 = new JLabel(
                 MessageProvider.getMessage("columns.addcopy.choose"));
+        instrLbl1.setAlignmentX(Component.CENTER_ALIGNMENT);
+        instrLbl1.setAlignmentY(Component.TOP_ALIGNMENT);
+        instrLbl1.setHorizontalAlignment(SwingConstants.CENTER);
         topPanel.add(instrLbl1);
 
         JLabel instrLbl2 = new JLabel(
                 MessageProvider.getMessage("columns.addcopy.warninggrey"));
+        instrLbl2.setAlignmentX(Component.CENTER_ALIGNMENT);
+        instrLbl2.setAlignmentY(Component.TOP_ALIGNMENT);
+        instrLbl2.setHorizontalAlignment(SwingConstants.CENTER);
         topPanel.add(instrLbl2);
 
         okBtn.addActionListener(e -> {
