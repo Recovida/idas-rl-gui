@@ -11,20 +11,9 @@ import java.util.stream.Collectors;
 public class MessageProvider {
 
     public final static List<String> SUPPORTED_LANGUAGES = Collections
-            .unmodifiableList(
-                    Arrays.asList(new String[] { "en", "es", "pt-BR" }));
+            .unmodifiableList(Arrays.asList(new String[] { "en", "es", "pt-BR" }));
 
-    public static final String DEFAULT_LANGUAGE = SUPPORTED_LANGUAGES
-            .get(Math.max(Math.max(
-                    // try exact match
-                    SUPPORTED_LANGUAGES
-                            .indexOf(Locale.getDefault().toLanguageTag()),
-                    // try language match, ignoring country
-                    SUPPORTED_LANGUAGES.stream().map(x -> x.split("-", 2)[0])
-                            .collect(Collectors.toList())
-                            .indexOf(Locale.getDefault().getLanguage())),
-                    // as a last resort, use English as a fallback
-                    0));
+    public static final String DEFAULT_LANGUAGE = getBestLanguage();
 
     protected static Locale currentLocale = new Locale(DEFAULT_LANGUAGE);
     protected static ResourceBundle bundle = createBundle(currentLocale);
@@ -36,6 +25,17 @@ public class MessageProvider {
 
     public static Locale getLocale() {
         return currentLocale;
+    }
+
+    protected static String getBestLanguage() {
+        Locale defaultLocale = Locale.getDefault();
+        // try exact match
+        int idx = SUPPORTED_LANGUAGES.indexOf(defaultLocale.toLanguageTag());
+        if (idx < 0) // try language match, ignoring country
+            idx = SUPPORTED_LANGUAGES.stream().map(x -> x.split("-", 2)[0]).collect(Collectors.toList())
+                    .indexOf(defaultLocale.getLanguage());
+        // as a last resort, use English as a fallback
+        return SUPPORTED_LANGUAGES.get(Math.max(0, idx));
     }
 
     protected static ResourceBundle createBundle(Locale locale) {
