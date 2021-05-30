@@ -56,5 +56,16 @@
 			<artifactId>idas-rl-core</artifactId>
 			<version>[1.0.4,)</version>
 		</dependency>
+		<dependency>
+			<groupId>com.sun</groupId>
+			<artifactId>jlfgr</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
+	<repositories>
+		<repository>
+			<id>jarlibs</id>
+			<url>file://${project.basedir}/src/main/resources/lib</url>
+		</repository>
+	</repositories>
 </project>

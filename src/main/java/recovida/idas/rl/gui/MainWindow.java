@@ -99,6 +99,7 @@ import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
 import recovida.idas.rl.gui.ui.window.AboutWindow;
 import recovida.idas.rl.gui.undo.HistoryPropertyChangeEventListener;
 import recovida.idas.rl.gui.undo.UndoHistory;
+import recovida.idas.rl.gui.ui.container.MainToolbar;
 
 public class MainWindow {
 
@@ -180,6 +181,7 @@ public class MainWindow {
     private JMenu runMenu;
     private JMenuItem runMenuItem;
     private Component horizontalStrut_1;
+    private MainToolbar mainToolBar;
 
     /**
      * Launch the application.
@@ -333,6 +335,15 @@ public class MainWindow {
         undoMenuItem.addActionListener(e -> doUndo());
         aboutMenuItem.addActionListener(e -> doAbout());
         runMenuItem.addActionListener(e -> doRun());
+        
+        // Toolbar buttons
+        
+        mainToolBar.getNewFileBtn().addActionListener(e -> doNew());
+        mainToolBar.getOpenFileBtn().addActionListener(e -> doOpen());
+        mainToolBar.getSaveFileBtn().addActionListener(e -> doSave());
+        mainToolBar.getRedoBtn().addActionListener(e -> doRedo());
+        mainToolBar.getUndoBtn().addActionListener(e -> doUndo());
+        mainToolBar.getRunBtn().addActionListener(e -> doRun());
 
         // Undo - changed state
 
@@ -348,11 +359,13 @@ public class MainWindow {
                     @Override
                     public void canUndoChanged(boolean canUndo) {
                         undoMenuItem.setEnabled(canUndo);
+                        mainToolBar.getUndoBtn().setEnabled(canUndo);
                     }
 
                     @Override
                     public void canRedoChanged(boolean canRedo) {
                         redoMenuItem.setEnabled(canRedo);
+                        mainToolBar.getRedoBtn().setEnabled(canRedo);
                     }
 
                     @Override
@@ -805,6 +818,7 @@ public class MainWindow {
     }
 
     protected void doRun() {
+        mainToolBar.getRunBtn().setEnabled(false);
         runMenuItem.setEnabled(false);
         if (dirty)
             doSave();
@@ -814,6 +828,7 @@ public class MainWindow {
         CompletableFuture<Boolean> f = ex.start();
         f.thenAccept((Boolean success) -> {
             SwingUtilities.invokeLater(() -> {
+                mainToolBar.getRunBtn().setEnabled(true);
                 runMenuItem.setEnabled(true);
                 f.join();
             });
@@ -843,6 +858,7 @@ public class MainWindow {
         currentFileName = fn;
         dirty = false;
         runMenuItem.setEnabled(fn != null);
+        mainToolBar.getRunBtn().setEnabled(fn != null);
         updateConfigFileLabel();
     }
 
@@ -1393,6 +1409,9 @@ public class MainWindow {
         linkageColsTable.getColumnModel()
                 .getColumn(columnPairTableModel.getColumnIndex("number"))
                 .setCellRenderer(new NumberColumnPairCellRenderer());
+        
+        mainToolBar = new MainToolbar();
+        frame.getContentPane().add(mainToolBar, BorderLayout.NORTH);
         JScrollPane linkageColsScrollPane = new JScrollPane(linkageColsTable);
         linkageColsTabPanel.add(linkageColsScrollPane);
 
@@ -1613,13 +1632,17 @@ public class MainWindow {
     }
 
     public void updateUndoMenuText(String summary) {
-        undoMenuItem.setText(MessageProvider.getMessage("menu.edit.undo")
-                + (summary != null ? String.format(" (%s)", summary) : ""));
+        String txt = MessageProvider.getMessage("menu.edit.undo")
+                + (summary != null ? String.format(" (%s)", summary) : "");
+        undoMenuItem.setText(txt);
+        mainToolBar.getUndoBtn().setToolTipText(txt);
     }
 
     public void updateRedoMenuText(String summary) {
-        redoMenuItem.setText(MessageProvider.getMessage("menu.edit.redo")
-                + (summary != null ? String.format(" (%s)", summary) : ""));
+        String txt = MessageProvider.getMessage("menu.edit.redo")
+                + (summary != null ? String.format(" (%s)", summary) : "");
+        redoMenuItem.setText(txt);
+        mainToolBar.getRedoBtn().setToolTipText(txt);
     }
 
     public void updateLocalisedStrings() {
@@ -1647,6 +1670,9 @@ public class MainWindow {
 
         // menu - current file name
         updateConfigFileLabel();
+        
+        // toolbar
+        mainToolBar.updateLocalisedStrings();
 
         // tab - datasets
         tabbedPane.setTitleAt(tabbedPane.indexOfComponent(datasetsTabPanel),
