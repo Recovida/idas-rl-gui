@@ -31,6 +31,7 @@ public class LinkageColumnButtonPanel extends JPanel {
     }
 
     public LinkageColumnButtonPanel() {
+        
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         addCopyColsBtn = new JButton("_Add columns to be copied");

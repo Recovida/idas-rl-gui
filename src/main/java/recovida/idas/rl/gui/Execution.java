@@ -19,7 +19,6 @@ public class Execution {
     }
 
     public CompletableFuture<Boolean> start() {
-        StatusReporter originalReporter = StatusReporter.get();
         StatusReporter reporter = new StatusReporter() {
 
             @Override

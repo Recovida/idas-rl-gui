@@ -18,6 +18,7 @@ import javax.swing.SwingConstants;
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.JComboBoxSuggestionProvider;
 import recovida.idas.rl.gui.ui.WarningIcon;
+import recovida.idas.rl.gui.ui.field.EncodingComboBox;
 import recovida.idas.rl.gui.ui.field.JComboBoxWithPlaceholder;
 import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
 
@@ -58,7 +59,7 @@ public class DatasetsTabPanel extends JPanel {
     private JLabel rowNumColLbl;
 
     public DatasetsTabPanel() {
-
+        
         // layout
 
         GridBagLayout gbl_datasetsTabPanel = new GridBagLayout();
@@ -109,6 +110,7 @@ public class DatasetsTabPanel extends JPanel {
         add(secondDatasetLabel, gbc_secondDatasetLabel);
 
         // file name
+        
         fileNameLbl = new JLabel("_File name");
         GridBagConstraints gbc_fileNameLbl = new GridBagConstraints();
         gbc_fileNameLbl.insets = new Insets(0, 0, 5, 5);
@@ -198,7 +200,7 @@ public class DatasetsTabPanel extends JPanel {
         add(firstEncodingContainer, gbc_firstEncodingContainer);
         firstEncodingContainer.setLayout(new BoxLayout(firstEncodingContainer, BoxLayout.X_AXIS));
 
-        firstEncodingField = new JComboBoxWithPlaceholder();
+        firstEncodingField = new EncodingComboBox();
         firstEncodingField.setEditable(true);
         new JComboBoxSuggestionProvider(firstEncodingField);
         firstEncodingContainer.add(firstEncodingField);
@@ -214,7 +216,7 @@ public class DatasetsTabPanel extends JPanel {
         add(secondEncodingContainer, gbc_secondEncodingContainer);
         secondEncodingContainer.setLayout(new BoxLayout(secondEncodingContainer, BoxLayout.X_AXIS));
 
-        secondEncodingField = new JComboBoxWithPlaceholder();
+        secondEncodingField = new EncodingComboBox();
         secondEncodingField.setEditable(true);
         new JComboBoxSuggestionProvider(secondEncodingField);
         secondEncodingContainer.add(secondEncodingField);

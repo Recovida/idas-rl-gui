@@ -99,6 +99,7 @@ public class LinkageColumnEditingPanel extends JPanel {
     }
 
     public LinkageColumnEditingPanel() {
+        
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         JPanel panel = new JPanel();

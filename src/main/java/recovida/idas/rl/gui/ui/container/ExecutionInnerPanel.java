@@ -62,6 +62,7 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
     private LogExportStatus logSavingStatus = LogExportStatus.NONE;
 
     public ExecutionInnerPanel() {
+        
         setLayout(new BorderLayout(0, 0));
 
         JPanel topPanel = new JPanel();

@@ -19,19 +19,12 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -86,7 +79,6 @@ import recovida.idas.rl.gui.ui.container.ExecutionPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnButtonPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnEditingPanel;
 import recovida.idas.rl.gui.ui.container.MainMenuBar;
-import recovida.idas.rl.gui.ui.field.JComboBoxWithPlaceholder;
 import recovida.idas.rl.gui.ui.field.JSpinnerWithBlankValue;
 import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
 import recovida.idas.rl.gui.ui.window.AboutWindow;
@@ -169,9 +161,6 @@ public class MainWindow {
         initialize();
 
         // Tab: DATASETS
-        JComboBoxWithPlaceholder[] encodingCboxes = { datasetsTabPanel.getFirstEncodingField(),
-                datasetsTabPanel.getSecondEncodingField() };
-        fillEncodings(encodingCboxes);
         SettingItemChangeListener datasetsTabEventListenerTop = (o) -> {
             if (!skipValidation)
                 tabbedPane.setSelectedComponent(datasetsTabPanel);
@@ -1082,29 +1071,6 @@ public class MainWindow {
                 + " - " + PROGRAM_NAME);
     }
 
-    private void fillEncodings(JComboBox<String>[] comboboxes) {
-        Set<String> allEncodings = new HashSet<>();
-        for (Entry<String, Charset> entry : Charset.availableCharsets().entrySet()) {
-            allEncodings.add(entry.getKey());
-            allEncodings.addAll(
-                    entry.getValue().aliases().stream().filter(enc -> enc.length() <= 10).collect(Collectors.toList()));
-        }
-        List<String> sortedEncodings = new ArrayList<>(allEncodings);
-        Collections.sort(sortedEncodings, new Comparator<String>() {
-
-            @Override
-            public int compare(String o1, String o2) {
-                if (Character.isDigit(o1.charAt(0)) == Character.isDigit(o2.charAt(0)))
-                    return o1.compareToIgnoreCase(o2);
-                return Character.isDigit(o1.charAt(0)) ? 1 : -1;
-            }
-        });
-        sortedEncodings.add(0, "ANSI");
-        sortedEncodings.add(0, "UTF-8"); // add again to the beginning
-        for (JComboBox<String> cb : comboboxes)
-            for (String enc : sortedEncodings)
-                cb.addItem(enc);
-    }
 
     public void updateUndoMenuText(String summary) {
         String txt = MessageProvider.getMessage("menu.edit.undo")

@@ -3,6 +3,11 @@ package recovida.idas.rl.gui.ui.container;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.util.HashSet;
+import java.util.OptionalInt;
+import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.JLabel;
@@ -10,6 +15,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
@@ -49,32 +55,43 @@ public class MainMenuBar extends JMenuBar {
         add(fileMenu);
 
         newFileMenuItem = new JMenuItem("_New");
-        newFileMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/New16.gif")));
+        newFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
+        newFileMenuItem
+                .setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/New16.gif")));
         fileMenu.add(newFileMenuItem);
 
         JSeparator separator_1 = new JSeparator();
         fileMenu.add(separator_1);
 
         openFileMenuItem = new JMenuItem("_Open...");
-        openFileMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/Open16.gif")));
+        openFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
+        openFileMenuItem
+                .setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/Open16.gif")));
         fileMenu.add(openFileMenuItem);
 
         JSeparator separator_2 = new JSeparator();
         fileMenu.add(separator_2);
 
         saveFileMenuItem = new JMenuItem("_Save");
-        saveFileMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/Save16.gif")));
+        saveFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+        saveFileMenuItem
+                .setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/Save16.gif")));
         fileMenu.add(saveFileMenuItem);
 
         saveAsFileMenuItem = new JMenuItem("_Save as...");
-        saveAsFileMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/SaveAs16.gif")));
+        saveAsFileMenuItem.setAccelerator(
+                KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+        saveAsFileMenuItem
+                .setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/SaveAs16.gif")));
         fileMenu.add(saveAsFileMenuItem);
 
         JSeparator separator = new JSeparator();
         fileMenu.add(separator);
 
-        exitMenuItem = new JMenuItem("_Exit");
-        exitMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/navigation/Back16.gif")));
+        exitMenuItem = new JMenuItem("_Quit");
+        exitMenuItem
+                .setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/navigation/Back16.gif")));
+        exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK));
         fileMenu.add(exitMenuItem);
 
         editMenu = new JMenuWithBorder("_Edit");
@@ -83,11 +100,13 @@ public class MainMenuBar extends JMenuBar {
         undoMenuItem = new JMenuItem("_Undo");
         undoMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/Undo16.gif")));
         undoMenuItem.setEnabled(false);
+        undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
         editMenu.add(undoMenuItem);
 
         redoMenuItem = new JMenuItem("_Redo");
         redoMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/Redo16.gif")));
         redoMenuItem.setEnabled(false);
+        redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK));
         editMenu.add(redoMenuItem);
 
         runMenu = new JMenuWithBorder("_Run");
@@ -96,13 +115,16 @@ public class MainMenuBar extends JMenuBar {
         runMenuItem = new JMenuItem("_Run using this configuration");
         runMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/media/Play16.gif")));
         runMenuItem.setEnabled(false);
+        runMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
         runMenu.add(runMenuItem);
 
         helpMenu = new JMenuWithBorder("_Help");
         add(helpMenu);
 
         aboutMenuItem = new JMenuItem("_About");
-        aboutMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/About16.gif")));
+        aboutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, InputEvent.CTRL_DOWN_MASK));
+        aboutMenuItem
+                .setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/About16.gif")));
         helpMenu.add(aboutMenuItem);
 
         Component menuGlue = Box.createGlue();
@@ -116,7 +138,7 @@ public class MainMenuBar extends JMenuBar {
 
         Component currentFileSpacer = Box.createRigidArea(new Dimension(20, 20));
         add(currentFileSpacer);
-        
+
         setVisible(true);
     }
 
@@ -139,7 +161,24 @@ public class MainMenuBar extends JMenuBar {
         // help
         helpMenu.setText(MessageProvider.getMessage("menu.help"));
         aboutMenuItem.setText(MessageProvider.getMessage("menu.help.about"));
+        
+        // mnemonics 
+        fillShortcuts(getComponents());
+    }
 
+    protected static void fillShortcuts(Component[] menu) {
+        Set<Integer> used = new HashSet<>();
+        for (Component m : menu) {
+            if (m instanceof JMenuItem) { // includes JMenu
+                if (m instanceof JMenu)
+                    fillShortcuts(((JMenu) m).getMenuComponents());
+                OptionalInt mnemonic = ((JMenuItem) m).getText().chars().filter(c -> !used.contains(c)).findFirst();
+                if (mnemonic.isPresent()) {
+                    ((JMenuItem) m).setMnemonic(mnemonic.getAsInt());
+                    used.add(mnemonic.getAsInt());
+                }
+            }
+        }
     }
 
     public JMenu getFileMenu() {
