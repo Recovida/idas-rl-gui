@@ -3,15 +3,17 @@ package recovida.idas.rl.gui.ui.container;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
-import java.awt.LayoutManager;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -19,16 +21,23 @@ import java.util.stream.IntStream;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
+import recovida.idas.rl.core.io.write.CSVDatasetWriter;
+import recovida.idas.rl.core.io.write.DatasetWriter;
 import recovida.idas.rl.core.util.StatusReporter.StatusLogger;
 import recovida.idas.rl.gui.lang.MessageProvider;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 
 public class ExecutionInnerPanel extends JPanel implements StatusLogger {
     private static final long serialVersionUID = -1501370560575937471L;
@@ -38,24 +47,38 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
     private DefaultTableModel model;
     private JProgressBar progressBar;
     private JButton openDirBtn;
-    private Component horizontalStrut;
+    
+    protected enum LogExportStatus {
+        NONE, DOING, DONE, FAILED
+    }
+    
+    private LogExportStatus logCopyingStatus = LogExportStatus.NONE;
+    private LogExportStatus logSavingStatus = LogExportStatus.NONE;
+    
 
     public ExecutionInnerPanel() {
         setLayout(new BorderLayout(0, 0));
 
         JPanel topPanel = new JPanel();
         add(topPanel, BorderLayout.NORTH);
+        topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
         copyLogBtn = new JButton("_Copy log");
+        copyLogBtn.setPreferredSize(new Dimension(250, 30));
+        copyLogBtn.setMaximumSize(new Dimension(500, 50));
+        copyLogBtn.setMinimumSize(new Dimension(250, 30));
         topPanel.add(copyLogBtn);
 
         saveLogBtn = new JButton("_Save log");
+        saveLogBtn.setPreferredSize(new Dimension(250, 30));
+        saveLogBtn.setMaximumSize(new Dimension(500, 50));
+        saveLogBtn.setMinimumSize(new Dimension(250, 30));
         topPanel.add(saveLogBtn);
 
-        horizontalStrut = Box.createHorizontalStrut(20);
-        topPanel.add(horizontalStrut);
-
         openDirBtn = new JButton("_Show result");
+        openDirBtn.setPreferredSize(new Dimension(250, 30));
+        openDirBtn.setMaximumSize(new Dimension(500, 50));
+        openDirBtn.setMinimumSize(new Dimension(250, 30));
         openDirBtn.setEnabled(false);
         topPanel.add(openDirBtn);
 
@@ -86,23 +109,127 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
         table.setRowHeight(table.getRowHeight() * 18 / 10);
         add(new JScrollPane(table), BorderLayout.CENTER);
 
-        copyLogBtn.addActionListener(
-                e -> Toolkit.getDefaultToolkit().getSystemClipboard()
-                        .setContents(new StringSelection(String.join(
-                                System.lineSeparator(), getLogRowsAsText())),
-                                null));
+        copyLogBtn.addActionListener(e -> {
+            copyLogBtn.setEnabled(false);
+            requestFocus();
+            logCopyingStatus = LogExportStatus.DOING;
+            updateCopyBtnText();
+            CompletableFuture<Boolean> f = CompletableFuture.supplyAsync(() -> copyLogToClipboard(getLogRowsAsText()));
+            f.thenAccept(c -> {
+                logCopyingStatus = c ? LogExportStatus.DONE : LogExportStatus.FAILED;
+                updateCopyBtnText();
+                Timer t = new javax.swing.Timer(2000, ee -> {
+                    logCopyingStatus = LogExportStatus.NONE;
+                    updateCopyBtnText();
+                    copyLogBtn.setEnabled(true);
+                });
+                t.setRepeats(false);
+                t.start();
+            });
+        });
+        
+        saveLogBtn.addActionListener(e -> {
+            String fn = selectLogFile();
+            saveLogBtn.setEnabled(false);
+            requestFocus();
+            logSavingStatus = LogExportStatus.DOING;
+            updateSaveBtnText();
+            CompletableFuture<Boolean> f = CompletableFuture.supplyAsync(() -> saveLogToFile(getLogRowsAsText(), fn));
+            f.thenAccept(c -> {
+                logSavingStatus = c ? LogExportStatus.DONE : LogExportStatus.FAILED;
+                updateSaveBtnText();
+                Timer t = new javax.swing.Timer(2000, ee -> {
+                    logSavingStatus = LogExportStatus.NONE;
+                    updateSaveBtnText();
+                    saveLogBtn.setEnabled(true);
+                });
+                t.setRepeats(false);
+                t.start();
+            });
+        });
     }
 
-    public ExecutionInnerPanel(LayoutManager layout) {
-        super(layout);
+    public static boolean copyToClipboard(String s) {
+        try {
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(s), null);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    public static boolean copyLogToClipboard(String[] log) {
+        return copyToClipboard(String.join(System.lineSeparator(), log));
+    }
+    
+    public static boolean saveLogToFile(String[] log, String fileName) {
+        try (DatasetWriter writer = new CSVDatasetWriter(fileName, '\t')) {
+            for (String l : log)
+                if (!writer.writeRow(l))
+                    return false;
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+    
+    private String selectLogFile() {
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                MessageProvider.getMessage("execution.savelog.formats"), "log",
+                "txt");
+        chooser.setFileFilter(filter);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
+            return chooser.getSelectedFile().getAbsolutePath();
+        return null;
+    }
+    
+    protected void updateCopyBtnText() {
+        String sfx;
+        switch (logCopyingStatus) {
+        case DOING:
+            sfx = ".doing";
+            break;
+        case DONE:
+            sfx = ".done";
+            break;
+        case FAILED:
+            sfx = ".failed";
+            break;
+        case NONE:
+        default:
+            sfx = "";
+            break;
+        }
+        SwingUtilities.invokeLater(() -> copyLogBtn.setText(MessageProvider.getMessage("execution.copylog" + sfx)));;
+    }
+    
+    protected void updateSaveBtnText() {
+        String sfx;
+        switch (logSavingStatus) {
+        case DOING:
+            sfx = ".doing";
+            break;
+        case DONE:
+            sfx = ".done";
+            break;
+        case FAILED:
+            sfx = ".failed";
+            break;
+        case NONE:
+        default:
+            sfx = "";
+            break;
+        }
+        SwingUtilities.invokeLater(() -> saveLogBtn.setText(MessageProvider.getMessage("execution.savelog" + sfx)));;
     }
 
     public void updateLocalisedStrings() {
-        copyLogBtn.setText(MessageProvider.getMessage("execution.copylog"));
+        updateCopyBtnText();
         saveLogBtn.setText(MessageProvider.getMessage("execution.savelog"));
         openDirBtn.setText(MessageProvider.getMessage("execution.showresult"));
-        model.setColumnIdentifiers(new String[] {
-                MessageProvider.getMessage("execution.table.time"),
+        model.setColumnIdentifiers(new String[] { MessageProvider.getMessage("execution.table.time"),
                 MessageProvider.getMessage("execution.table.type"),
                 MessageProvider.getMessage("execution.table.message") });
         table.getColumnModel().getColumn(0).setMinWidth(70);
@@ -162,10 +289,8 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
 
     protected void addMessageRow(String type, Supplier<String> message) {
         SwingUtilities.invokeLater(() -> {
-            model.addRow(new Object[] { getTime(), getLogEntryTypeObject(type),
-                    getMessageObject(message) });
-            table.setRowSelectionInterval(table.getRowCount() - 1,
-                    table.getRowCount() - 1);
+            model.addRow(new Object[] { getTime(), getLogEntryTypeObject(type), getMessageObject(message) });
+            table.setRowSelectionInterval(table.getRowCount() - 1, table.getRowCount() - 1);
         }
 
         );
@@ -173,10 +298,8 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
 
     public String[] getLogRowsAsText() {
         String[] lines = new String[table.getRowCount()];
-        Arrays.setAll(lines,
-                i -> IntStream.range(0, table.getColumnCount())
-                        .mapToObj(j -> table.getValueAt(i, j).toString())
-                        .collect(Collectors.joining("\t")));
+        Arrays.setAll(lines, i -> IntStream.range(0, table.getColumnCount())
+                .mapToObj(j -> table.getValueAt(i, j).toString()).collect(Collectors.joining("\t")));
         return lines;
     }
 

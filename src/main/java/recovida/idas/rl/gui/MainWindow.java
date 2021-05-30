@@ -812,7 +812,7 @@ public class MainWindow {
                 executionTabPanel.addExecutionPanel("AGORA"), currentFileName);
         tabbedPane.setSelectedComponent(executionTabPanel);
         CompletableFuture<Boolean> f = ex.start();
-        f.whenComplete((Boolean success, Throwable t) -> {
+        f.thenAccept((Boolean success) -> {
             SwingUtilities.invokeLater(() -> {
                 runMenuItem.setEnabled(true);
                 f.join();
@@ -1494,8 +1494,9 @@ public class MainWindow {
         menuBar.add(menuGlue);
 
         currentFileLbl = new JLabel("_unsaved file");
+        Font f  = currentFileLbl.getFont();
         currentFileLbl
-                .setFont(currentFileLbl.getFont().deriveFont(Font.ITALIC));
+                .setFont(f.deriveFont(Font.ITALIC).deriveFont(f.getSize2D() * 0.9f));
         currentFileLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         menuBar.add(currentFileLbl);
 
@@ -1507,7 +1508,7 @@ public class MainWindow {
 
         frame.pack();
         
-        Font f = frame.getFont();
+        f = frame.getFont();
         frame.setFont(f.deriveFont(f.getSize2D() * 1.1f));
 
     }
