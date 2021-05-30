@@ -13,7 +13,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
@@ -36,7 +35,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -45,7 +43,6 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -99,7 +96,7 @@ import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
 import recovida.idas.rl.gui.ui.window.AboutWindow;
 import recovida.idas.rl.gui.undo.HistoryPropertyChangeEventListener;
 import recovida.idas.rl.gui.undo.UndoHistory;
-import recovida.idas.rl.gui.ui.container.MainToolbar;
+import recovida.idas.rl.gui.ui.container.MainToolBar;
 
 public class MainWindow {
 
@@ -147,7 +144,6 @@ public class MainWindow {
     private JMenuItem redoMenuItem;
     private JMenu helpMenu;
     private JMenuItem aboutMenuItem;
-    private JComboBox<Locale> languageCbox;
     private JTabbedPane tabbedPane;
     private JPanel datasetsTabPanel;
     private JPanel optionsTabPanel;
@@ -181,7 +177,7 @@ public class MainWindow {
     private JMenu runMenu;
     private JMenuItem runMenuItem;
     private Component horizontalStrut_1;
-    private MainToolbar mainToolBar;
+    private MainToolBar mainToolBar;
 
     /**
      * Launch the application.
@@ -380,17 +376,13 @@ public class MainWindow {
                 });
 
         // LANGUAGE
-        languageCbox.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
+        mainToolBar.getLanguageCBox().addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     MessageProvider.setLocale((Locale) e.getItem());
                     recovida.idas.rl.core.lang.MessageProvider
                             .setLocale((Locale) e.getItem());
                     updateLocalisedStrings();
                 }
-            }
         });
 
         updateConfigFileLabel();
@@ -1410,7 +1402,7 @@ public class MainWindow {
                 .getColumn(columnPairTableModel.getColumnIndex("number"))
                 .setCellRenderer(new NumberColumnPairCellRenderer());
         
-        mainToolBar = new MainToolbar();
+        mainToolBar = new MainToolBar();
         frame.getContentPane().add(mainToolBar, BorderLayout.NORTH);
         JScrollPane linkageColsScrollPane = new JScrollPane(linkageColsTable);
         linkageColsTabPanel.add(linkageColsScrollPane);
@@ -1478,36 +1470,8 @@ public class MainWindow {
         aboutMenuItem = new JMenuItem("_About");
         helpMenu.add(aboutMenuItem);
 
-        languageCbox = new JComboBox<>();
-        languageCbox.setMaximumSize(new Dimension(1000, 32767));
-        languageCbox.setRenderer(new DefaultListCellRenderer() {
-
-            private static final long serialVersionUID = 3504291023159861529L;
-
-            @Override
-            public Component getListCellRendererComponent(JList<?> list,
-                    Object value, int index, boolean isSelected,
-                    boolean cellHasFocus) {
-                if (value instanceof Locale) {
-                    String lang = ((Locale) value)
-                            .getDisplayName((Locale) value);
-                    value = lang.substring(0, 1).toUpperCase()
-                            + lang.substring(1);
-                }
-                super.getListCellRendererComponent(list, value, index,
-                        isSelected, cellHasFocus);
-                return this;
-            }
-
-        });
-        for (String l : MessageProvider.SUPPORTED_LANGUAGES)
-            languageCbox.addItem(Locale.forLanguageTag(l));
-
         horizontalStrut_1 = Box.createHorizontalStrut(20);
         menuBar.add(horizontalStrut_1);
-        languageCbox.setSelectedItem(
-                Locale.forLanguageTag(MessageProvider.DEFAULT_LANGUAGE));
-        menuBar.add(languageCbox);
 
         Component menuGlue = Box.createGlue();
         menuBar.add(menuGlue);
