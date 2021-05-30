@@ -14,6 +14,7 @@ import javax.swing.SwingConstants;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.JMenuWithBorder;
+import javax.swing.ImageIcon;
 
 public class MainMenuBar extends JMenuBar {
 
@@ -48,37 +49,44 @@ public class MainMenuBar extends JMenuBar {
         add(fileMenu);
 
         newFileMenuItem = new JMenuItem("_New");
+        newFileMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/New16.gif")));
         fileMenu.add(newFileMenuItem);
 
         JSeparator separator_1 = new JSeparator();
         fileMenu.add(separator_1);
 
         openFileMenuItem = new JMenuItem("_Open...");
+        openFileMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/Open16.gif")));
         fileMenu.add(openFileMenuItem);
 
         JSeparator separator_2 = new JSeparator();
         fileMenu.add(separator_2);
 
         saveFileMenuItem = new JMenuItem("_Save");
+        saveFileMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/Save16.gif")));
         fileMenu.add(saveFileMenuItem);
 
         saveAsFileMenuItem = new JMenuItem("_Save as...");
+        saveAsFileMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/SaveAs16.gif")));
         fileMenu.add(saveAsFileMenuItem);
 
         JSeparator separator = new JSeparator();
         fileMenu.add(separator);
 
         exitMenuItem = new JMenuItem("_Exit");
+        exitMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/navigation/Back16.gif")));
         fileMenu.add(exitMenuItem);
 
         editMenu = new JMenuWithBorder("_Edit");
         add(editMenu);
 
         undoMenuItem = new JMenuItem("_Undo");
+        undoMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/Undo16.gif")));
         undoMenuItem.setEnabled(false);
         editMenu.add(undoMenuItem);
 
         redoMenuItem = new JMenuItem("_Redo");
+        redoMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/Redo16.gif")));
         redoMenuItem.setEnabled(false);
         editMenu.add(redoMenuItem);
 
@@ -86,6 +94,7 @@ public class MainMenuBar extends JMenuBar {
         add(runMenu);
 
         runMenuItem = new JMenuItem("_Run using this configuration");
+        runMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/media/Play16.gif")));
         runMenuItem.setEnabled(false);
         runMenu.add(runMenuItem);
 
@@ -93,6 +102,7 @@ public class MainMenuBar extends JMenuBar {
         add(helpMenu);
 
         aboutMenuItem = new JMenuItem("_About");
+        aboutMenuItem.setIcon(new ImageIcon(MainMenuBar.class.getResource("/toolbarButtonGraphics/general/About16.gif")));
         helpMenu.add(aboutMenuItem);
 
         Component menuGlue = Box.createGlue();
@@ -106,6 +116,8 @@ public class MainMenuBar extends JMenuBar {
 
         Component currentFileSpacer = Box.createRigidArea(new Dimension(20, 20));
         add(currentFileSpacer);
+        
+        setVisible(true);
     }
 
     public void updateLocalisedStrings() {
