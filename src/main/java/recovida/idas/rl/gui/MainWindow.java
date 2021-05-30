@@ -43,13 +43,9 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -79,7 +75,6 @@ import recovida.idas.rl.gui.settingitem.StringSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItemWithList;
 import recovida.idas.rl.gui.ui.ColumnPairTableModel;
 import recovida.idas.rl.gui.ui.JComboBoxSuggestionProvider;
-import recovida.idas.rl.gui.ui.JMenuWithBorder;
 import recovida.idas.rl.gui.ui.WarningIcon;
 import recovida.idas.rl.gui.ui.cellrendering.NameColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.cellrendering.NumberColumnPairCellRenderer;
@@ -90,6 +85,7 @@ import recovida.idas.rl.gui.ui.cellrendering.WeightColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.container.ExecutionPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnButtonPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnEditingPanel;
+import recovida.idas.rl.gui.ui.container.MainMenuBar;
 import recovida.idas.rl.gui.ui.field.JComboBoxWithPlaceholder;
 import recovida.idas.rl.gui.ui.field.JSpinnerWithBlankValue;
 import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
@@ -105,7 +101,6 @@ public class MainWindow {
     UndoHistory history = new UndoHistory();
     ConfigurationFile cf = new ConfigurationFile();
     String currentFileName = null;
-    private JLabel currentFileLbl;
     boolean dirty = false;
     boolean skipValidation = false; // while filling in values read from file
     FileChangeWatcher currentFileChangeWatcher = null;
@@ -127,11 +122,6 @@ public class MainWindow {
     private JSpinner maxRowsField;
     private JComboBoxWithPlaceholder firstEncodingField;
     private JComboBoxWithPlaceholder secondEncodingField;
-    private JMenuItem exitMenuItem;
-    private JMenuItem newFileMenuItem;
-    private JMenuItem openFileMenuItem;
-    private JMenuItem saveFileMenuItem;
-    private JMenuItem saveAsFileMenuItem;
     private WarningIcon firstDatasetSuffixWarningLbl;
     private WarningIcon secondDatasetSuffixWarningLbl;
     private WarningIcon secondDatasetRowNumColWarningLbl;
@@ -140,10 +130,6 @@ public class MainWindow {
     private WarningIcon secondEncodingWarningLbl;
     private WarningIcon firstDatasetWarningLbl;
     private WarningIcon secondDatasetWarningLbl;
-    private JMenuItem undoMenuItem;
-    private JMenuItem redoMenuItem;
-    private JMenu helpMenu;
-    private JMenuItem aboutMenuItem;
     private JTabbedPane tabbedPane;
     private JPanel datasetsTabPanel;
     private JPanel optionsTabPanel;
@@ -152,8 +138,6 @@ public class MainWindow {
     private ColumnPairTableModel columnPairTableModel;
     private JPanel linkageColsTabPanel;
 
-    private JMenu editMenu;
-    private JMenu fileMenu;
     private JButton firstDatasetBtn;
     private JButton secondDatasetBtn;
     private JLabel rowNumColLbl;
@@ -174,9 +158,8 @@ public class MainWindow {
     private JLabel coresLabel;
     private Component horizontalStrut;
     private ExecutionPanel executionTabPanel;
-    private JMenu runMenu;
-    private JMenuItem runMenuItem;
     private MainToolBar mainToolBar;
+    private MainMenuBar menuBar;
 
     /**
      * Launch the application.
@@ -321,15 +304,15 @@ public class MainWindow {
 
         // Menus
 
-        newFileMenuItem.addActionListener(e -> doNew());
-        exitMenuItem.addActionListener(e -> doExit());
-        openFileMenuItem.addActionListener(e -> doOpen());
-        saveFileMenuItem.addActionListener(e -> doSave());
-        saveAsFileMenuItem.addActionListener(e -> doSaveAs());
-        redoMenuItem.addActionListener(e -> doRedo());
-        undoMenuItem.addActionListener(e -> doUndo());
-        aboutMenuItem.addActionListener(e -> doAbout());
-        runMenuItem.addActionListener(e -> doRun());
+        menuBar.getNewFileMenuItem().addActionListener(e -> doNew());
+        menuBar.getExitMenuItem().addActionListener(e -> doExit());
+        menuBar.getOpenFileMenuItem().addActionListener(e -> doOpen());
+        menuBar.getSaveFileMenuItem().addActionListener(e -> doSave());
+        menuBar.getSaveAsFileMenuItem().addActionListener(e -> doSaveAs());
+        menuBar.getRedoMenuItem().addActionListener(e -> doRedo());
+        menuBar.getUndoMenuItem().addActionListener(e -> doUndo());
+        menuBar.getAboutMenuItem().addActionListener(e -> doAbout());
+        menuBar.getRunMenuItem().addActionListener(e -> doRun());
         
         // Toolbar buttons
         
@@ -353,13 +336,13 @@ public class MainWindow {
 
                     @Override
                     public void canUndoChanged(boolean canUndo) {
-                        undoMenuItem.setEnabled(canUndo);
+                        menuBar.getUndoMenuItem().setEnabled(canUndo);
                         mainToolBar.getUndoBtn().setEnabled(canUndo);
                     }
 
                     @Override
                     public void canRedoChanged(boolean canRedo) {
-                        redoMenuItem.setEnabled(canRedo);
+                        menuBar.getRedoMenuItem().setEnabled(canRedo);
                         mainToolBar.getRedoBtn().setEnabled(canRedo);
                     }
 
@@ -810,7 +793,7 @@ public class MainWindow {
 
     protected void doRun() {
         mainToolBar.getRunBtn().setEnabled(false);
-        runMenuItem.setEnabled(false);
+        menuBar.getRunMenuItem().setEnabled(false);
         if (dirty)
             doSave();
         Execution ex = new Execution(
@@ -820,7 +803,7 @@ public class MainWindow {
         f.thenAccept((Boolean success) -> {
             SwingUtilities.invokeLater(() -> {
                 mainToolBar.getRunBtn().setEnabled(true);
-                runMenuItem.setEnabled(true);
+                menuBar.getRunMenuItem().setEnabled(true);
                 f.join();
             });
         });
@@ -848,7 +831,7 @@ public class MainWindow {
             currentFileChangeWatcher = null;
         currentFileName = fn;
         dirty = false;
-        runMenuItem.setEnabled(fn != null);
+        menuBar.getRunMenuItem().setEnabled(fn != null);
         mainToolBar.getRunBtn().setEnabled(fn != null);
         updateConfigFileLabel();
     }
@@ -1415,79 +1398,16 @@ public class MainWindow {
 
         frame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
-        JMenuBar menuBar = new JMenuBar();
+        menuBar = new MainMenuBar();
         frame.setJMenuBar(menuBar);
 
-        fileMenu = new JMenuWithBorder("_File");
-        menuBar.add(fileMenu);
-
-        newFileMenuItem = new JMenuItem("_New");
-        fileMenu.add(newFileMenuItem);
-
-        JSeparator separator_1 = new JSeparator();
-        fileMenu.add(separator_1);
-
-        openFileMenuItem = new JMenuItem("_Open...");
-        fileMenu.add(openFileMenuItem);
-
-        JSeparator separator_2 = new JSeparator();
-        fileMenu.add(separator_2);
-
-        saveFileMenuItem = new JMenuItem("_Save");
-        fileMenu.add(saveFileMenuItem);
-
-        saveAsFileMenuItem = new JMenuItem("_Save as...");
-        fileMenu.add(saveAsFileMenuItem);
-
-        JSeparator separator = new JSeparator();
-        fileMenu.add(separator);
-
-        exitMenuItem = new JMenuItem("_Exit");
-        fileMenu.add(exitMenuItem);
-
-        editMenu = new JMenuWithBorder("_Edit");
-        menuBar.add(editMenu);
-
-        undoMenuItem = new JMenuItem("_Undo");
-        undoMenuItem.setEnabled(false);
-        editMenu.add(undoMenuItem);
-
-        redoMenuItem = new JMenuItem("_Redo");
-        redoMenuItem.setEnabled(false);
-        editMenu.add(redoMenuItem);
-
-        runMenu = new JMenuWithBorder("_Run");
-        menuBar.add(runMenu);
-
-        runMenuItem = new JMenuItem("_Run using this configuration");
-        runMenuItem.setEnabled(false);
-        runMenu.add(runMenuItem);
-
-        helpMenu = new JMenuWithBorder("_Help");
-        menuBar.add(helpMenu);
-
-        aboutMenuItem = new JMenuItem("_About");
-        helpMenu.add(aboutMenuItem);
-
-        Component menuGlue = Box.createGlue();
-        menuBar.add(menuGlue);
-
-        currentFileLbl = new JLabel("_unsaved file");
-        Font f  = currentFileLbl.getFont();
-        currentFileLbl
-                .setFont(f.deriveFont(Font.ITALIC).deriveFont(f.getSize2D() * 0.9f));
-        currentFileLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-        menuBar.add(currentFileLbl);
-
-        Component currentFileSpacer = Box
-                .createRigidArea(new Dimension(20, 20));
-        menuBar.add(currentFileSpacer);
+        
 
         ToolTipManager.sharedInstance().setInitialDelay(100);
 
         frame.pack();
         
-        f = frame.getFont();
+        Font f = frame.getFont();
         frame.setFont(f.deriveFont(f.getSize2D() * 1.1f));
 
     }
@@ -1556,7 +1476,7 @@ public class MainWindow {
 
     private void updateConfigFileLabel() {
         String unsaved = MessageProvider.getMessage("menu.unsavedfile");
-        currentFileLbl.setText((dirty ? "[*] " : "")
+        menuBar.getCurrentFileLbl().setText((dirty ? "[*] " : "")
                 + (currentFileName == null ? unsaved : currentFileName));
         frame.setTitle((dirty ? "[*] " : "")
                 + (currentFileName == null ? unsaved
@@ -1594,41 +1514,22 @@ public class MainWindow {
     public void updateUndoMenuText(String summary) {
         String txt = MessageProvider.getMessage("menu.edit.undo")
                 + (summary != null ? String.format(" (%s)", summary) : "");
-        undoMenuItem.setText(txt);
+        menuBar.getUndoMenuItem().setText(txt);
         mainToolBar.getUndoBtn().setToolTipText(txt);
     }
 
     public void updateRedoMenuText(String summary) {
         String txt = MessageProvider.getMessage("menu.edit.redo")
                 + (summary != null ? String.format(" (%s)", summary) : "");
-        redoMenuItem.setText(txt);
+        menuBar.getRedoMenuItem().setText(txt);
         mainToolBar.getRedoBtn().setToolTipText(txt);
     }
 
     public void updateLocalisedStrings() {
-        // menu - file
-        fileMenu.setText(MessageProvider.getMessage("menu.file"));
-        newFileMenuItem.setText(MessageProvider.getMessage("menu.file.new"));
-        openFileMenuItem.setText(MessageProvider.getMessage("menu.file.open"));
-        saveFileMenuItem.setText(MessageProvider.getMessage("menu.file.save"));
-        saveAsFileMenuItem
-                .setText(MessageProvider.getMessage("menu.file.saveas"));
-        exitMenuItem.setText(MessageProvider.getMessage("menu.file.exit"));
-
-        // menu - edit
-        editMenu.setText(MessageProvider.getMessage("menu.edit"));
+        // menu bar
+        menuBar.updateLocalisedStrings();
         updateUndoMenuText(history.getUndoSummary());
         updateRedoMenuText(history.getRedoSummary());
-
-        // menu - run
-        runMenu.setText(MessageProvider.getMessage("menu.run"));
-        runMenuItem.setText(MessageProvider.getMessage("menu.run.run"));
-
-        // menu - help
-        helpMenu.setText(MessageProvider.getMessage("menu.help"));
-        aboutMenuItem.setText(MessageProvider.getMessage("menu.help.about"));
-
-        // menu - current file name
         updateConfigFileLabel();
         
         // toolbar
