@@ -1,4 +1,4 @@
-package recovida.idas.rl.gui.ui.cellrendering;
+package recovida.idas.rl.gui.ui.table.cellrendering;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -8,8 +8,8 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
-import recovida.idas.rl.gui.ui.ColumnPairTableModel;
 import recovida.idas.rl.gui.ui.WarningIcon;
+import recovida.idas.rl.gui.ui.table.ColumnPairTableModel;
 
 public abstract class ColumnPairCellRenderer extends JLabel
         implements TableCellRenderer {

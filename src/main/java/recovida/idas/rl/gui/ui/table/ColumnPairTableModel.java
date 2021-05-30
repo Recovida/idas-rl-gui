@@ -1,4 +1,4 @@
-package recovida.idas.rl.gui.ui;
+package recovida.idas.rl.gui.ui.table;
 
 import java.util.Collection;
 import java.util.Collections;

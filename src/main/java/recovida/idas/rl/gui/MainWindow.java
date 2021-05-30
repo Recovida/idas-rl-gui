@@ -16,7 +16,6 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -36,15 +35,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.TableRowSorter;
 
 import recovida.idas.rl.gui.DatasetPeek.DatasetPeekResult;
 import recovida.idas.rl.gui.lang.MessageProvider;
@@ -57,20 +52,15 @@ import recovida.idas.rl.gui.settingitem.NumberSettingItem;
 import recovida.idas.rl.gui.settingitem.SettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItemWithList;
-import recovida.idas.rl.gui.ui.ColumnPairTableModel;
 import recovida.idas.rl.gui.ui.WarningIcon;
-import recovida.idas.rl.gui.ui.cellrendering.NameColumnPairCellRenderer;
-import recovida.idas.rl.gui.ui.cellrendering.NumberColumnPairCellRenderer;
-import recovida.idas.rl.gui.ui.cellrendering.PhonWeightColumnPairCellRenderer;
-import recovida.idas.rl.gui.ui.cellrendering.RenameColumnPairCellRenderer;
-import recovida.idas.rl.gui.ui.cellrendering.TypeColumnPairCellRenderer;
-import recovida.idas.rl.gui.ui.cellrendering.WeightColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.container.DatasetsTabPanel;
 import recovida.idas.rl.gui.ui.container.ExecutionPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnButtonPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnEditingPanel;
 import recovida.idas.rl.gui.ui.container.MainMenuBar;
 import recovida.idas.rl.gui.ui.field.JSpinnerWithBlankValue;
+import recovida.idas.rl.gui.ui.table.ColumnPairTable;
+import recovida.idas.rl.gui.ui.table.ColumnPairTableModel;
 import recovida.idas.rl.gui.ui.window.AboutWindow;
 import recovida.idas.rl.gui.undo.HistoryPropertyChangeEventListener;
 import recovida.idas.rl.gui.undo.UndoHistory;
@@ -205,6 +195,7 @@ public class MainWindow {
         };
         manager = new ColumnPairManager(history, linkageColsButtonPanel, linkageColsEditingPanel, linkageColsTable);
 
+        // Tab: EXECUTION
         executionTabPanel = new ExecutionPanel();
         tabbedPane.addTab("_Execution", null, executionTabPanel, null);
         manager.addInclusionExclusionListener(linkageColsTabValueChangeEventListener);
@@ -267,6 +258,7 @@ public class MainWindow {
         });
 
         // LANGUAGE
+        
         mainToolBar.getLanguageCBox().addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 MessageProvider.setLocale((Locale) e.getItem());
@@ -784,35 +776,9 @@ public class MainWindow {
         linkageColsTabPanel = new JPanel();
         tabbedPane.addTab("_Columns", null, linkageColsTabPanel, null);
 
-        linkageColsTable = new JTable();
-        linkageColsTable.getTableHeader().setReorderingAllowed(false);
-        linkageColsTable.setShowVerticalLines(true);
-        linkageColsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         columnPairTableModel = new ColumnPairTableModel();
+        linkageColsTable = new ColumnPairTable(columnPairTableModel);
         linkageColsTabPanel.setLayout(new BorderLayout(0, 0));
-        linkageColsTable.setModel(columnPairTableModel);
-        TableRowSorter<ColumnPairTableModel> sorter = new TableRowSorter<>(columnPairTableModel);
-        sorter.setSortKeys(Collections.singletonList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
-        linkageColsTable.setRowSorter(sorter);
-        linkageColsTable.setUpdateSelectionOnSort(true);
-        linkageColsTable.setRowHeight(linkageColsTable.getRowHeight() * 15 / 10);
-        sorter.setSortsOnUpdates(true);
-        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("weight"))
-                .setCellRenderer(new WeightColumnPairCellRenderer());
-        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("phon_weight"))
-                .setCellRenderer(new PhonWeightColumnPairCellRenderer());
-        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("rename_a"))
-                .setCellRenderer(new RenameColumnPairCellRenderer("index_a"));
-        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("rename_b"))
-                .setCellRenderer(new RenameColumnPairCellRenderer("index_b"));
-        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("index_a"))
-                .setCellRenderer(new NameColumnPairCellRenderer());
-        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("index_b"))
-                .setCellRenderer(new NameColumnPairCellRenderer());
-        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("type"))
-                .setCellRenderer(new TypeColumnPairCellRenderer());
-        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("number"))
-                .setCellRenderer(new NumberColumnPairCellRenderer());
 
         mainToolBar = new MainToolBar();
         frame.getContentPane().add(mainToolBar, BorderLayout.NORTH);
@@ -949,6 +915,7 @@ public class MainWindow {
 
         // Swing-provided buttons such as 'Ok', 'Open', 'Cancel'
         JComponent.setDefaultLocale(MessageProvider.getLocale());
+        Locale.setDefault(MessageProvider.getLocale());
 
         // re-create validation messages
         validateAllTabs();

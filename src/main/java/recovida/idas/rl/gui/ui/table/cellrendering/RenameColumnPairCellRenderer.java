@@ -1,4 +1,4 @@
-package recovida.idas.rl.gui.ui.cellrendering;
+package recovida.idas.rl.gui.ui.table.cellrendering;
 
 import java.awt.Component;
 import java.util.Optional;
