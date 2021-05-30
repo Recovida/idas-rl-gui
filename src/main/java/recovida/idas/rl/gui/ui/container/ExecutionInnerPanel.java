@@ -83,6 +83,7 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
         table.setShowVerticalLines(true);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        table.setRowHeight(table.getRowHeight() * 18 / 10);
         add(new JScrollPane(table), BorderLayout.CENTER);
 
         copyLogBtn.addActionListener(

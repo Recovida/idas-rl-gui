@@ -1367,6 +1367,7 @@ public class MainWindow {
                 .singletonList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
         linkageColsTable.setRowSorter(sorter);
         linkageColsTable.setUpdateSelectionOnSort(true);
+        linkageColsTable.setRowHeight(linkageColsTable.getRowHeight() * 15 / 10);
         sorter.setSortsOnUpdates(true);
         linkageColsTable.getColumnModel()
                 .getColumn(columnPairTableModel.getColumnIndex("weight"))
@@ -1505,6 +1506,9 @@ public class MainWindow {
         ToolTipManager.sharedInstance().setInitialDelay(100);
 
         frame.pack();
+        
+        Font f = frame.getFont();
+        frame.setFont(f.deriveFont(f.getSize2D() * 1.1f));
 
     }
 
