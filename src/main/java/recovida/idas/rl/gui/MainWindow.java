@@ -74,7 +74,6 @@ import recovida.idas.rl.gui.settingitem.SettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItemWithList;
 import recovida.idas.rl.gui.ui.ColumnPairTableModel;
-import recovida.idas.rl.gui.ui.JComboBoxSuggestionProvider;
 import recovida.idas.rl.gui.ui.WarningIcon;
 import recovida.idas.rl.gui.ui.cellrendering.NameColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.cellrendering.NumberColumnPairCellRenderer;
@@ -82,6 +81,7 @@ import recovida.idas.rl.gui.ui.cellrendering.PhonWeightColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.cellrendering.RenameColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.cellrendering.TypeColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.cellrendering.WeightColumnPairCellRenderer;
+import recovida.idas.rl.gui.ui.container.DatasetsTabPanel;
 import recovida.idas.rl.gui.ui.container.ExecutionPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnButtonPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnEditingPanel;
@@ -109,43 +109,19 @@ public class MainWindow {
 
     /* GUI components */
     private JFrame frame;
-    private JTextFieldWithPlaceholder firstDatasetSuffixField;
-    private JTextFieldWithPlaceholder secondDatasetSuffixField;
-    private JTextFieldWithPlaceholder firstDatasetRowNumColField;
-    private JTextFieldWithPlaceholder secondDatasetRowNumColField;
-    private JTextField firstDatasetField;
-    private JTextField secondDatasetField;
     private JTable linkageColsTable;
     private JTextFieldWithPlaceholder linkageDirField;
     private JTextFieldWithPlaceholder indexDirField;
     private JSpinner minScoreField;
     private JSpinner maxRowsField;
-    private JComboBoxWithPlaceholder firstEncodingField;
-    private JComboBoxWithPlaceholder secondEncodingField;
-    private WarningIcon firstDatasetSuffixWarningLbl;
-    private WarningIcon secondDatasetSuffixWarningLbl;
-    private WarningIcon secondDatasetRowNumColWarningLbl;
-    private WarningIcon firstDatasetRowNumColWarningLbl;
-    private WarningIcon firstEncodingWarningLbl;
-    private WarningIcon secondEncodingWarningLbl;
-    private WarningIcon firstDatasetWarningLbl;
-    private WarningIcon secondDatasetWarningLbl;
     private JTabbedPane tabbedPane;
-    private JPanel datasetsTabPanel;
+    private DatasetsTabPanel datasetsTabPanel;
     private JPanel optionsTabPanel;
     private LinkageColumnEditingPanel linkageColsEditingPanel;
     private LinkageColumnButtonPanel linkageColsButtonPanel;
     private ColumnPairTableModel columnPairTableModel;
     private JPanel linkageColsTabPanel;
 
-    private JButton firstDatasetBtn;
-    private JButton secondDatasetBtn;
-    private JLabel rowNumColLbl;
-    private JLabel suffixLbl;
-    private JLabel encodingLbl;
-    private JLabel fileNameLbl;
-    private JLabel firstDatasetLabel;
-    private JLabel secondDatasetLabel;
     private JButton linkageDirBtn;
     private JLabel indexDirLbl;
     private JButton indexDirBtn;
@@ -193,8 +169,8 @@ public class MainWindow {
         initialize();
 
         // Tab: DATASETS
-        JComboBoxWithPlaceholder[] encodingCboxes = { firstEncodingField,
-                secondEncodingField };
+        JComboBoxWithPlaceholder[] encodingCboxes = { datasetsTabPanel.getFirstEncodingField(),
+                datasetsTabPanel.getSecondEncodingField() };
         fillEncodings(encodingCboxes);
         SettingItemChangeListener datasetsTabEventListenerTop = (o) -> {
             if (!skipValidation)
@@ -207,27 +183,23 @@ public class MainWindow {
             validateDatasetsTabBottomPart();
         };
 
-        cf.addSettingItem("db_a", new StringSettingItem(history, "", "",
-                firstDatasetField, datasetsTabEventListenerTop));
-        cf.addSettingItem("encoding_a", new StringSettingItemWithList(history,
-                "", "UTF-8", firstEncodingField, datasetsTabEventListenerTop));
+        cf.addSettingItem("db_a", new StringSettingItem(history, "", "", datasetsTabPanel.getFirstDatasetField(),
+                datasetsTabEventListenerTop));
+        cf.addSettingItem("encoding_a", new StringSettingItemWithList(history, "", "UTF-8",
+                datasetsTabPanel.getFirstEncodingField(), datasetsTabEventListenerTop));
         cf.addSettingItem("suffix_a", new StringSettingItem(history, "", "_dsa",
-                firstDatasetSuffixField, datasetsTabEventListenerBottom));
-        cf.addSettingItem("row_num_col_a",
-                new StringSettingItem(history, "", "#A",
-                        firstDatasetRowNumColField,
-                        datasetsTabEventListenerBottom));
+                datasetsTabPanel.getFirstDatasetSuffixField(), datasetsTabEventListenerBottom));
+        cf.addSettingItem("row_num_col_a", new StringSettingItem(history, "", "#A",
+                datasetsTabPanel.getFirstDatasetRowNumColField(), datasetsTabEventListenerBottom));
 
-        cf.addSettingItem("db_b", new StringSettingItem(history, "", "",
-                secondDatasetField, datasetsTabEventListenerTop));
-        cf.addSettingItem("encoding_b", new StringSettingItemWithList(history,
-                "", "UTF-8", secondEncodingField, datasetsTabEventListenerTop));
+        cf.addSettingItem("db_b", new StringSettingItem(history, "", "", datasetsTabPanel.getSecondDatasetField(),
+                datasetsTabEventListenerTop));
+        cf.addSettingItem("encoding_b", new StringSettingItemWithList(history, "", "UTF-8",
+                datasetsTabPanel.getSecondEncodingField(), datasetsTabEventListenerTop));
         cf.addSettingItem("suffix_b", new StringSettingItem(history, "", "_dsb",
-                secondDatasetSuffixField, datasetsTabEventListenerBottom));
-        cf.addSettingItem("row_num_col_b",
-                new StringSettingItem(history, "", "#B",
-                        secondDatasetRowNumColField,
-                        datasetsTabEventListenerBottom));
+                datasetsTabPanel.getSecondDatasetSuffixField(), datasetsTabEventListenerBottom));
+        cf.addSettingItem("row_num_col_b", new StringSettingItem(history, "", "#B",
+                datasetsTabPanel.getSecondDatasetRowNumColField(), datasetsTabEventListenerBottom));
 
         // Tab: OPTIONS
         SettingItemChangeListener optionsTabEventListener = (o) -> {
@@ -235,25 +207,20 @@ public class MainWindow {
                 tabbedPane.setSelectedComponent(optionsTabPanel);
             validateOptionsTab();
         };
-        cf.addSettingItem("db_index", new StringSettingItem(history, "", "",
-                indexDirField, optionsTabEventListener));
-        cf.addSettingItem("linkage_folder", new StringSettingItem(history, "",
-                "", linkageDirField, optionsTabEventListener));
-        cf.addSettingItem("min_score", new NumberSettingItem(history, 0.0, 0.0,
-                minScoreField, optionsTabEventListener));
-        cf.addSettingItem("num_threads",
-                new NumberSettingItem(history, 0, 0, threadsField));
+        cf.addSettingItem("db_index", new StringSettingItem(history, "", "", indexDirField, optionsTabEventListener));
+        cf.addSettingItem("linkage_folder",
+                new StringSettingItem(history, "", "", linkageDirField, optionsTabEventListener));
+        cf.addSettingItem("min_score",
+                new NumberSettingItem(history, 0.0, 0.0, minScoreField, optionsTabEventListener));
+        cf.addSettingItem("num_threads", new NumberSettingItem(history, 0, 0, threadsField));
 
         horizontalStrut = Box.createHorizontalStrut(20);
         threadsPanel.add(horizontalStrut);
 
-        coresLabel = new JLabel(
-                "_On this computer, this number should ideally be at most n.");
+        coresLabel = new JLabel("_On this computer, this number should ideally be at most n.");
         threadsPanel.add(coresLabel);
-        cf.addSettingItem("max_rows",
-                new NumberSettingItem(history, Integer.MAX_VALUE,
-                        Integer.MAX_VALUE, maxRowsField,
-                        optionsTabEventListener));
+        cf.addSettingItem("max_rows", new NumberSettingItem(history, Integer.MAX_VALUE, Integer.MAX_VALUE, maxRowsField,
+                optionsTabEventListener));
         linkageDirBtn.addActionListener(e -> {
             String current = linkageDirField.getText();
             String result = selectDir(current.isEmpty() ? null : current);
@@ -268,8 +235,7 @@ public class MainWindow {
         });
 
         // Tab: COLUMNS
-        ColumnPairValueChangeListener linkageColsTabAddDelEventListener = (
-                int index, String key, Object newValue) -> {
+        ColumnPairValueChangeListener linkageColsTabAddDelEventListener = (int index, String key, Object newValue) -> {
             if (!skipValidation)
                 tabbedPane.setSelectedComponent(linkageColsTabPanel);
             validateLinkageColsTab();
@@ -286,20 +252,16 @@ public class MainWindow {
                 validateLinkageColsTab();
             }
         };
-        ColumnPairSelectionListener linkageColsTabSelChangeEventListener = (
-                int index) -> {
+        ColumnPairSelectionListener linkageColsTabSelChangeEventListener = (int index) -> {
             validateLinkageColsTabSelectedRow(index);
         };
-        manager = new ColumnPairManager(history, linkageColsButtonPanel,
-                linkageColsEditingPanel, linkageColsTable);
+        manager = new ColumnPairManager(history, linkageColsButtonPanel, linkageColsEditingPanel, linkageColsTable);
 
         executionTabPanel = new ExecutionPanel();
         tabbedPane.addTab("_Execution", null, executionTabPanel, null);
-        manager.addInclusionExclusionListener(
-                linkageColsTabValueChangeEventListener);
+        manager.addInclusionExclusionListener(linkageColsTabValueChangeEventListener);
         manager.addSelectionListener(linkageColsTabSelChangeEventListener);
-        manager.addValueChangeSelectionListener(
-                linkageColsTabAddDelEventListener);
+        manager.addValueChangeSelectionListener(linkageColsTabAddDelEventListener);
         cf.setPairPanager(manager);
 
         // Menus
@@ -313,9 +275,9 @@ public class MainWindow {
         menuBar.getUndoMenuItem().addActionListener(e -> doUndo());
         menuBar.getAboutMenuItem().addActionListener(e -> doAbout());
         menuBar.getRunMenuItem().addActionListener(e -> doRun());
-        
+
         // Toolbar buttons
-        
+
         mainToolBar.getNewFileBtn().addActionListener(e -> doNew());
         mainToolBar.getOpenFileBtn().addActionListener(e -> doOpen());
         mainToolBar.getSaveFileBtn().addActionListener(e -> doSave());
@@ -325,46 +287,44 @@ public class MainWindow {
 
         // Undo - changed state
 
-        history.addPropertyChangeListener(
-                new HistoryPropertyChangeEventListener() {
+        history.addPropertyChangeListener(new HistoryPropertyChangeEventListener() {
 
-                    @Override
-                    public void cleanChanged(boolean isClean) {
-                        dirty = !isClean;
-                        updateConfigFileLabel();
-                    }
+            @Override
+            public void cleanChanged(boolean isClean) {
+                dirty = !isClean;
+                updateConfigFileLabel();
+            }
 
-                    @Override
-                    public void canUndoChanged(boolean canUndo) {
-                        menuBar.getUndoMenuItem().setEnabled(canUndo);
-                        mainToolBar.getUndoBtn().setEnabled(canUndo);
-                    }
+            @Override
+            public void canUndoChanged(boolean canUndo) {
+                menuBar.getUndoMenuItem().setEnabled(canUndo);
+                mainToolBar.getUndoBtn().setEnabled(canUndo);
+            }
 
-                    @Override
-                    public void canRedoChanged(boolean canRedo) {
-                        menuBar.getRedoMenuItem().setEnabled(canRedo);
-                        mainToolBar.getRedoBtn().setEnabled(canRedo);
-                    }
+            @Override
+            public void canRedoChanged(boolean canRedo) {
+                menuBar.getRedoMenuItem().setEnabled(canRedo);
+                mainToolBar.getRedoBtn().setEnabled(canRedo);
+            }
 
-                    @Override
-                    public void undoSummaryChanged(String summary) {
-                        updateUndoMenuText(summary);
-                    }
+            @Override
+            public void undoSummaryChanged(String summary) {
+                updateUndoMenuText(summary);
+            }
 
-                    @Override
-                    public void redoSummaryChanged(String summary) {
-                        updateRedoMenuText(summary);
-                    }
-                });
+            @Override
+            public void redoSummaryChanged(String summary) {
+                updateRedoMenuText(summary);
+            }
+        });
 
         // LANGUAGE
         mainToolBar.getLanguageCBox().addItemListener(e -> {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    MessageProvider.setLocale((Locale) e.getItem());
-                    recovida.idas.rl.core.lang.MessageProvider
-                            .setLocale((Locale) e.getItem());
-                    updateLocalisedStrings();
-                }
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                MessageProvider.setLocale((Locale) e.getItem());
+                recovida.idas.rl.core.lang.MessageProvider.setLocale((Locale) e.getItem());
+                updateLocalisedStrings();
+            }
         });
 
         updateConfigFileLabel();
@@ -379,8 +339,7 @@ public class MainWindow {
     }
 
     protected Icon getTabErrorIcon() {
-        return new ImageIcon(WarningIcon.BUFFERED_IMAGE.getScaledInstance(15,
-                15, Image.SCALE_SMOOTH));
+        return new ImageIcon(WarningIcon.BUFFERED_IMAGE.getScaledInstance(15, 15, Image.SCALE_SMOOTH));
     }
 
     public synchronized int validateDatasetsTabTopPart() {
@@ -400,25 +359,24 @@ public class MainWindow {
         if (enc2 == null || enc2.isEmpty())
             enc2 = (String) items.get("encoding_b").getDefaultValue();
         if (!isValidEncoding(enc1)) {
-            firstEncodingWarningLbl.setToolTipText(
-                    MessageProvider.getMessage("datasets.badencoding"));
-            firstEncodingWarningLbl.setVisible(true);
+            datasetsTabPanel.getFirstEncodingWarningLbl()
+                    .setToolTipText(MessageProvider.getMessage("datasets.badencoding"));
+            datasetsTabPanel.getFirstEncodingWarningLbl().setVisible(true);
             errorCount++;
         } else {
-            firstEncodingWarningLbl.setVisible(false);
+            datasetsTabPanel.getFirstEncodingWarningLbl().setVisible(false);
         }
         if (!isValidEncoding(enc2)) {
-            secondEncodingWarningLbl.setToolTipText(
-                    MessageProvider.getMessage("datasets.badencoding"));
-            secondEncodingWarningLbl.setVisible(true);
+            datasetsTabPanel.getSecondEncodingWarningLbl()
+                    .setToolTipText(MessageProvider.getMessage("datasets.badencoding"));
+            datasetsTabPanel.getSecondEncodingWarningLbl().setVisible(true);
             errorCount++;
         } else {
-            secondEncodingWarningLbl.setVisible(false);
+            datasetsTabPanel.getSecondEncodingWarningLbl().setVisible(false);
         }
 
         // File names
-        Path dir = currentFileName == null ? null
-                : Paths.get(currentFileName).getParent();
+        Path dir = currentFileName == null ? null : Paths.get(currentFileName).getParent();
         String f1 = (String) items.get("db_a").getCurrentValue();
         String f2 = (String) items.get("db_b").getCurrentValue();
         String fn1, fn2;
@@ -431,10 +389,8 @@ public class MainWindow {
         }
         DatasetPeek p;
         if (!peekFromFileNameAndEncoding.containsKey(fn1))
-            peekFromFileNameAndEncoding.put(fn1,
-                    new ConcurrentHashMap<String, DatasetPeek>());
-        ConcurrentMap<String, DatasetPeek> m = peekFromFileNameAndEncoding
-                .get(fn1);
+            peekFromFileNameAndEncoding.put(fn1, new ConcurrentHashMap<String, DatasetPeek>());
+        ConcurrentMap<String, DatasetPeek> m = peekFromFileNameAndEncoding.get(fn1);
         if (m.containsKey(enc1)) {
             p = m.get(enc1);
         } else {
@@ -451,15 +407,13 @@ public class MainWindow {
         DatasetPeekResult result = p.getResult();
         if (result != DatasetPeekResult.SUCCESS) {
             errorCount++;
-            firstDatasetWarningLbl
-                    .setToolTipText(getDatasetHeaderErrorMessage(result, fn1));
-            firstDatasetWarningLbl.setVisible(true);
+            datasetsTabPanel.getFirstDatasetWarningLbl().setToolTipText(getDatasetHeaderErrorMessage(result, fn1));
+            datasetsTabPanel.getFirstDatasetWarningLbl().setVisible(true);
         } else
-            firstDatasetWarningLbl.setVisible(false);
+            datasetsTabPanel.getFirstDatasetWarningLbl().setVisible(false);
         manager.setFirstDatasetColumnNames(p.getColumnNames());
         if (!peekFromFileNameAndEncoding.containsKey(fn2))
-            peekFromFileNameAndEncoding.put(fn2,
-                    new ConcurrentHashMap<String, DatasetPeek>());
+            peekFromFileNameAndEncoding.put(fn2, new ConcurrentHashMap<String, DatasetPeek>());
         m = peekFromFileNameAndEncoding.get(fn2);
         if (m.containsKey(enc2)) {
             p = m.get(enc2);
@@ -477,18 +431,15 @@ public class MainWindow {
         result = p.getResult();
         if (result != DatasetPeekResult.SUCCESS) {
             errorCount++;
-            secondDatasetWarningLbl
-                    .setToolTipText(getDatasetHeaderErrorMessage(result, fn2));
-            secondDatasetWarningLbl.setVisible(true);
+            datasetsTabPanel.getSecondDatasetWarningLbl().setToolTipText(getDatasetHeaderErrorMessage(result, fn2));
+            datasetsTabPanel.getSecondDatasetWarningLbl().setVisible(true);
         } else
-            secondDatasetWarningLbl.setVisible(false);
+            datasetsTabPanel.getSecondDatasetWarningLbl().setVisible(false);
         manager.setSecondDatasetColumnNames(p.getColumnNames());
         if (manager.getColumnPairCount() > 0)
-            manager.getTableModel().fireTableRowsUpdated(0,
-                    manager.getColumnPairCount() - 1);
+            manager.getTableModel().fireTableRowsUpdated(0, manager.getColumnPairCount() - 1);
         validateLinkageColsTab();
-        tabbedPane.setIconAt(tabbedPane.indexOfComponent(datasetsTabPanel),
-                errorCount == 0 ? null : getTabErrorIcon());
+        tabbedPane.setIconAt(tabbedPane.indexOfComponent(datasetsTabPanel), errorCount == 0 ? null : getTabErrorIcon());
         return errorCount;
     }
 
@@ -509,16 +460,15 @@ public class MainWindow {
         if (s2 == null || s2.isEmpty())
             s2 = (String) items.get("suffix_b").getDefaultValue();
         if (s1.equals(s2)) {
-            String msg = MessageProvider
-                    .getMessage("datasets.identicalprefixes");
-            firstDatasetSuffixWarningLbl.setToolTipText(msg);
-            secondDatasetSuffixWarningLbl.setToolTipText(msg);
-            firstDatasetSuffixWarningLbl.setVisible(true);
-            secondDatasetSuffixWarningLbl.setVisible(true);
+            String msg = MessageProvider.getMessage("datasets.identicalprefixes");
+            datasetsTabPanel.getFirstDatasetSuffixWarningLbl().setToolTipText(msg);
+            datasetsTabPanel.getSecondDatasetSuffixWarningLbl().setToolTipText(msg);
+            datasetsTabPanel.getFirstDatasetSuffixWarningLbl().setVisible(true);
+            datasetsTabPanel.getSecondDatasetSuffixWarningLbl().setVisible(true);
             errorCount++;
         } else {
-            firstDatasetSuffixWarningLbl.setVisible(false);
-            secondDatasetSuffixWarningLbl.setVisible(false);
+            datasetsTabPanel.getFirstDatasetSuffixWarningLbl().setVisible(false);
+            datasetsTabPanel.getSecondDatasetSuffixWarningLbl().setVisible(false);
         }
         manager.setFirstRenameSuffix(s1);
         manager.setSecondRenameSuffix(s2);
@@ -531,16 +481,15 @@ public class MainWindow {
         if (s2 == null || s2.isEmpty())
             s2 = (String) items.get("row_num_col_b").getDefaultValue();
         if (s1.equals(s2)) {
-            String msg = MessageProvider
-                    .getMessage("datasets.identicalrownumcolnames");
-            firstDatasetRowNumColWarningLbl.setToolTipText(msg);
-            secondDatasetRowNumColWarningLbl.setToolTipText(msg);
-            firstDatasetRowNumColWarningLbl.setVisible(true);
-            secondDatasetRowNumColWarningLbl.setVisible(true);
+            String msg = MessageProvider.getMessage("datasets.identicalrownumcolnames");
+            datasetsTabPanel.getFirstDatasetRowNumColWarningLbl().setToolTipText(msg);
+            datasetsTabPanel.getSecondDatasetRowNumColWarningLbl().setToolTipText(msg);
+            datasetsTabPanel.getFirstDatasetRowNumColWarningLbl().setVisible(true);
+            datasetsTabPanel.getSecondDatasetRowNumColWarningLbl().setVisible(true);
             errorCount++;
         } else {
-            firstDatasetRowNumColWarningLbl.setVisible(false);
-            secondDatasetRowNumColWarningLbl.setVisible(false);
+            datasetsTabPanel.getFirstDatasetRowNumColWarningLbl().setVisible(false);
+            datasetsTabPanel.getSecondDatasetRowNumColWarningLbl().setVisible(false);
         }
         return errorCount;
     }
@@ -551,33 +500,26 @@ public class MainWindow {
         return 0;
     }
 
-    public synchronized int validateLinkageColsTabSelectedRow(int rowIndex,
-            String key) {
+    public synchronized int validateLinkageColsTabSelectedRow(int rowIndex, String key) {
         if (skipValidation)
             return -1;
-        boolean error = rowIndex >= 0
-                && !columnPairTableModel.isCellValid(rowIndex, key);
+        boolean error = rowIndex >= 0 && !columnPairTableModel.isCellValid(rowIndex, key);
         JLabel lbl;
         switch (key) {
         case "index_a":
             lbl = linkageColsEditingPanel.getFirstNameWarningLbl();
             lbl.setVisible(error);
-            lbl.setToolTipText(
-                    error ? MessageProvider.getMessage("columns.badcolumn")
-                            : "");
+            lbl.setToolTipText(error ? MessageProvider.getMessage("columns.badcolumn") : "");
             break;
         case "index_b":
             lbl = linkageColsEditingPanel.getSecondNameWarningLbl();
             lbl.setVisible(error);
-            lbl.setToolTipText(
-                    error ? MessageProvider.getMessage("columns.badcolumn")
-                            : "");
+            lbl.setToolTipText(error ? MessageProvider.getMessage("columns.badcolumn") : "");
             break;
         case "type":
             lbl = linkageColsEditingPanel.getTypeWarningLbl();
             lbl.setVisible(error);
-            lbl.setToolTipText(
-                    error ? MessageProvider.getMessage("columns.badtype") : "");
+            lbl.setToolTipText(error ? MessageProvider.getMessage("columns.badtype") : "");
             break;
         case "weight":
         case "phon_weight":
@@ -594,8 +536,7 @@ public class MainWindow {
         if (skipValidation)
             return -1;
         int errorCount = 0;
-        String[] keys = { "number", "index_a", "index_b", "type", "weight",
-                "phon_weight", "rename_a", "rename_b" };
+        String[] keys = { "number", "index_a", "index_b", "type", "weight", "phon_weight", "rename_a", "rename_b" };
         for (String key : keys)
             errorCount += validateLinkageColsTabSelectedRow(index, key);
         return errorCount;
@@ -615,12 +556,11 @@ public class MainWindow {
     }
 
     public int validateAllTabs() {
-        return validateDatasetsTabTopPart() + validateDatasetsTabBottomPart()
-                + validateOptionsTab() + validateLinkageColsTab();
+        return validateDatasetsTabTopPart() + validateDatasetsTabBottomPart() + validateOptionsTab()
+                + validateLinkageColsTab();
     }
 
-    public static String getDatasetHeaderErrorMessage(DatasetPeekResult result,
-            String fileName) {
+    public static String getDatasetHeaderErrorMessage(DatasetPeekResult result, String fileName) {
         switch (result) {
         case BLANK_NAME:
             return MessageProvider.getMessage("datasets.blankfilename");
@@ -643,13 +583,10 @@ public class MainWindow {
             JComponent component = item.getGuiComponent();
             if (component instanceof JTextField)
                 ((JTextField) component).setText("");
-            else if (component instanceof JComboBox<?>
-                    && ((JComboBox<String>) component).isEditable())
-                ((JComboBox<String>) item.getGuiComponent())
-                        .setSelectedItem("");
+            else if (component instanceof JComboBox<?> && ((JComboBox<String>) component).isEditable())
+                ((JComboBox<String>) item.getGuiComponent()).setSelectedItem("");
             else if (component instanceof JSpinnerWithBlankValue)
-                ((JSpinnerWithBlankValue) component).setValue(
-                        ((JSpinnerWithBlankValue) component).getBlankValue());
+                ((JSpinnerWithBlankValue) component).setValue(((JSpinnerWithBlankValue) component).getBlankValue());
         }
         columnPairTableModel.setRowCount(0);
     }
@@ -658,8 +595,7 @@ public class MainWindow {
         if (enc == null)
             return false;
         try {
-            return enc.toUpperCase().replaceAll("[^A-Z0-9]", "").equals("ANSI")
-                    || Charset.isSupported(enc);
+            return enc.toUpperCase().replaceAll("[^A-Z0-9]", "").equals("ANSI") || Charset.isSupported(enc);
         } catch (IllegalCharsetNameException e) {
             return false;
         }
@@ -680,8 +616,7 @@ public class MainWindow {
             int ans = promptToSaveChanges();
             if (ans == JOptionPane.YES_OPTION)
                 doSave();
-            else if (ans == JOptionPane.CANCEL_OPTION
-                    || ans == JOptionPane.CLOSED_OPTION)
+            else if (ans == JOptionPane.CANCEL_OPTION || ans == JOptionPane.CLOSED_OPTION)
                 return;
         }
         clearAllFields();
@@ -696,13 +631,11 @@ public class MainWindow {
             int ans = promptToSaveChanges();
             if (ans == JOptionPane.YES_OPTION)
                 doSave();
-            else if (ans == JOptionPane.CANCEL_OPTION
-                    || ans == JOptionPane.CLOSED_OPTION)
+            else if (ans == JOptionPane.CANCEL_OPTION || ans == JOptionPane.CLOSED_OPTION)
                 return;
         }
-        String newConfigFileName = selectConfigFile(currentFileName == null
-                ? null
-                : Paths.get(currentFileName).toAbsolutePath().toString());
+        String newConfigFileName = selectConfigFile(
+                currentFileName == null ? null : Paths.get(currentFileName).toAbsolutePath().toString());
         if (newConfigFileName != null) {
             doOpen(newConfigFileName);
         }
@@ -718,10 +651,8 @@ public class MainWindow {
             history.clearAll();
             linkageColsTable.clearSelection();
         } else {
-            JOptionPane.showMessageDialog(frame,
-                    MessageProvider.getMessage("menu.file.open.cantopen"),
-                    MessageProvider.getMessage("menu.file.open.error"),
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, MessageProvider.getMessage("menu.file.open.cantopen"),
+                    MessageProvider.getMessage("menu.file.open.error"), JOptionPane.ERROR_MESSAGE);
         }
         SwingUtilities.invokeLater(() -> {
             skipValidation = false;
@@ -745,16 +676,11 @@ public class MainWindow {
             updateConfigFileName(currentFileName);
             history.setClean();
             if (validateAllTabs() > 0 && wasDirty)
-                JOptionPane.showMessageDialog(frame,
-                        MessageProvider
-                                .getMessage("menu.file.save.containserrors"),
-                        MessageProvider.getMessage("menu.file.save.warning"),
-                        JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(frame, MessageProvider.getMessage("menu.file.save.containserrors"),
+                        MessageProvider.getMessage("menu.file.save.warning"), JOptionPane.WARNING_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(frame,
-                    MessageProvider.getMessage("menu.file.save.cantsave"),
-                    MessageProvider.getMessage("menu.file.save.error"),
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, MessageProvider.getMessage("menu.file.save.cantsave"),
+                    MessageProvider.getMessage("menu.file.save.error"), JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -773,10 +699,8 @@ public class MainWindow {
     }
 
     protected void showDuplicateNumbersWarning() {
-        JOptionPane.showMessageDialog(frame,
-                MessageProvider.getMessage("menu.file.save.duplicatenumbers"),
-                MessageProvider.getMessage("menu.file.save.error"),
-                JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(frame, MessageProvider.getMessage("menu.file.save.duplicatenumbers"),
+                MessageProvider.getMessage("menu.file.save.error"), JOptionPane.ERROR_MESSAGE);
     }
 
     protected void doExit() {
@@ -784,8 +708,7 @@ public class MainWindow {
             int ans = promptToSaveChanges();
             if (ans == JOptionPane.YES_OPTION)
                 doSave();
-            else if (ans == JOptionPane.CANCEL_OPTION
-                    || ans == JOptionPane.CLOSED_OPTION)
+            else if (ans == JOptionPane.CANCEL_OPTION || ans == JOptionPane.CLOSED_OPTION)
                 return;
         }
         frame.dispose();
@@ -796,8 +719,7 @@ public class MainWindow {
         menuBar.getRunMenuItem().setEnabled(false);
         if (dirty)
             doSave();
-        Execution ex = new Execution(
-                executionTabPanel.addExecutionPanel(), currentFileName);
+        Execution ex = new Execution(executionTabPanel.addExecutionPanel(), currentFileName);
         tabbedPane.setSelectedComponent(executionTabPanel);
         CompletableFuture<Boolean> f = ex.start();
         f.thenAccept((Boolean success) -> {
@@ -818,14 +740,13 @@ public class MainWindow {
             currentFileChangeWatcher.disable();
         if (fn != null) {
             if (!fn.equals(currentFileName) || currentFileChangeWatcher == null)
-                currentFileChangeWatcher = new FileChangeWatcher(Paths.get(fn),
-                        () -> {
-                            int result = promptToSaveChangesAfterChangeOnDisk();
-                            if (result == JOptionPane.YES_OPTION)
-                                doSave();
-                            else if (result == JOptionPane.NO_OPTION)
-                                doOpen(currentFileName);
-                        });
+                currentFileChangeWatcher = new FileChangeWatcher(Paths.get(fn), () -> {
+                    int result = promptToSaveChangesAfterChangeOnDisk();
+                    if (result == JOptionPane.YES_OPTION)
+                        doSave();
+                    else if (result == JOptionPane.NO_OPTION)
+                        doOpen(currentFileName);
+                });
             currentFileChangeWatcher.enable();
         } else
             currentFileChangeWatcher = null;
@@ -837,35 +758,23 @@ public class MainWindow {
     }
 
     protected int promptToSaveChanges() {
-        String msg = (currentFileName == null
-                ? MessageProvider.getMessage("menu.file.save.savechangesnofile")
-                : MessageFormat.format(
-                        MessageProvider
-                                .getMessage("menu.file.save.savechangesfile"),
-                        currentFileName));
-        return JOptionPane.showOptionDialog(this.frame, msg,
-                MessageProvider.getMessage("menu.file.save.savechanges"),
-                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, null, null);
+        String msg = (currentFileName == null ? MessageProvider.getMessage("menu.file.save.savechangesnofile")
+                : MessageFormat.format(MessageProvider.getMessage("menu.file.save.savechangesfile"), currentFileName));
+        return JOptionPane.showOptionDialog(this.frame, msg, MessageProvider.getMessage("menu.file.save.savechanges"),
+                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
     }
 
     protected int promptToSaveChangesAfterChangeOnDisk() {
         String[] opt = new String[] {
-                MessageProvider.getMessage("menu.file.save."
-                        + (dirty ? "saveandoverwrite" : "overwrite")),
-                MessageProvider.getMessage("menu.file.save."
-                        + (dirty ? "discardandreload" : "reload")) };
-        String msg = MessageFormat.format(
-                MessageProvider.getMessage("menu.file.save.changedondisk"),
-                currentFileName == null ? ""
-                        : Paths.get(currentFileName).getFileName());
-        String title = MessageProvider
-                .getMessage("menu.file.save.changedexternally");
+                MessageProvider.getMessage("menu.file.save." + (dirty ? "saveandoverwrite" : "overwrite")),
+                MessageProvider.getMessage("menu.file.save." + (dirty ? "discardandreload" : "reload")) };
+        String msg = MessageFormat.format(MessageProvider.getMessage("menu.file.save.changedondisk"),
+                currentFileName == null ? "" : Paths.get(currentFileName).getFileName());
+        String title = MessageProvider.getMessage("menu.file.save.changedexternally");
         int result;
         do {
-            result = JOptionPane.showOptionDialog(this.frame, msg, title,
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                    null, opt, null);
+            result = JOptionPane.showOptionDialog(this.frame, msg, title, JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, opt, null);
         } while (result == JOptionPane.CLOSED_OPTION);
         return result;
     }
@@ -884,300 +793,24 @@ public class MainWindow {
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
-        datasetsTabPanel = new JPanel();
+        datasetsTabPanel = new DatasetsTabPanel();
         tabbedPane.addTab("_Datasets", null, datasetsTabPanel, null);
-        GridBagLayout gbl_datasetsTabPanel = new GridBagLayout();
-        gbl_datasetsTabPanel.columnWidths = new int[] { 35, 150, 180, 150, 35 };
-        gbl_datasetsTabPanel.rowHeights = new int[] { 10, 20, 30, 0, 30, 30, 0,
-                30 };
-        gbl_datasetsTabPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0,
-                0.0 };
-        gbl_datasetsTabPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0, 1.0 };
-        datasetsTabPanel.setLayout(gbl_datasetsTabPanel);
 
-        Component datasetsTabTopMargin = Box
-                .createRigidArea(new Dimension(20, 20));
-        GridBagConstraints gbc_datasetsTabTopMargin = new GridBagConstraints();
-        gbc_datasetsTabTopMargin.insets = new Insets(0, 0, 5, 5);
-        gbc_datasetsTabTopMargin.gridx = 2;
-        gbc_datasetsTabTopMargin.gridy = 0;
-        datasetsTabPanel.add(datasetsTabTopMargin, gbc_datasetsTabTopMargin);
-
-        firstDatasetLabel = new JLabel("_Dataset A");
-        firstDatasetLabel
-                .setFont(firstDatasetLabel.getFont().deriveFont(Font.BOLD));
-        GridBagConstraints gbc_firstDatasetLabel = new GridBagConstraints();
-        gbc_firstDatasetLabel.weightx = 1.0;
-        gbc_firstDatasetLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_firstDatasetLabel.gridx = 1;
-        gbc_firstDatasetLabel.gridy = 1;
-        datasetsTabPanel.add(firstDatasetLabel, gbc_firstDatasetLabel);
-
-        secondDatasetLabel = new JLabel("_Dataset B");
-        secondDatasetLabel
-                .setFont(secondDatasetLabel.getFont().deriveFont(Font.BOLD));
-        GridBagConstraints gbc_secondDatasetLabel = new GridBagConstraints();
-        gbc_secondDatasetLabel.weightx = 1.0;
-        gbc_secondDatasetLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_secondDatasetLabel.gridx = 3;
-        gbc_secondDatasetLabel.gridy = 1;
-        datasetsTabPanel.add(secondDatasetLabel, gbc_secondDatasetLabel);
-
-        firstDatasetWarningLbl = new WarningIcon();
-        GridBagConstraints gbc_firstDatasetWarningLbl = new GridBagConstraints();
-        gbc_firstDatasetWarningLbl.anchor = GridBagConstraints.EAST;
-        gbc_firstDatasetWarningLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_firstDatasetWarningLbl.gridx = 0;
-        gbc_firstDatasetWarningLbl.gridy = 2;
-        datasetsTabPanel.add(firstDatasetWarningLbl,
-                gbc_firstDatasetWarningLbl);
-
-        JPanel firstDatasetContainer = new JPanel();
-        GridBagConstraints gbc_firstDatasetContainer = new GridBagConstraints();
-        gbc_firstDatasetContainer.insets = new Insets(0, 0, 5, 5);
-        gbc_firstDatasetContainer.fill = GridBagConstraints.HORIZONTAL;
-        gbc_firstDatasetContainer.gridx = 1;
-        gbc_firstDatasetContainer.gridy = 2;
-        datasetsTabPanel.add(firstDatasetContainer, gbc_firstDatasetContainer);
-        firstDatasetContainer.setLayout(
-                new BoxLayout(firstDatasetContainer, BoxLayout.X_AXIS));
-
-        firstDatasetField = new JTextField();
-        firstDatasetField.setHorizontalAlignment(SwingConstants.TRAILING);
-        firstDatasetContainer.add(firstDatasetField);
-        firstDatasetField.setColumns(10);
-
-        firstDatasetBtn = new JButton("_Select...");
-        firstDatasetBtn.addActionListener(e -> {
-            String current = firstDatasetField.getText();
-            String result = selectDatasetFile(
-                    current.isEmpty() ? null : current);
+        datasetsTabPanel.getFirstDatasetBtn().addActionListener(e -> {
+            String current = datasetsTabPanel.getFirstDatasetField().getText();
+            String result = selectDatasetFile(current.isEmpty() ? null : current);
             if (result != null)
-                firstDatasetField.setText(result);
+                datasetsTabPanel.getFirstDatasetField().setText(result);
         });
-        firstDatasetContainer.add(firstDatasetBtn);
-
-        fileNameLbl = new JLabel("_File name");
-        GridBagConstraints gbc_fileNameLbl = new GridBagConstraints();
-        gbc_fileNameLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_fileNameLbl.gridx = 2;
-        gbc_fileNameLbl.gridy = 2;
-        datasetsTabPanel.add(fileNameLbl, gbc_fileNameLbl);
-
-        JPanel secondDatasetContainer = new JPanel();
-        GridBagConstraints gbc_secondDatasetContainer = new GridBagConstraints();
-        gbc_secondDatasetContainer.insets = new Insets(0, 0, 5, 5);
-        gbc_secondDatasetContainer.fill = GridBagConstraints.HORIZONTAL;
-        gbc_secondDatasetContainer.gridx = 3;
-        gbc_secondDatasetContainer.gridy = 2;
-        datasetsTabPanel.add(secondDatasetContainer,
-                gbc_secondDatasetContainer);
-        secondDatasetContainer.setLayout(
-                new BoxLayout(secondDatasetContainer, BoxLayout.X_AXIS));
-
-        secondDatasetBtn = new JButton("_Select...");
-        secondDatasetBtn.addActionListener(new ActionListener() {
+        datasetsTabPanel.getSecondDatasetBtn().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String current = secondDatasetField.getText();
-                String result = selectDatasetFile(
-                        current.isEmpty() ? null : current);
+                String current = datasetsTabPanel.getSecondDatasetField().getText();
+                String result = selectDatasetFile(current.isEmpty() ? null : current);
                 if (result != null)
-                    secondDatasetField.setText(result);
+                    datasetsTabPanel.getSecondDatasetField().setText(result);
             }
         });
-        secondDatasetContainer.add(secondDatasetBtn);
-
-        secondDatasetField = new JTextField();
-        secondDatasetField.setHorizontalAlignment(SwingConstants.TRAILING);
-        secondDatasetContainer.add(secondDatasetField);
-        secondDatasetField.setColumns(10);
-
-        secondDatasetWarningLbl = new WarningIcon();
-        GridBagConstraints gbc_secondDatasetWarningLbl = new GridBagConstraints();
-        gbc_secondDatasetWarningLbl.anchor = GridBagConstraints.WEST;
-        gbc_secondDatasetWarningLbl.insets = new Insets(0, 0, 5, 0);
-        gbc_secondDatasetWarningLbl.gridx = 4;
-        gbc_secondDatasetWarningLbl.gridy = 2;
-        datasetsTabPanel.add(secondDatasetWarningLbl,
-                gbc_secondDatasetWarningLbl);
-
-        firstEncodingWarningLbl = new WarningIcon();
-        GridBagConstraints gbc_firstEncodingWarningLbl = new GridBagConstraints();
-        gbc_firstEncodingWarningLbl.anchor = GridBagConstraints.EAST;
-        gbc_firstEncodingWarningLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_firstEncodingWarningLbl.gridx = 0;
-        gbc_firstEncodingWarningLbl.gridy = 3;
-        datasetsTabPanel.add(firstEncodingWarningLbl,
-                gbc_firstEncodingWarningLbl);
-
-        JPanel firstEncodingContainer = new JPanel();
-        GridBagConstraints gbc_firstEncodingContainer = new GridBagConstraints();
-        gbc_firstEncodingContainer.fill = GridBagConstraints.HORIZONTAL;
-        gbc_firstEncodingContainer.insets = new Insets(0, 0, 5, 5);
-        gbc_firstEncodingContainer.gridx = 1;
-        gbc_firstEncodingContainer.gridy = 3;
-        datasetsTabPanel.add(firstEncodingContainer,
-                gbc_firstEncodingContainer);
-        firstEncodingContainer.setLayout(
-                new BoxLayout(firstEncodingContainer, BoxLayout.X_AXIS));
-
-        firstEncodingField = new JComboBoxWithPlaceholder();
-        firstEncodingField.setEditable(true);
-        new JComboBoxSuggestionProvider(firstEncodingField);
-        firstEncodingContainer.add(firstEncodingField);
-
-        encodingLbl = new JLabel("_Encoding");
-        GridBagConstraints gbc_encodingLbl = new GridBagConstraints();
-        gbc_encodingLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_encodingLbl.gridx = 2;
-        gbc_encodingLbl.gridy = 3;
-        datasetsTabPanel.add(encodingLbl, gbc_encodingLbl);
-
-        JPanel secondEncodingContainer = new JPanel();
-        GridBagConstraints gbc_secondEncodingContainer = new GridBagConstraints();
-        gbc_secondEncodingContainer.insets = new Insets(0, 0, 5, 5);
-        gbc_secondEncodingContainer.fill = GridBagConstraints.HORIZONTAL;
-        gbc_secondEncodingContainer.gridx = 3;
-        gbc_secondEncodingContainer.gridy = 3;
-        datasetsTabPanel.add(secondEncodingContainer,
-                gbc_secondEncodingContainer);
-        secondEncodingContainer.setLayout(
-                new BoxLayout(secondEncodingContainer, BoxLayout.X_AXIS));
-
-        secondEncodingField = new JComboBoxWithPlaceholder();
-        secondEncodingField.setEditable(true);
-        new JComboBoxSuggestionProvider(secondEncodingField);
-        secondEncodingContainer.add(secondEncodingField);
-
-        secondEncodingWarningLbl = new WarningIcon();
-        GridBagConstraints gbc_secondEncodingWarningLbl = new GridBagConstraints();
-        gbc_secondEncodingWarningLbl.anchor = GridBagConstraints.WEST;
-        gbc_secondEncodingWarningLbl.insets = new Insets(0, 0, 5, 0);
-        gbc_secondEncodingWarningLbl.gridx = 4;
-        gbc_secondEncodingWarningLbl.gridy = 3;
-        datasetsTabPanel.add(secondEncodingWarningLbl,
-                gbc_secondEncodingWarningLbl);
-
-        firstDatasetSuffixWarningLbl = new WarningIcon();
-        GridBagConstraints gbc_firstDatasetSuffixWarningLbl = new GridBagConstraints();
-        gbc_firstDatasetSuffixWarningLbl.anchor = GridBagConstraints.EAST;
-        gbc_firstDatasetSuffixWarningLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_firstDatasetSuffixWarningLbl.gridx = 0;
-        gbc_firstDatasetSuffixWarningLbl.gridy = 4;
-        datasetsTabPanel.add(firstDatasetSuffixWarningLbl,
-                gbc_firstDatasetSuffixWarningLbl);
-
-        JPanel firstDatasetSuffixContainer = new JPanel();
-        GridBagConstraints gbc_firstDatasetSuffixContainer = new GridBagConstraints();
-        gbc_firstDatasetSuffixContainer.fill = GridBagConstraints.BOTH;
-        gbc_firstDatasetSuffixContainer.insets = new Insets(0, 0, 5, 5);
-        gbc_firstDatasetSuffixContainer.gridx = 1;
-        gbc_firstDatasetSuffixContainer.gridy = 4;
-        datasetsTabPanel.add(firstDatasetSuffixContainer,
-                gbc_firstDatasetSuffixContainer);
-        firstDatasetSuffixContainer.setLayout(
-                new BoxLayout(firstDatasetSuffixContainer, BoxLayout.X_AXIS));
-
-        firstDatasetSuffixField = new JTextFieldWithPlaceholder();
-        firstDatasetSuffixContainer.add(firstDatasetSuffixField);
-        firstDatasetSuffixField.setColumns(10);
-
-        suffixLbl = new JLabel("_Suffix");
-        GridBagConstraints gbc_suffixLbl = new GridBagConstraints();
-        gbc_suffixLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_suffixLbl.gridx = 2;
-        gbc_suffixLbl.gridy = 4;
-        datasetsTabPanel.add(suffixLbl, gbc_suffixLbl);
-
-        JPanel secondDatasetSuffixContainer = new JPanel();
-        GridBagConstraints gbc_secondDatasetSuffixContainer = new GridBagConstraints();
-        gbc_secondDatasetSuffixContainer.fill = GridBagConstraints.BOTH;
-        gbc_secondDatasetSuffixContainer.insets = new Insets(0, 0, 5, 5);
-        gbc_secondDatasetSuffixContainer.gridx = 3;
-        gbc_secondDatasetSuffixContainer.gridy = 4;
-        datasetsTabPanel.add(secondDatasetSuffixContainer,
-                gbc_secondDatasetSuffixContainer);
-        secondDatasetSuffixContainer.setLayout(
-                new BoxLayout(secondDatasetSuffixContainer, BoxLayout.X_AXIS));
-
-        secondDatasetSuffixField = new JTextFieldWithPlaceholder();
-        secondDatasetSuffixContainer.add(secondDatasetSuffixField);
-        secondDatasetSuffixField.setColumns(10);
-
-        secondDatasetSuffixWarningLbl = new WarningIcon();
-        GridBagConstraints gbc_secondDatasetSuffixWarningLbl = new GridBagConstraints();
-        gbc_secondDatasetSuffixWarningLbl.anchor = GridBagConstraints.WEST;
-        gbc_secondDatasetSuffixWarningLbl.insets = new Insets(0, 0, 5, 0);
-        gbc_secondDatasetSuffixWarningLbl.gridx = 4;
-        gbc_secondDatasetSuffixWarningLbl.gridy = 4;
-        datasetsTabPanel.add(secondDatasetSuffixWarningLbl,
-                gbc_secondDatasetSuffixWarningLbl);
-
-        firstDatasetRowNumColWarningLbl = new WarningIcon();
-        GridBagConstraints gbc_firstDatasetRowNumColWarningLbl = new GridBagConstraints();
-        gbc_firstDatasetRowNumColWarningLbl.anchor = GridBagConstraints.EAST;
-        gbc_firstDatasetRowNumColWarningLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_firstDatasetRowNumColWarningLbl.gridx = 0;
-        gbc_firstDatasetRowNumColWarningLbl.gridy = 5;
-        datasetsTabPanel.add(firstDatasetRowNumColWarningLbl,
-                gbc_firstDatasetRowNumColWarningLbl);
-
-        JPanel firstDatasetRowNumColContainer = new JPanel();
-        GridBagConstraints gbc_firstDatasetRowNumColContainer = new GridBagConstraints();
-        gbc_firstDatasetRowNumColContainer.fill = GridBagConstraints.BOTH;
-        gbc_firstDatasetRowNumColContainer.insets = new Insets(0, 0, 5, 5);
-        gbc_firstDatasetRowNumColContainer.gridx = 1;
-        gbc_firstDatasetRowNumColContainer.gridy = 5;
-        datasetsTabPanel.add(firstDatasetRowNumColContainer,
-                gbc_firstDatasetRowNumColContainer);
-        firstDatasetRowNumColContainer.setLayout(new BoxLayout(
-                firstDatasetRowNumColContainer, BoxLayout.X_AXIS));
-
-        firstDatasetRowNumColField = new JTextFieldWithPlaceholder();
-        firstDatasetRowNumColContainer.add(firstDatasetRowNumColField);
-        firstDatasetRowNumColField.setColumns(10);
-
-        rowNumColLbl = new JLabel("_Row number column name");
-        GridBagConstraints gbc_rowNumColLbl = new GridBagConstraints();
-        gbc_rowNumColLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_rowNumColLbl.gridx = 2;
-        gbc_rowNumColLbl.gridy = 5;
-        datasetsTabPanel.add(rowNumColLbl, gbc_rowNumColLbl);
-
-        JPanel secondDatasetRowNumColContainer = new JPanel();
-        GridBagConstraints gbc_secondDatasetRowNumColContainer = new GridBagConstraints();
-        gbc_secondDatasetRowNumColContainer.fill = GridBagConstraints.BOTH;
-        gbc_secondDatasetRowNumColContainer.insets = new Insets(0, 0, 5, 5);
-        gbc_secondDatasetRowNumColContainer.gridx = 3;
-        gbc_secondDatasetRowNumColContainer.gridy = 5;
-        datasetsTabPanel.add(secondDatasetRowNumColContainer,
-                gbc_secondDatasetRowNumColContainer);
-        secondDatasetRowNumColContainer.setLayout(new BoxLayout(
-                secondDatasetRowNumColContainer, BoxLayout.X_AXIS));
-
-        secondDatasetRowNumColField = new JTextFieldWithPlaceholder();
-        secondDatasetRowNumColContainer.add(secondDatasetRowNumColField);
-        secondDatasetRowNumColField.setColumns(10);
-
-        secondDatasetRowNumColWarningLbl = new WarningIcon();
-        GridBagConstraints gbc_secondDatasetRowNumColWarningLbl = new GridBagConstraints();
-        gbc_secondDatasetRowNumColWarningLbl.anchor = GridBagConstraints.WEST;
-        gbc_secondDatasetRowNumColWarningLbl.insets = new Insets(0, 0, 5, 0);
-        gbc_secondDatasetRowNumColWarningLbl.gridx = 4;
-        gbc_secondDatasetRowNumColWarningLbl.gridy = 5;
-        datasetsTabPanel.add(secondDatasetRowNumColWarningLbl,
-                gbc_secondDatasetRowNumColWarningLbl);
-
-        Component datasetsTabBottomMargin = Box.createVerticalGlue();
-        GridBagConstraints gbc_datasetsTabBottomMargin = new GridBagConstraints();
-        gbc_datasetsTabBottomMargin.fill = GridBagConstraints.VERTICAL;
-        gbc_datasetsTabBottomMargin.insets = new Insets(0, 0, 0, 5);
-        gbc_datasetsTabBottomMargin.gridx = 2;
-        gbc_datasetsTabBottomMargin.gridy = 7;
-        datasetsTabPanel.add(datasetsTabBottomMargin,
-                gbc_datasetsTabBottomMargin);
 
         optionsTabPanel = new JPanel();
         tabbedPane.addTab("_Options", null, optionsTabPanel, null);
@@ -1185,12 +818,10 @@ public class MainWindow {
         gbl_optionsTabPanel.columnWidths = new int[] { 250, 500 };
         gbl_optionsTabPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
         gbl_optionsTabPanel.columnWeights = new double[] { 0.0, 1.0 };
-        gbl_optionsTabPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0,
-                0.0, Double.MIN_VALUE };
+        gbl_optionsTabPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
         optionsTabPanel.setLayout(gbl_optionsTabPanel);
 
-        Component optionsTabTopMargin = Box
-                .createRigidArea(new Dimension(20, 20));
+        Component optionsTabTopMargin = Box.createRigidArea(new Dimension(20, 20));
         GridBagConstraints gbc_optionsTabTopMargin = new GridBagConstraints();
         gbc_optionsTabTopMargin.insets = new Insets(0, 0, 5, 5);
         gbc_optionsTabTopMargin.gridx = 0;
@@ -1213,8 +844,7 @@ public class MainWindow {
         gbc_linkageDirContainer.gridx = 1;
         gbc_linkageDirContainer.gridy = 1;
         optionsTabPanel.add(linkageDirContainer, gbc_linkageDirContainer);
-        linkageDirContainer.setLayout(
-                new BoxLayout(linkageDirContainer, BoxLayout.X_AXIS));
+        linkageDirContainer.setLayout(new BoxLayout(linkageDirContainer, BoxLayout.X_AXIS));
 
         JLabel linkageDirWarningLbl = new WarningIcon();
         linkageDirContainer.add(linkageDirWarningLbl);
@@ -1227,11 +857,9 @@ public class MainWindow {
         linkageDirBtn = new JButton("_Select...");
         linkageDirContainer.add(linkageDirBtn);
 
-        SpinnerNumberModel minScoreModel = new SpinnerNumberModel(0.0, 0.0, 100,
-                0.001);
+        SpinnerNumberModel minScoreModel = new SpinnerNumberModel(0.0, 0.0, 100, 0.001);
 
-        SpinnerNumberModel maxRowsModel = new SpinnerNumberModel(
-                Integer.MAX_VALUE, 0, Integer.MAX_VALUE, 1);
+        SpinnerNumberModel maxRowsModel = new SpinnerNumberModel(Integer.MAX_VALUE, 0, Integer.MAX_VALUE, 1);
 
         SpinnerNumberModel threadsModel = new SpinnerNumberModel(0, 0, 256, 1);
 
@@ -1251,8 +879,7 @@ public class MainWindow {
         gbc_indexDirContainer.gridx = 1;
         gbc_indexDirContainer.gridy = 2;
         optionsTabPanel.add(indexDirContainer, gbc_indexDirContainer);
-        indexDirContainer
-                .setLayout(new BoxLayout(indexDirContainer, BoxLayout.X_AXIS));
+        indexDirContainer.setLayout(new BoxLayout(indexDirContainer, BoxLayout.X_AXIS));
 
         JLabel indexDirWarningLbl = new WarningIcon();
         indexDirContainer.add(indexDirWarningLbl);
@@ -1274,8 +901,7 @@ public class MainWindow {
         gbc_minScoreLbl.gridy = 3;
         optionsTabPanel.add(minScoreLbl, gbc_minScoreLbl);
         minScoreField = new JSpinnerWithBlankValue(minScoreModel);
-        ((JSpinnerWithBlankValue) minScoreField)
-                .setBlankValue(Double.valueOf(0.0));
+        ((JSpinnerWithBlankValue) minScoreField).setBlankValue(Double.valueOf(0.0));
         GridBagConstraints gbc_minScoreField = new GridBagConstraints();
         gbc_minScoreField.anchor = GridBagConstraints.WEST;
         gbc_minScoreField.insets = new Insets(0, 0, 5, 0);
@@ -1283,8 +909,7 @@ public class MainWindow {
         gbc_minScoreField.gridy = 3;
         optionsTabPanel.add(minScoreField, gbc_minScoreField);
 
-        JSpinner.NumberEditor ne_minScoreField = new JSpinner.NumberEditor(
-                minScoreField, "0.000");
+        JSpinner.NumberEditor ne_minScoreField = new JSpinner.NumberEditor(minScoreField, "0.000");
         ne_minScoreField.setPreferredSize(new Dimension(122, 29));
         ne_minScoreField.setRequestFocusEnabled(false);
         minScoreField.setEditor(ne_minScoreField);
@@ -1313,8 +938,7 @@ public class MainWindow {
         threadsPanel.add(threadsField);
         threadsField.setBlankValue(Integer.valueOf(0));
 
-        JSpinner.NumberEditor ne_threadsField = new JSpinner.NumberEditor(
-                threadsField, "0");
+        JSpinner.NumberEditor ne_threadsField = new JSpinner.NumberEditor(threadsField, "0");
         ne_threadsField.setPreferredSize(new Dimension(122, 29));
         ne_threadsField.setRequestFocusEnabled(false);
         threadsField.setEditor(ne_threadsField);
@@ -1329,16 +953,14 @@ public class MainWindow {
         gbc_maxRowsLbl.gridy = 5;
         optionsTabPanel.add(maxRowsLbl, gbc_maxRowsLbl);
         maxRowsField = new JSpinnerWithBlankValue(maxRowsModel);
-        ((JSpinnerWithBlankValue) maxRowsField)
-                .setBlankValue(Integer.MAX_VALUE);
+        ((JSpinnerWithBlankValue) maxRowsField).setBlankValue(Integer.MAX_VALUE);
         GridBagConstraints gbc_maxRowsField = new GridBagConstraints();
         gbc_maxRowsField.anchor = GridBagConstraints.WEST;
         gbc_maxRowsField.gridx = 1;
         gbc_maxRowsField.gridy = 5;
         optionsTabPanel.add(maxRowsField, gbc_maxRowsField);
 
-        JSpinner.NumberEditor ne_maxRowsField = new JSpinner.NumberEditor(
-                maxRowsField, "0");
+        JSpinner.NumberEditor ne_maxRowsField = new JSpinner.NumberEditor(maxRowsField, "0");
         maxRowsField.setEditor(ne_maxRowsField);
 
         linkageColsTabPanel = new JPanel();
@@ -1351,39 +973,29 @@ public class MainWindow {
         columnPairTableModel = new ColumnPairTableModel();
         linkageColsTabPanel.setLayout(new BorderLayout(0, 0));
         linkageColsTable.setModel(columnPairTableModel);
-        TableRowSorter<ColumnPairTableModel> sorter = new TableRowSorter<>(
-                columnPairTableModel);
-        sorter.setSortKeys(Collections
-                .singletonList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
+        TableRowSorter<ColumnPairTableModel> sorter = new TableRowSorter<>(columnPairTableModel);
+        sorter.setSortKeys(Collections.singletonList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
         linkageColsTable.setRowSorter(sorter);
         linkageColsTable.setUpdateSelectionOnSort(true);
         linkageColsTable.setRowHeight(linkageColsTable.getRowHeight() * 15 / 10);
         sorter.setSortsOnUpdates(true);
-        linkageColsTable.getColumnModel()
-                .getColumn(columnPairTableModel.getColumnIndex("weight"))
+        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("weight"))
                 .setCellRenderer(new WeightColumnPairCellRenderer());
-        linkageColsTable.getColumnModel()
-                .getColumn(columnPairTableModel.getColumnIndex("phon_weight"))
+        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("phon_weight"))
                 .setCellRenderer(new PhonWeightColumnPairCellRenderer());
-        linkageColsTable.getColumnModel()
-                .getColumn(columnPairTableModel.getColumnIndex("rename_a"))
+        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("rename_a"))
                 .setCellRenderer(new RenameColumnPairCellRenderer("index_a"));
-        linkageColsTable.getColumnModel()
-                .getColumn(columnPairTableModel.getColumnIndex("rename_b"))
+        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("rename_b"))
                 .setCellRenderer(new RenameColumnPairCellRenderer("index_b"));
-        linkageColsTable.getColumnModel()
-                .getColumn(columnPairTableModel.getColumnIndex("index_a"))
+        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("index_a"))
                 .setCellRenderer(new NameColumnPairCellRenderer());
-        linkageColsTable.getColumnModel()
-                .getColumn(columnPairTableModel.getColumnIndex("index_b"))
+        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("index_b"))
                 .setCellRenderer(new NameColumnPairCellRenderer());
-        linkageColsTable.getColumnModel()
-                .getColumn(columnPairTableModel.getColumnIndex("type"))
+        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("type"))
                 .setCellRenderer(new TypeColumnPairCellRenderer());
-        linkageColsTable.getColumnModel()
-                .getColumn(columnPairTableModel.getColumnIndex("number"))
+        linkageColsTable.getColumnModel().getColumn(columnPairTableModel.getColumnIndex("number"))
                 .setCellRenderer(new NumberColumnPairCellRenderer());
-        
+
         mainToolBar = new MainToolBar();
         frame.getContentPane().add(mainToolBar, BorderLayout.NORTH);
         JScrollPane linkageColsScrollPane = new JScrollPane(linkageColsTable);
@@ -1401,12 +1013,10 @@ public class MainWindow {
         menuBar = new MainMenuBar();
         frame.setJMenuBar(menuBar);
 
-        
-
         ToolTipManager.sharedInstance().setInitialDelay(100);
 
         frame.pack();
-        
+
         Font f = frame.getFont();
         frame.setFont(f.deriveFont(f.getSize2D() * 1.1f));
 
@@ -1416,17 +1026,13 @@ public class MainWindow {
         JFileChooser chooser = new JFileChooser();
         Path dir = currentFileName == null ? Paths.get(".").toAbsolutePath()
                 : Paths.get(currentFileName).toAbsolutePath().getParent();
-        chooser.setCurrentDirectory(currentName != null
-                ? dir.resolve(currentName).getParent().toFile()
-                : dir.toFile());
+        chooser.setCurrentDirectory(currentName != null ? dir.resolve(currentName).getParent().toFile() : dir.toFile());
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                MessageProvider.getMessage("datasets.supportedformats"), "csv",
-                "dbf");
+                MessageProvider.getMessage("datasets.supportedformats"), "csv", "dbf");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            Path here = currentFileName == null ? null
-                    : Paths.get(currentFileName).toAbsolutePath().getParent();
+            Path here = currentFileName == null ? null : Paths.get(currentFileName).toAbsolutePath().getParent();
             String f = chooser.getSelectedFile().getAbsolutePath();
             if (here != null && f.startsWith(here.toString() + File.separator))
                 return here.relativize(Paths.get(f)).toString();
@@ -1439,17 +1045,13 @@ public class MainWindow {
     private String selectConfigFile(String fileName, boolean save) {
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(
-                fileName != null ? new File(fileName).getParentFile()
-                        : new File(".").getAbsoluteFile());
+                fileName != null ? new File(fileName).getParentFile() : new File(".").getAbsoluteFile());
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                MessageProvider
-                        .getMessage(save ? "menu.file.save.propertiesfile"
-                                : "menu.file.open.propertiesfile"),
+                MessageProvider.getMessage(save ? "menu.file.save.propertiesfile" : "menu.file.open.propertiesfile"),
                 "properties", "ini");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
-        int result = save ? chooser.showSaveDialog(frame)
-                : chooser.showOpenDialog(frame);
+        int result = save ? chooser.showSaveDialog(frame) : chooser.showOpenDialog(frame);
         if (result == JFileChooser.APPROVE_OPTION)
             return chooser.getSelectedFile().getAbsolutePath();
         return null;
@@ -1459,9 +1061,7 @@ public class MainWindow {
         JFileChooser chooser = new JFileChooser();
         Path dir = currentFileName == null ? Paths.get(".").toAbsolutePath()
                 : Paths.get(currentFileName).toAbsolutePath().getParent();
-        chooser.setCurrentDirectory(
-                fileName != null ? dir.resolve(fileName).getParent().toFile()
-                        : dir.toFile());
+        chooser.setCurrentDirectory(fileName != null ? dir.resolve(fileName).getParent().toFile() : dir.toFile());
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setAcceptAllFileFilterUsed(true);
         int result = chooser.showSaveDialog(frame);
@@ -1476,30 +1076,25 @@ public class MainWindow {
 
     private void updateConfigFileLabel() {
         String unsaved = MessageProvider.getMessage("menu.unsavedfile");
-        menuBar.getCurrentFileLbl().setText((dirty ? "[*] " : "")
-                + (currentFileName == null ? unsaved : currentFileName));
-        frame.setTitle((dirty ? "[*] " : "")
-                + (currentFileName == null ? unsaved
-                        : new File(currentFileName).getName())
+        menuBar.getCurrentFileLbl()
+                .setText((dirty ? "[*] " : "") + (currentFileName == null ? unsaved : currentFileName));
+        frame.setTitle((dirty ? "[*] " : "") + (currentFileName == null ? unsaved : new File(currentFileName).getName())
                 + " - " + PROGRAM_NAME);
     }
 
     private void fillEncodings(JComboBox<String>[] comboboxes) {
         Set<String> allEncodings = new HashSet<>();
-        for (Entry<String, Charset> entry : Charset.availableCharsets()
-                .entrySet()) {
+        for (Entry<String, Charset> entry : Charset.availableCharsets().entrySet()) {
             allEncodings.add(entry.getKey());
-            allEncodings.addAll(entry.getValue().aliases().stream()
-                    .filter(enc -> enc.length() <= 10)
-                    .collect(Collectors.toList()));
+            allEncodings.addAll(
+                    entry.getValue().aliases().stream().filter(enc -> enc.length() <= 10).collect(Collectors.toList()));
         }
         List<String> sortedEncodings = new ArrayList<>(allEncodings);
         Collections.sort(sortedEncodings, new Comparator<String>() {
 
             @Override
             public int compare(String o1, String o2) {
-                if (Character.isDigit(o1.charAt(0)) == Character
-                        .isDigit(o2.charAt(0)))
+                if (Character.isDigit(o1.charAt(0)) == Character.isDigit(o2.charAt(0)))
                     return o1.compareToIgnoreCase(o2);
                 return Character.isDigit(o1.charAt(0)) ? 1 : -1;
             }
@@ -1531,41 +1126,26 @@ public class MainWindow {
         updateUndoMenuText(history.getUndoSummary());
         updateRedoMenuText(history.getRedoSummary());
         updateConfigFileLabel();
-        
+
         // toolbar
         mainToolBar.updateLocalisedStrings();
 
         // tab - datasets
         tabbedPane.setTitleAt(tabbedPane.indexOfComponent(datasetsTabPanel),
                 " " + MessageProvider.getMessage("datasets") + " ");
-        firstDatasetLabel
-                .setText(MessageProvider.getMessage("datasets.dataseta"));
-        secondDatasetLabel
-                .setText(MessageProvider.getMessage("datasets.datasetb"));
-        firstDatasetBtn.setText(MessageProvider.getMessage("datasets.select"));
-        secondDatasetBtn.setText(MessageProvider.getMessage("datasets.select"));
-        fileNameLbl.setText(MessageProvider.getMessage("datasets.filename"));
-        encodingLbl.setText(MessageProvider.getMessage("datasets.encoding"));
-        suffixLbl.setText(MessageProvider.getMessage("datasets.suffix"));
-        rowNumColLbl
-                .setText(MessageProvider.getMessage("datasets.rownumcolname"));
+        datasetsTabPanel.updateLocalisedStrings();
 
         // tab - options
         tabbedPane.setTitleAt(tabbedPane.indexOfComponent(optionsTabPanel),
                 " " + MessageProvider.getMessage("options") + " ");
-        indexDirLbl
-                .setText(MessageProvider.getMessage("options.indexlocation"));
-        indexDirBtn.setText(
-                MessageProvider.getMessage("options.indexlocation.select"));
-        linkageDirLbl
-                .setText(MessageProvider.getMessage("options.linkagelocation"));
-        linkageDirBtn.setText(
-                MessageProvider.getMessage("options.linkagelocation.select"));
+        indexDirLbl.setText(MessageProvider.getMessage("options.indexlocation"));
+        indexDirBtn.setText(MessageProvider.getMessage("options.indexlocation.select"));
+        linkageDirLbl.setText(MessageProvider.getMessage("options.linkagelocation"));
+        linkageDirBtn.setText(MessageProvider.getMessage("options.linkagelocation.select"));
         maxRowsLbl.setText(MessageProvider.getMessage("options.maxrows"));
         minScoreLbl.setText(MessageProvider.getMessage("options.minscore"));
         threadsLbl.setText(MessageProvider.getMessage("options.threads"));
-        coresLabel.setText(MessageFormat.format(
-                MessageProvider.getMessage("options.threads.cores"),
+        coresLabel.setText(MessageFormat.format(MessageProvider.getMessage("options.threads.cores"),
                 Runtime.getRuntime().availableProcessors()));
 
         // tab - columns
@@ -1573,8 +1153,7 @@ public class MainWindow {
                 " " + MessageProvider.getMessage("columns") + " ");
         linkageColsEditingPanel.updateLocalisedStrings();
         linkageColsButtonPanel.updateLocalisedStrings();
-        ColumnPairTableModel model = (ColumnPairTableModel) linkageColsTable
-                .getModel();
+        ColumnPairTableModel model = (ColumnPairTableModel) linkageColsTable.getModel();
         model.updateLocalisedStrings(linkageColsTable.getColumnModel());
 
         // tab - execution
