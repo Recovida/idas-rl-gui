@@ -176,7 +176,6 @@ public class MainWindow {
     private ExecutionPanel executionTabPanel;
     private JMenu runMenu;
     private JMenuItem runMenuItem;
-    private Component horizontalStrut_1;
     private MainToolBar mainToolBar;
 
     /**
@@ -1469,9 +1468,6 @@ public class MainWindow {
 
         aboutMenuItem = new JMenuItem("_About");
         helpMenu.add(aboutMenuItem);
-
-        horizontalStrut_1 = Box.createHorizontalStrut(20);
-        menuBar.add(horizontalStrut_1);
 
         Component menuGlue = Box.createGlue();
         menuBar.add(menuGlue);

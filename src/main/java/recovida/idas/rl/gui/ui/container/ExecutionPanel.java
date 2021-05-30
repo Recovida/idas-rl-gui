@@ -52,6 +52,7 @@ public class ExecutionPanel extends JPanel {
 
     public void clear() {
         tabbedPane.removeAll();
+        tabCounter.set(0);
         updateLocalisedStrings();
     }
 

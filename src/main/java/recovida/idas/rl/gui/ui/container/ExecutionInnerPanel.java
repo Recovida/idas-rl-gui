@@ -178,6 +178,7 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
                 });
                 t.setRepeats(false);
                 t.start();
+                f.join();
             });
         });
     }
