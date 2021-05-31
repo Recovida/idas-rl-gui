@@ -19,7 +19,7 @@ public class ExecutionPanel extends JPanel {
     private AtomicInteger tabCounter = new AtomicInteger(0);
 
     public ExecutionPanel() {
-        
+
         setLayout(new BorderLayout(0, 0));
 
         logWontBeSavedLbl = new JLabel("_This log won't be saved!");

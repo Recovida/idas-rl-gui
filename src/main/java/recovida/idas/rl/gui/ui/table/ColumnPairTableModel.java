@@ -171,8 +171,10 @@ public class ColumnPairTableModel extends DefaultTableModel {
         v[indexFromKey.get("rename_b")] = true;
         // validate number
         value = getValue(rowIndex, "number");
-        v[indexFromKey.get("number")] = value instanceof Integer && ((Integer) value) >= 0 && 
-                 numberToColIdx.getOrDefault(value, Collections.emptySet()).size() == 1;
+        v[indexFromKey.get("number")] = value instanceof Integer
+                && ((Integer) value) >= 0
+                && numberToColIdx.getOrDefault(value, Collections.emptySet())
+                        .size() == 1;
     }
 
     public boolean isValid() {

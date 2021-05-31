@@ -99,7 +99,7 @@ public class LinkageColumnEditingPanel extends JPanel {
     }
 
     public LinkageColumnEditingPanel() {
-        
+
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         JPanel panel = new JPanel();
@@ -346,7 +346,8 @@ public class LinkageColumnEditingPanel extends JPanel {
         weightContainer
                 .setLayout(new BoxLayout(weightContainer, BoxLayout.X_AXIS));
         weightField = new JSpinnerWithBlankValue(
-                new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1), "0.0000");
+                new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1),
+                "0.0000");
         weightContainer.add(weightField);
         weightField.setPreferredSize(new Dimension(65, 30));
         weightField.setMinimumSize(new Dimension(50, 30));
@@ -370,7 +371,8 @@ public class LinkageColumnEditingPanel extends JPanel {
                 new BoxLayout(phonWeightContainer, BoxLayout.X_AXIS));
 
         phonWeightField = new JSpinnerWithBlankValue(
-                new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1), "0.0000");
+                new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1),
+                "0.0000");
         phonWeightContainer.add(phonWeightField);
         phonWeightField.setBlankValue(zero);
         phonWeightField.setPreferredSize(new Dimension(65, 30));

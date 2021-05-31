@@ -20,10 +20,9 @@ import recovida.idas.rl.gui.ui.table.cellrendering.WeightColumnPairCellRenderer;
 public class ColumnPairTable extends JTable {
 
     private static final long serialVersionUID = -7568545759297132632L;
-    
-    
+
     protected ColumnPairTableModel model;
-    
+
     public ColumnPairTable(ColumnPairTableModel model) {
         super(model);
         this.model = model;
@@ -31,8 +30,10 @@ public class ColumnPairTable extends JTable {
         setShowVerticalLines(true);
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        TableRowSorter<ColumnPairTableModel> sorter = new TableRowSorter<>(model);
-        sorter.setSortKeys(Collections.singletonList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
+        TableRowSorter<ColumnPairTableModel> sorter = new TableRowSorter<>(
+                model);
+        sorter.setSortKeys(Collections
+                .singletonList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
         setRowSorter(sorter);
         setUpdateSelectionOnSort(true);
         setRowHeight(getRowHeight() * 15 / 10);
@@ -43,25 +44,28 @@ public class ColumnPairTable extends JTable {
             getColumnModel().getColumn(model.getColumnIndex("phon_weight"))
                     .setCellRenderer(new PhonWeightColumnPairCellRenderer());
             getColumnModel().getColumn(model.getColumnIndex("rename_a"))
-                    .setCellRenderer(new RenameColumnPairCellRenderer("index_a"));
+                    .setCellRenderer(
+                            new RenameColumnPairCellRenderer("index_a"));
             getColumnModel().getColumn(model.getColumnIndex("rename_b"))
-                    .setCellRenderer(new RenameColumnPairCellRenderer("index_b"));
+                    .setCellRenderer(
+                            new RenameColumnPairCellRenderer("index_b"));
             getColumnModel().getColumn(model.getColumnIndex("index_a"))
                     .setCellRenderer(new NameColumnPairCellRenderer());
             getColumnModel().getColumn(model.getColumnIndex("index_b"))
                     .setCellRenderer(new NameColumnPairCellRenderer());
-            getColumnModel().getColumn(model.getColumnIndex("type")).setCellRenderer(new TypeColumnPairCellRenderer());
+            getColumnModel().getColumn(model.getColumnIndex("type"))
+                    .setCellRenderer(new TypeColumnPairCellRenderer());
             getColumnModel().getColumn(model.getColumnIndex("number"))
                     .setCellRenderer(new NumberColumnPairCellRenderer());
         });
 
     }
-    
+
     @Override
     public ColumnPairTableModel getModel() {
         return model;
     }
-    
+
     @Override
     public void setModel(TableModel model) {
         if (!(model instanceof ColumnPairTableModel))
@@ -69,6 +73,5 @@ public class ColumnPairTable extends JTable {
         this.model = (ColumnPairTableModel) model;
         super.setModel(model);
     }
-
 
 }

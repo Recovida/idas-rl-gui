@@ -12,7 +12,7 @@ import recovida.idas.rl.gui.lang.MessageProvider;
 public class LanguageComboBox extends JComboBox<Locale> {
 
     private static final long serialVersionUID = -3549865108104546786L;
-    
+
     public LanguageComboBox() {
         setRenderer(new DefaultListCellRenderer() {
 

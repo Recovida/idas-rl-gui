@@ -59,19 +59,23 @@ public class DatasetsTabPanel extends JPanel {
     private JLabel rowNumColLbl;
 
     public DatasetsTabPanel() {
-        
+
         // layout
 
         GridBagLayout gbl_datasetsTabPanel = new GridBagLayout();
         gbl_datasetsTabPanel.columnWidths = new int[] { 35, 150, 180, 150, 35 };
-        gbl_datasetsTabPanel.rowHeights = new int[] { 10, 20, 30, 0, 30, 30, 0, 30 };
-        gbl_datasetsTabPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0 };
-        gbl_datasetsTabPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 };
+        gbl_datasetsTabPanel.rowHeights = new int[] { 10, 20, 30, 0, 30, 30, 0,
+                30 };
+        gbl_datasetsTabPanel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0,
+                0.0 };
+        gbl_datasetsTabPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 1.0 };
         setLayout(gbl_datasetsTabPanel);
 
         // top margin
 
-        Component datasetsTabTopMargin = Box.createRigidArea(new Dimension(20, 20));
+        Component datasetsTabTopMargin = Box
+                .createRigidArea(new Dimension(20, 20));
         GridBagConstraints gbc_datasetsTabTopMargin = new GridBagConstraints();
         gbc_datasetsTabTopMargin.insets = new Insets(0, 0, 5, 5);
         gbc_datasetsTabTopMargin.gridx = 2;
@@ -90,7 +94,8 @@ public class DatasetsTabPanel extends JPanel {
         // top label (A)
 
         firstDatasetLabel = new JLabel("_Dataset A");
-        firstDatasetLabel.setFont(firstDatasetLabel.getFont().deriveFont(Font.BOLD));
+        firstDatasetLabel
+                .setFont(firstDatasetLabel.getFont().deriveFont(Font.BOLD));
         GridBagConstraints gbc_firstDatasetLabel = new GridBagConstraints();
         gbc_firstDatasetLabel.weightx = 1.0;
         gbc_firstDatasetLabel.insets = new Insets(0, 0, 5, 5);
@@ -101,7 +106,8 @@ public class DatasetsTabPanel extends JPanel {
         // top label (B)
 
         secondDatasetLabel = new JLabel("_Dataset B");
-        secondDatasetLabel.setFont(secondDatasetLabel.getFont().deriveFont(Font.BOLD));
+        secondDatasetLabel
+                .setFont(secondDatasetLabel.getFont().deriveFont(Font.BOLD));
         GridBagConstraints gbc_secondDatasetLabel = new GridBagConstraints();
         gbc_secondDatasetLabel.weightx = 1.0;
         gbc_secondDatasetLabel.insets = new Insets(0, 0, 5, 5);
@@ -110,7 +116,7 @@ public class DatasetsTabPanel extends JPanel {
         add(secondDatasetLabel, gbc_secondDatasetLabel);
 
         // file name
-        
+
         fileNameLbl = new JLabel("_File name");
         GridBagConstraints gbc_fileNameLbl = new GridBagConstraints();
         gbc_fileNameLbl.insets = new Insets(0, 0, 5, 5);
@@ -135,7 +141,8 @@ public class DatasetsTabPanel extends JPanel {
         gbc_firstDatasetContainer.gridx = 1;
         gbc_firstDatasetContainer.gridy = 2;
         add(firstDatasetContainer, gbc_firstDatasetContainer);
-        firstDatasetContainer.setLayout(new BoxLayout(firstDatasetContainer, BoxLayout.X_AXIS));
+        firstDatasetContainer.setLayout(
+                new BoxLayout(firstDatasetContainer, BoxLayout.X_AXIS));
 
         firstDatasetField = new JTextField();
         firstDatasetField.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -154,7 +161,8 @@ public class DatasetsTabPanel extends JPanel {
         gbc_secondDatasetContainer.gridx = 3;
         gbc_secondDatasetContainer.gridy = 2;
         add(secondDatasetContainer, gbc_secondDatasetContainer);
-        secondDatasetContainer.setLayout(new BoxLayout(secondDatasetContainer, BoxLayout.X_AXIS));
+        secondDatasetContainer.setLayout(
+                new BoxLayout(secondDatasetContainer, BoxLayout.X_AXIS));
 
         secondDatasetBtn = new JButton("_Select...");
         secondDatasetContainer.add(secondDatasetBtn);
@@ -198,7 +206,8 @@ public class DatasetsTabPanel extends JPanel {
         gbc_firstEncodingContainer.gridx = 1;
         gbc_firstEncodingContainer.gridy = 3;
         add(firstEncodingContainer, gbc_firstEncodingContainer);
-        firstEncodingContainer.setLayout(new BoxLayout(firstEncodingContainer, BoxLayout.X_AXIS));
+        firstEncodingContainer.setLayout(
+                new BoxLayout(firstEncodingContainer, BoxLayout.X_AXIS));
 
         firstEncodingField = new EncodingComboBox();
         firstEncodingField.setEditable(true);
@@ -214,7 +223,8 @@ public class DatasetsTabPanel extends JPanel {
         gbc_secondEncodingContainer.gridx = 3;
         gbc_secondEncodingContainer.gridy = 3;
         add(secondEncodingContainer, gbc_secondEncodingContainer);
-        secondEncodingContainer.setLayout(new BoxLayout(secondEncodingContainer, BoxLayout.X_AXIS));
+        secondEncodingContainer.setLayout(
+                new BoxLayout(secondEncodingContainer, BoxLayout.X_AXIS));
 
         secondEncodingField = new EncodingComboBox();
         secondEncodingField.setEditable(true);
@@ -255,7 +265,8 @@ public class DatasetsTabPanel extends JPanel {
         gbc_firstDatasetSuffixContainer.gridx = 1;
         gbc_firstDatasetSuffixContainer.gridy = 4;
         add(firstDatasetSuffixContainer, gbc_firstDatasetSuffixContainer);
-        firstDatasetSuffixContainer.setLayout(new BoxLayout(firstDatasetSuffixContainer, BoxLayout.X_AXIS));
+        firstDatasetSuffixContainer.setLayout(
+                new BoxLayout(firstDatasetSuffixContainer, BoxLayout.X_AXIS));
 
         firstDatasetSuffixField = new JTextFieldWithPlaceholder();
         firstDatasetSuffixContainer.add(firstDatasetSuffixField);
@@ -270,7 +281,8 @@ public class DatasetsTabPanel extends JPanel {
         gbc_secondDatasetSuffixContainer.gridx = 3;
         gbc_secondDatasetSuffixContainer.gridy = 4;
         add(secondDatasetSuffixContainer, gbc_secondDatasetSuffixContainer);
-        secondDatasetSuffixContainer.setLayout(new BoxLayout(secondDatasetSuffixContainer, BoxLayout.X_AXIS));
+        secondDatasetSuffixContainer.setLayout(
+                new BoxLayout(secondDatasetSuffixContainer, BoxLayout.X_AXIS));
 
         secondDatasetSuffixField = new JTextFieldWithPlaceholder();
         secondDatasetSuffixContainer.add(secondDatasetSuffixField);
@@ -302,7 +314,8 @@ public class DatasetsTabPanel extends JPanel {
         gbc_firstDatasetRowNumColContainer.gridx = 1;
         gbc_firstDatasetRowNumColContainer.gridy = 5;
         add(firstDatasetRowNumColContainer, gbc_firstDatasetRowNumColContainer);
-        firstDatasetRowNumColContainer.setLayout(new BoxLayout(firstDatasetRowNumColContainer, BoxLayout.X_AXIS));
+        firstDatasetRowNumColContainer.setLayout(new BoxLayout(
+                firstDatasetRowNumColContainer, BoxLayout.X_AXIS));
 
         firstDatasetRowNumColField = new JTextFieldWithPlaceholder();
         firstDatasetRowNumColContainer.add(firstDatasetRowNumColField);
@@ -314,7 +327,8 @@ public class DatasetsTabPanel extends JPanel {
         gbc_firstDatasetRowNumColWarningLbl.insets = new Insets(0, 0, 5, 5);
         gbc_firstDatasetRowNumColWarningLbl.gridx = 0;
         gbc_firstDatasetRowNumColWarningLbl.gridy = 5;
-        add(firstDatasetRowNumColWarningLbl, gbc_firstDatasetRowNumColWarningLbl);
+        add(firstDatasetRowNumColWarningLbl,
+                gbc_firstDatasetRowNumColWarningLbl);
 
         // row num col (B)
 
@@ -324,8 +338,10 @@ public class DatasetsTabPanel extends JPanel {
         gbc_secondDatasetRowNumColContainer.insets = new Insets(0, 0, 5, 5);
         gbc_secondDatasetRowNumColContainer.gridx = 3;
         gbc_secondDatasetRowNumColContainer.gridy = 5;
-        add(secondDatasetRowNumColContainer, gbc_secondDatasetRowNumColContainer);
-        secondDatasetRowNumColContainer.setLayout(new BoxLayout(secondDatasetRowNumColContainer, BoxLayout.X_AXIS));
+        add(secondDatasetRowNumColContainer,
+                gbc_secondDatasetRowNumColContainer);
+        secondDatasetRowNumColContainer.setLayout(new BoxLayout(
+                secondDatasetRowNumColContainer, BoxLayout.X_AXIS));
 
         secondDatasetRowNumColField = new JTextFieldWithPlaceholder();
         secondDatasetRowNumColContainer.add(secondDatasetRowNumColField);
@@ -337,19 +353,23 @@ public class DatasetsTabPanel extends JPanel {
         gbc_secondDatasetRowNumColWarningLbl.insets = new Insets(0, 0, 5, 0);
         gbc_secondDatasetRowNumColWarningLbl.gridx = 4;
         gbc_secondDatasetRowNumColWarningLbl.gridy = 5;
-        add(secondDatasetRowNumColWarningLbl, gbc_secondDatasetRowNumColWarningLbl);
+        add(secondDatasetRowNumColWarningLbl,
+                gbc_secondDatasetRowNumColWarningLbl);
 
     }
 
     public void updateLocalisedStrings() {
-        firstDatasetLabel.setText(MessageProvider.getMessage("datasets.dataseta"));
-        secondDatasetLabel.setText(MessageProvider.getMessage("datasets.datasetb"));
+        firstDatasetLabel
+                .setText(MessageProvider.getMessage("datasets.dataseta"));
+        secondDatasetLabel
+                .setText(MessageProvider.getMessage("datasets.datasetb"));
         firstDatasetBtn.setText(MessageProvider.getMessage("datasets.select"));
         secondDatasetBtn.setText(MessageProvider.getMessage("datasets.select"));
         fileNameLbl.setText(MessageProvider.getMessage("datasets.filename"));
         encodingLbl.setText(MessageProvider.getMessage("datasets.encoding"));
         suffixLbl.setText(MessageProvider.getMessage("datasets.suffix"));
-        rowNumColLbl.setText(MessageProvider.getMessage("datasets.rownumcolname"));
+        rowNumColLbl
+                .setText(MessageProvider.getMessage("datasets.rownumcolname"));
 
     }
 

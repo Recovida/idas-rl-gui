@@ -178,7 +178,8 @@ public class MainMenuBar extends JMenuBar {
         // run
         runMenu.setText(MessageProvider.getMessage("menu.run"));
         runMenuItem.setText(MessageProvider.getMessage("menu.run.run"));
-        getCancelMenuItem().setText(MessageProvider.getMessage("menu.run.cancel"));
+        getCancelMenuItem()
+                .setText(MessageProvider.getMessage("menu.run.cancel"));
 
         // help
         helpMenu.setText(MessageProvider.getMessage("menu.help"));

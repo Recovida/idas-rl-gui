@@ -30,8 +30,8 @@ public class NumberColumnPairCellRenderer extends ColumnPairCellRenderer
             c.setForeground(getErrorColour(isSelected));
             if (italic)
                 c.setFont(c.getFont().deriveFont(Font.ITALIC));
-        } 
-        
+        }
+
         if (!italic && c instanceof JLabel) {
             ((JLabel) c).setHorizontalAlignment(JLabel.RIGHT);
             c.setFont(c.getFont().deriveFont(Font.BOLD));

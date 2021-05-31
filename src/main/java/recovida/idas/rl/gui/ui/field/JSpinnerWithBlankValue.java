@@ -24,17 +24,18 @@ public class JSpinnerWithBlankValue extends JSpinner {
     private NumberFormat numberFormat;
     private NumberFormatter numberFormatter;
 
-    public JSpinnerWithBlankValue(SpinnerModel model, String decimalFormatPattern) {
+    public JSpinnerWithBlankValue(SpinnerModel model,
+            String decimalFormatPattern) {
         super(model);
         this.decimalFormatPattern = decimalFormatPattern;
         refreshLocaleFormat();
         setEditor(getEditor());
     }
-    
+
     private class CustomFormatter extends NumberFormatter {
-        
+
         // Based on "NumberEditorFormatter"
-        
+
         private static final long serialVersionUID = -6275164348037924598L;
         private final SpinnerNumberModel model;
 
@@ -61,31 +62,34 @@ public class JSpinnerWithBlankValue extends JSpinner {
         public Comparable<?> getMaximum() {
             return model.getMaximum();
         }
-        
+
         @Override
         public String valueToString(Object value) throws ParseException {
             return blankValue.equals(value) ? blankText
-                                : super.valueToString(value);
+                    : super.valueToString(value);
         }
-        
+
         @Override
         public Object stringToValue(String text) throws ParseException {
-            return blankText.equals(text) ? blankValue : super.stringToValue(text);
+            return blankText.equals(text) ? blankValue
+                    : super.stringToValue(text);
         }
     }
-    
+
     public void refreshLocaleFormat() {
         numberFormat = NumberFormat.getInstance(MessageProvider.getLocale());
         if (numberFormat instanceof DecimalFormat)
             ((DecimalFormat) numberFormat).applyPattern(decimalFormatPattern);
-        numberFormatter = new CustomFormatter((SpinnerNumberModel) getModel(), numberFormat);
+        numberFormatter = new CustomFormatter((SpinnerNumberModel) getModel(),
+                numberFormat);
         setEditor(getEditor());
     }
 
     @Override
     public void setEditor(JComponent editor) {
         super.setEditor(editor);
-        JFormattedTextField tf = ((JSpinner.DefaultEditor) editor).getTextField();
+        JFormattedTextField tf = ((JSpinner.DefaultEditor) editor)
+                .getTextField();
         tf.setFormatterFactory(new DefaultFormatterFactory(numberFormatter));
     }
 

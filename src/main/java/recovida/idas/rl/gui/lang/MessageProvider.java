@@ -11,11 +11,13 @@ import java.util.stream.Collectors;
 public class MessageProvider {
 
     public final static List<String> SUPPORTED_LANGUAGES = Collections
-            .unmodifiableList(Arrays.asList(new String[] { "en", "es", "pt-BR" }));
+            .unmodifiableList(
+                    Arrays.asList(new String[] { "en", "es", "pt-BR" }));
 
     public static final String DEFAULT_LANGUAGE = getBestLanguage();
 
-    protected static Locale currentLocale = Locale.forLanguageTag(DEFAULT_LANGUAGE);
+    protected static Locale currentLocale = Locale
+            .forLanguageTag(DEFAULT_LANGUAGE);
     protected static ResourceBundle bundle = createBundle(currentLocale);
 
     public static void setLocale(Locale locale) {
@@ -32,7 +34,8 @@ public class MessageProvider {
         // try exact match
         int idx = SUPPORTED_LANGUAGES.indexOf(defaultLocale.toLanguageTag());
         if (idx < 0) // try language match, ignoring country
-            idx = SUPPORTED_LANGUAGES.stream().map(x -> x.split("-", 2)[0]).collect(Collectors.toList())
+            idx = SUPPORTED_LANGUAGES.stream().map(x -> x.split("-", 2)[0])
+                    .collect(Collectors.toList())
                     .indexOf(defaultLocale.getLanguage());
         // as a last resort, use English as a fallback
         return SUPPORTED_LANGUAGES.get(Math.max(0, idx));

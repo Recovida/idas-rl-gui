@@ -50,7 +50,9 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
 
         JButton okBtn = new JButton(
                 MessageProvider.getMessage("columns.addcopy.insert"));
-        okBtn.setIcon(new ImageIcon(BulkCopyColumnInclusionDialogue.class.getResource("/toolbarButtonGraphics/table/RowInsertAfter24.gif")));
+        okBtn.setIcon(
+                new ImageIcon(BulkCopyColumnInclusionDialogue.class.getResource(
+                        "/toolbarButtonGraphics/table/RowInsertAfter24.gif")));
         bottomPanel.add(okBtn);
         getContentPane().add(mainPanel, BorderLayout.CENTER);
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.X_AXIS));
