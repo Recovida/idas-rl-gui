@@ -8,40 +8,40 @@ import javax.swing.JComponent;
 import recovida.idas.rl.gui.listener.SettingItemChangeListener;
 import recovida.idas.rl.gui.undo.UndoHistory;
 
-public abstract class SettingItem<T1, T2 extends JComponent> {
+public abstract class AbstractSettingItem<V, F extends JComponent> {
 
-    public T1 getCurrentValue() {
+    public V getCurrentValue() {
         return currentValue;
     }
 
-    public void setCurrentValue(T1 currentValue) {
+    public void setCurrentValue(V currentValue) {
         this.currentValue = currentValue;
     }
 
-    public T1 getDefaultValue() {
+    public V getDefaultValue() {
         return defaultValue;
     }
 
-    public void setDefaultValue(T1 defaultValue) {
+    public void setDefaultValue(V defaultValue) {
         this.defaultValue = defaultValue;
     }
 
-    public T2 getGuiComponent() {
+    public F getGuiComponent() {
         return guiComponent;
     }
 
-    public void setGuiComponent(T2 guiComponent) {
+    public void setGuiComponent(F guiComponent) {
         this.guiComponent = guiComponent;
     }
 
-    protected T1 currentValue;
-    protected T1 defaultValue;
-    protected T2 guiComponent;
+    protected V currentValue;
+    protected V defaultValue;
+    protected F guiComponent;
     protected List<SettingItemChangeListener> listeners;
     protected UndoHistory history;
 
-    public SettingItem(UndoHistory history, T1 currentValue, T1 defaultValue,
-            T2 guiComponent) {
+    public AbstractSettingItem(UndoHistory history, V currentValue, V defaultValue,
+            F guiComponent) {
         this.currentValue = currentValue;
         this.guiComponent = guiComponent;
         this.defaultValue = defaultValue;
@@ -49,17 +49,17 @@ public abstract class SettingItem<T1, T2 extends JComponent> {
         this.listeners = new LinkedList<>();
     }
 
-    public SettingItem(UndoHistory history, T1 currentValue, T1 defaultValue,
-            T2 guiComponent, SettingItemChangeListener listener) {
+    public AbstractSettingItem(UndoHistory history, V currentValue, V defaultValue,
+            F guiComponent, SettingItemChangeListener listener) {
         this(history, currentValue, defaultValue, guiComponent);
         this.listeners.add(listener);
     }
 
-    public abstract void setValue(T1 newValue);
+    public abstract void setValue(V newValue);
 
     public abstract void setValueFromString(String newValue);
 
-    public abstract void onChange(T1 newValue);
+    public abstract void onChange(V newValue);
 
     public void addChangeListener(SettingItemChangeListener listener) {
         listeners.add(listener);

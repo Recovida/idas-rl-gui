@@ -95,9 +95,9 @@ public class DatasetPeek {
             delimiter = Collections.max(delimiterFreq.keySet(),
                     (Character c1, Character c2) -> delimiterFreq.get(c1)
                             - delimiterFreq.get(c2));
-        } catch (FileNotFoundException e1) {
+        } catch (FileNotFoundException ex) {
             return DatasetPeekResult.FILE_NOT_FOUND;
-        } catch (IOException e1) {
+        } catch (IOException ex) {
             return DatasetPeekResult.IO_ERROR;
         }
 

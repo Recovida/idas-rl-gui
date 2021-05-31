@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class MessageProvider {
 
-    public final static List<String> SUPPORTED_LANGUAGES = Collections
+    public static final List<String> SUPPORTED_LANGUAGES = Collections
             .unmodifiableList(
                     Arrays.asList(new String[] { "en", "es", "pt-BR" }));
 

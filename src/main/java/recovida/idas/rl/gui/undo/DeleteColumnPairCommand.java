@@ -3,7 +3,7 @@ package recovida.idas.rl.gui.undo;
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.pair.ColumnPairManager;
 
-public class DeleteColumnPairCommand extends Command {
+public class DeleteColumnPairCommand extends AbstractCommand {
 
     private ColumnPairManager manager;
     int index = 0;

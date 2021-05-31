@@ -42,8 +42,8 @@ public class LinkageColumnButtonPanel extends JPanel {
         addCopyColsBtn.setEnabled(false);
         add(addCopyColsBtn);
 
-        Component horizontalGlue_2 = Box.createHorizontalGlue();
-        add(horizontalGlue_2);
+        Component hg1 = Box.createHorizontalGlue();
+        add(hg1);
 
         addPairBtn = new JButton("_Add column pair");
         addPairBtn.setIcon(
@@ -51,9 +51,9 @@ public class LinkageColumnButtonPanel extends JPanel {
                         "/toolbarButtonGraphics/table/RowInsertAfter24.gif")));
         add(addPairBtn);
 
-        Component horizontalGlue_1 = Box.createHorizontalGlue();
-        horizontalGlue_1.setMaximumSize(new Dimension(50, 0));
-        add(horizontalGlue_1);
+        Component hg2 = Box.createHorizontalGlue();
+        hg2.setMaximumSize(new Dimension(50, 0));
+        add(hg2);
 
         Component horizontalGlue = Box.createHorizontalGlue();
         add(horizontalGlue);
@@ -64,9 +64,9 @@ public class LinkageColumnButtonPanel extends JPanel {
         deletePairBtn.setEnabled(false);
         add(deletePairBtn);
 
-        Component rigidArea_2 = Box.createRigidArea(new Dimension(20, 20));
-        rigidArea_2.setPreferredSize(new Dimension(8, 20));
-        add(rigidArea_2);
+        Component ra = Box.createRigidArea(new Dimension(20, 20));
+        ra.setPreferredSize(new Dimension(8, 20));
+        add(ra);
 
         setBorder(BorderFactory.createRaisedSoftBevelBorder());
 

@@ -62,8 +62,8 @@ public class MainMenuBar extends JMenuBar {
                 .getResource("/toolbarButtonGraphics/general/New16.gif")));
         fileMenu.add(newFileMenuItem);
 
-        JSeparator separator_1 = new JSeparator();
-        fileMenu.add(separator_1);
+        JSeparator sep1 = new JSeparator();
+        fileMenu.add(sep1);
 
         openFileMenuItem = new JMenuItem("_Open...");
         openFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
@@ -72,8 +72,8 @@ public class MainMenuBar extends JMenuBar {
                 .getResource("/toolbarButtonGraphics/general/Open16.gif")));
         fileMenu.add(openFileMenuItem);
 
-        JSeparator separator_2 = new JSeparator();
-        fileMenu.add(separator_2);
+        JSeparator sep2 = new JSeparator();
+        fileMenu.add(sep2);
 
         saveFileMenuItem = new JMenuItem("_Save");
         saveFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,

@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import recovida.idas.rl.gui.pair.ColumnPairManager;
 
-public class EditColumnPairFieldCommand<T> extends Command {
+public class EditColumnPairFieldCommand<T> extends AbstractCommand {
 
     private ColumnPairManager manager;
     int index = 0;
@@ -36,7 +36,7 @@ public class EditColumnPairFieldCommand<T> extends Command {
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean merge(Command that) {
+    public boolean merge(AbstractCommand that) {
         if (!(that instanceof EditColumnPairFieldCommand<?>))
             return false;
         EditColumnPairFieldCommand<T> t = (EditColumnPairFieldCommand<T>) that;

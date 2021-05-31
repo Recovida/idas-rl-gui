@@ -50,7 +50,7 @@ import recovida.idas.rl.gui.listener.ColumnPairValueChangeListener;
 import recovida.idas.rl.gui.listener.SettingItemChangeListener;
 import recovida.idas.rl.gui.pair.ColumnPairManager;
 import recovida.idas.rl.gui.settingitem.NumberSettingItem;
-import recovida.idas.rl.gui.settingitem.SettingItem;
+import recovida.idas.rl.gui.settingitem.AbstractSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItemWithList;
 import recovida.idas.rl.gui.ui.WarningIcon;
@@ -71,7 +71,7 @@ import recovida.idas.rl.gui.undo.UndoHistory;
 public class MainWindow {
 
     /* Non-GUI attributes */
-    public final static String PROGRAM_NAME = "IDaS-RL";
+    public static final String PROGRAM_NAME = "IDaS-RL";
     UndoHistory history = new UndoHistory();
     ConfigurationFile cf = new ConfigurationFile();
     String currentFileName = null;
@@ -135,12 +135,12 @@ public class MainWindow {
         initialize();
 
         // Tab: DATASETS
-        SettingItemChangeListener datasetsTabEventListenerTop = (o) -> {
+        SettingItemChangeListener datasetsTabEventListenerTop = o -> {
             if (!skipValidation)
                 tabbedPane.setSelectedComponent(datasetsTabPanel);
             validateDatasetsTabTopPart();
         };
-        SettingItemChangeListener datasetsTabEventListenerBottom = (o) -> {
+        SettingItemChangeListener datasetsTabEventListenerBottom = o -> {
             if (!skipValidation)
                 tabbedPane.setSelectedComponent(datasetsTabPanel);
             validateDatasetsTabBottomPart();
@@ -181,7 +181,7 @@ public class MainWindow {
                         datasetsTabEventListenerBottom));
 
         // Tab: OPTIONS
-        SettingItemChangeListener optionsTabEventListener = (o) -> {
+        SettingItemChangeListener optionsTabEventListener = o -> {
             if (!skipValidation)
                 tabbedPane.setSelectedComponent(optionsTabPanel);
             validateOptionsTab();
@@ -331,7 +331,7 @@ public class MainWindow {
         int errorCount = 0;
 
         @SuppressWarnings("rawtypes")
-        Map<String, SettingItem> items = cf.getSettingItems();
+        Map<String, AbstractSettingItem> items = cf.getSettingItems();
 
         // Encodings
         String enc1 = (String) items.get("encoding_a").getCurrentValue();
@@ -447,7 +447,7 @@ public class MainWindow {
 
         int errorCount = 0;
         @SuppressWarnings("rawtypes")
-        Map<String, SettingItem> items = cf.getSettingItems();
+        Map<String, AbstractSettingItem> items = cf.getSettingItems();
         String s1, s2;
 
         // Suffixes
@@ -599,7 +599,7 @@ public class MainWindow {
 
     @SuppressWarnings("unchecked")
     public void clearAllFields() {
-        for (SettingItem<?, ?> item : cf.getSettingItems().values()) {
+        for (AbstractSettingItem<?, ?> item : cf.getSettingItems().values()) {
             JComponent component = item.getGuiComponent();
             if (component instanceof JTextField)
                 ((JTextField) component).setText("");
@@ -813,12 +813,12 @@ public class MainWindow {
     }
 
     protected int promptToSaveChanges() {
-        String msg = (currentFileName == null
+        String msg = currentFileName == null
                 ? MessageProvider.getMessage("menu.file.save.savechangesnofile")
                 : MessageFormat.format(
                         MessageProvider
                                 .getMessage("menu.file.save.savechangesfile"),
-                        currentFileName));
+                        currentFileName);
         return JOptionPane.showOptionDialog(this.frame, msg,
                 MessageProvider.getMessage("menu.file.save.savechanges"),
                 JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,

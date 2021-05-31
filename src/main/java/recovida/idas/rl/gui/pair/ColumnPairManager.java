@@ -43,9 +43,9 @@ import recovida.idas.rl.gui.ui.container.LinkageColumnEditingPanel;
 import recovida.idas.rl.gui.ui.table.ColumnPairTableModel;
 import recovida.idas.rl.gui.ui.table.cellrendering.RenameColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.window.BulkCopyColumnInclusionDialogue;
+import recovida.idas.rl.gui.undo.AbstractCommand;
+import recovida.idas.rl.gui.undo.AbstractCompositeCommand;
 import recovida.idas.rl.gui.undo.AddColumnPairCommand;
-import recovida.idas.rl.gui.undo.Command;
-import recovida.idas.rl.gui.undo.CompositeCommand;
 import recovida.idas.rl.gui.undo.DeleteColumnPairCommand;
 import recovida.idas.rl.gui.undo.EditColumnPairFieldCommand;
 import recovida.idas.rl.gui.undo.UndoHistory;
@@ -62,8 +62,8 @@ public class ColumnPairManager {
     protected String firstRenameSuffix = "";
     protected String secondRenameSuffix = "";
 
-    public final int FIRST_NUMBER = 1;
-    public final int FIRST_COPY_NUMBER = 201;
+    public static final int FIRST_NUMBER = 1;
+    public static final int FIRST_COPY_NUMBER = 201;
 
     protected final AtomicInteger nextNumber = new AtomicInteger(FIRST_NUMBER);
     protected final AtomicInteger nextCopyNumber = new AtomicInteger(
@@ -121,7 +121,7 @@ public class ColumnPairManager {
                         dialogue.addItemToRightPanel(col,
                                 alreadyIncludedRight.contains(col));
                 List<String>[] result = dialogue.run();
-                List<Command> cmd = new LinkedList<>();
+                List<AbstractCommand> cmd = new LinkedList<>();
                 for (String c : result[0])
                     cmd.add(new AddColumnPairCommand(ColumnPairManager.this,
                             "copy", c, null));
@@ -129,7 +129,7 @@ public class ColumnPairManager {
                     cmd.add(new AddColumnPairCommand(ColumnPairManager.this,
                             "copy", null, c));
                 if (!cmd.isEmpty())
-                    history.push(new CompositeCommand(cmd) {
+                    history.push(new AbstractCompositeCommand(cmd) {
 
                         @Override
                         public String getSummary() {
@@ -398,7 +398,7 @@ public class ColumnPairManager {
                             e.getDocument().getLength());
                     newValue = (Number) ((DefaultFormatter) tf.getFormatter())
                             .stringToValue(txt);
-                } catch (ParseException | BadLocationException e1) {
+                } catch (ParseException | BadLocationException ex) {
                     return;
                 }
                 if (!completelyIgnoreChangeEvent) {
@@ -463,7 +463,7 @@ public class ColumnPairManager {
                         }
                         onChange(rowIndex, key, newValue);
                     }
-                } catch (BadLocationException e1) {
+                } catch (BadLocationException ex) {
                 }
 
             }

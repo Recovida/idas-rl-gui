@@ -15,7 +15,7 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 import recovida.idas.rl.gui.pair.ColumnPairManager;
-import recovida.idas.rl.gui.settingitem.SettingItem;
+import recovida.idas.rl.gui.settingitem.AbstractSettingItem;
 
 @SuppressWarnings("rawtypes")
 public class ConfigurationFile {
@@ -46,20 +46,20 @@ public class ConfigurationFile {
         }
     }
 
-    Map<String, SettingItem> settingItems;
+    Map<String, AbstractSettingItem> settingItems;
     ColumnPairManager pairManager;
 
-    public final int MAX_NUMBER = 999;
-    protected final String[] COL_KEYS = { "type", "index_a", "index_b",
+    public static final int MAX_NUMBER = 999;
+    protected static final String[] COL_KEYS = { "type", "index_a", "index_b",
             "rename_a", "rename_b", "weight", "phon_weight" };
-    protected final Pattern COL_KEY_PATTERN = Pattern
+    protected static final Pattern COL_KEY_PATTERN = Pattern
             .compile("^[0-9]+_(" + String.join("|", COL_KEYS) + ")$");
 
     public ConfigurationFile() {
         settingItems = new LinkedHashMap<>();
     }
 
-    public void addSettingItem(String key, SettingItem settingItem) {
+    public void addSettingItem(String key, AbstractSettingItem settingItem) {
         settingItems.put(key, settingItem);
     }
 
@@ -71,7 +71,7 @@ public class ConfigurationFile {
         Properties props = new Properties();
         try (FileInputStream in = new FileInputStream(fileName)) {
             props.load(in);
-        } catch (Exception e1) {
+        } catch (Exception e) {
             return false;
         }
         // number --> row index in the table
@@ -111,7 +111,7 @@ public class ConfigurationFile {
         return true;
     }
 
-    public Map<String, SettingItem> getSettingItems() {
+    public Map<String, AbstractSettingItem> getSettingItems() {
         return Collections.unmodifiableMap(settingItems);
     }
 
@@ -120,7 +120,8 @@ public class ConfigurationFile {
             SkipFirstLineOutputStream skipTimestampOutput = new SkipFirstLineOutputStream(
                     output);
             Properties p = new Properties();
-            for (Entry<String, SettingItem> entry : settingItems.entrySet()) {
+            for (Entry<String, AbstractSettingItem> entry : settingItems
+                    .entrySet()) {
                 String key = entry.getKey();
                 Object value = entry.getValue().getCurrentValue();
                 if (value == null || "".equals(value))

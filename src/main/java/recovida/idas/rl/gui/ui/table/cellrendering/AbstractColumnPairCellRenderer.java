@@ -11,7 +11,7 @@ import javax.swing.table.TableCellRenderer;
 import recovida.idas.rl.gui.ui.WarningIcon;
 import recovida.idas.rl.gui.ui.table.ColumnPairTableModel;
 
-public abstract class ColumnPairCellRenderer extends JLabel
+public abstract class AbstractColumnPairCellRenderer extends JLabel
         implements TableCellRenderer {
 
     private static final long serialVersionUID = 4429833685885120604L;

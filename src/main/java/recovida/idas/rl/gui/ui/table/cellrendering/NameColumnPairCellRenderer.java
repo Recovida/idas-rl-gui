@@ -9,7 +9,7 @@ import javax.swing.table.TableCellRenderer;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
 
-public class NameColumnPairCellRenderer extends ColumnPairCellRenderer
+public class NameColumnPairCellRenderer extends AbstractColumnPairCellRenderer
         implements TableCellRenderer {
 
     private static final long serialVersionUID = 4089960339928197149L;

@@ -47,8 +47,8 @@ public class UndoHistory {
         }
     }
 
-    protected List<Command> commandList;
-    protected ListIterator<Command> commandListIterator;
+    protected List<AbstractCommand> commandList;
+    protected ListIterator<AbstractCommand> commandListIterator;
     protected int cleanIndex;
     protected List<HistoryPropertyChangeEventListener> listeners;
 
@@ -83,13 +83,13 @@ public class UndoHistory {
         HistoryPropertyState.get(this).notifyIfChanged(oldState, listeners);
     }
 
-    public void push(Command command) {
+    public void push(AbstractCommand command) {
         HistoryPropertyState oldState = HistoryPropertyState.get(this);
         if (cleanIndex > commandListIterator.nextIndex())
             cleanIndex = -1;
         else if (!isClean() && commandListIterator.hasPrevious()
                 && !commandListIterator.hasNext()) {
-            Command previousCommand = commandListIterator.previous();
+            AbstractCommand previousCommand = commandListIterator.previous();
             commandListIterator.next();
             if (previousCommand.merge(command))
                 command.markAsMerged();

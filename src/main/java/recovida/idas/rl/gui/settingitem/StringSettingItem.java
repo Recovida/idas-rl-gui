@@ -11,7 +11,7 @@ import recovida.idas.rl.gui.ui.field.FieldWithPlaceholder;
 import recovida.idas.rl.gui.undo.SetOptionCommand;
 import recovida.idas.rl.gui.undo.UndoHistory;
 
-public class StringSettingItem extends SettingItem<String, JTextField> {
+public class StringSettingItem extends AbstractSettingItem<String, JTextField> {
 
     protected boolean supressDocumentListener = false;
 
@@ -45,7 +45,7 @@ public class StringSettingItem extends SettingItem<String, JTextField> {
                                 new SetOptionCommand<>(StringSettingItem.this,
                                         getCurrentValue(), value, true));
                     onChange(value);
-                } catch (BadLocationException e1) {
+                } catch (BadLocationException ex) {
                 }
 
             }

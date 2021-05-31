@@ -6,7 +6,7 @@ import java.util.Optional;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-public class RenameColumnPairCellRenderer extends ColumnPairCellRenderer
+public class RenameColumnPairCellRenderer extends AbstractColumnPairCellRenderer
         implements TableCellRenderer {
 
     private static final long serialVersionUID = 4089960339928197149L;

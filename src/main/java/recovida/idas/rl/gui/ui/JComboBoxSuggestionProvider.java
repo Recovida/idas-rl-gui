@@ -20,15 +20,15 @@ public class JComboBoxSuggestionProvider {
     private JPopupMenu menu;
     private int limit = 20;
 
-    final static Pattern ALPHANUMERIC = Pattern.compile("[^A-Za-z0-9]");
+    static final Pattern ALPHANUMERIC = Pattern.compile("[^A-Za-z0-9]");
 
     public JComboBoxSuggestionProvider(JComboBox<String> field) {
         this.field = field;
         this.menu = new JPopupMenu();
 
         menu.setFocusable(false);
-        JTextField tf = ((JTextField) this.field.getEditor()
-                .getEditorComponent());
+        JTextField tf = (JTextField) this.field.getEditor()
+                .getEditorComponent();
         tf.addKeyListener(new KeyListener() {
 
             @Override

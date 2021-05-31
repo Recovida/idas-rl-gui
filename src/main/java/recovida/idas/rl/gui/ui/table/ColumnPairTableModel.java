@@ -157,14 +157,14 @@ public class ColumnPairTableModel extends DefaultTableModel {
         // validate index_a
         value = getValue(rowIndex, "index_a");
         v[indexFromKey.get("index_a")] = firstDatasetColumnNames == null
-                || ("copy".equals(getValue(rowIndex, "type"))
-                        && (value == null || "".equals(value)))
+                || "copy".equals(getValue(rowIndex, "type"))
+                        && (value == null || "".equals(value))
                 || firstDatasetColumnNames.contains(value);
         // validate index_b
         value = getValue(rowIndex, "index_b");
         v[indexFromKey.get("index_b")] = secondDatasetColumnNames == null
-                || ("copy".equals(getValue(rowIndex, "type"))
-                        && (value == null || "".equals(value)))
+                || "copy".equals(getValue(rowIndex, "type"))
+                        && (value == null || "".equals(value))
                 || secondDatasetColumnNames.contains(value);
         // validate rename_a and rename_b
         v[indexFromKey.get("rename_a")] = true;

@@ -1,12 +1,12 @@
 package recovida.idas.rl.gui.undo;
 
-public abstract class Command {
+public abstract class AbstractCommand {
 
     public abstract void undo();
 
     public abstract void redo();
 
-    public boolean merge(Command that) {
+    public boolean merge(AbstractCommand that) {
         return false;
     }
 

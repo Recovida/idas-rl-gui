@@ -60,30 +60,30 @@ public class OptionsTabPanel extends JPanel {
 
         Component optionsTabTopMargin = Box
                 .createRigidArea(new Dimension(20, 20));
-        GridBagConstraints gbc_optionsTabTopMargin = new GridBagConstraints();
-        gbc_optionsTabTopMargin.insets = new Insets(0, 0, 5, 5);
-        gbc_optionsTabTopMargin.gridx = 0;
-        gbc_optionsTabTopMargin.gridy = 0;
-        add(optionsTabTopMargin, gbc_optionsTabTopMargin);
+        GridBagConstraints optionsTabTopMarginGBC = new GridBagConstraints();
+        optionsTabTopMarginGBC.insets = new Insets(0, 0, 5, 5);
+        optionsTabTopMarginGBC.gridx = 0;
+        optionsTabTopMarginGBC.gridy = 0;
+        add(optionsTabTopMargin, optionsTabTopMarginGBC);
 
         // linkage directory
 
         linkageDirLbl = new JLabel("_Linkage location");
         linkageDirLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-        GridBagConstraints gbc_linkageDirLbl = new GridBagConstraints();
-        gbc_linkageDirLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_linkageDirLbl.anchor = GridBagConstraints.EAST;
-        gbc_linkageDirLbl.gridx = 0;
-        gbc_linkageDirLbl.gridy = 1;
-        add(linkageDirLbl, gbc_linkageDirLbl);
+        GridBagConstraints linkageDirLblGBC = new GridBagConstraints();
+        linkageDirLblGBC.insets = new Insets(0, 0, 5, 5);
+        linkageDirLblGBC.anchor = GridBagConstraints.EAST;
+        linkageDirLblGBC.gridx = 0;
+        linkageDirLblGBC.gridy = 1;
+        add(linkageDirLbl, linkageDirLblGBC);
 
         JPanel linkageDirContainer = new JPanel();
-        GridBagConstraints gbc_linkageDirContainer = new GridBagConstraints();
-        gbc_linkageDirContainer.fill = GridBagConstraints.BOTH;
-        gbc_linkageDirContainer.insets = new Insets(0, 0, 5, 0);
-        gbc_linkageDirContainer.gridx = 1;
-        gbc_linkageDirContainer.gridy = 1;
-        add(linkageDirContainer, gbc_linkageDirContainer);
+        GridBagConstraints linkageDirContainerGBC = new GridBagConstraints();
+        linkageDirContainerGBC.fill = GridBagConstraints.BOTH;
+        linkageDirContainerGBC.insets = new Insets(0, 0, 5, 0);
+        linkageDirContainerGBC.gridx = 1;
+        linkageDirContainerGBC.gridy = 1;
+        add(linkageDirContainer, linkageDirContainerGBC);
         linkageDirContainer.setLayout(
                 new BoxLayout(linkageDirContainer, BoxLayout.X_AXIS));
 
@@ -102,20 +102,20 @@ public class OptionsTabPanel extends JPanel {
 
         indexDirLbl = new JLabel("_Index location");
         indexDirLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-        GridBagConstraints gbc_indexDirLbl = new GridBagConstraints();
-        gbc_indexDirLbl.anchor = GridBagConstraints.EAST;
-        gbc_indexDirLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_indexDirLbl.gridx = 0;
-        gbc_indexDirLbl.gridy = 2;
-        add(indexDirLbl, gbc_indexDirLbl);
+        GridBagConstraints indexDirLblGBC = new GridBagConstraints();
+        indexDirLblGBC.anchor = GridBagConstraints.EAST;
+        indexDirLblGBC.insets = new Insets(0, 0, 5, 5);
+        indexDirLblGBC.gridx = 0;
+        indexDirLblGBC.gridy = 2;
+        add(indexDirLbl, indexDirLblGBC);
 
         JPanel indexDirContainer = new JPanel();
-        GridBagConstraints gbc_indexDirContainer = new GridBagConstraints();
-        gbc_indexDirContainer.fill = GridBagConstraints.BOTH;
-        gbc_indexDirContainer.insets = new Insets(0, 0, 5, 0);
-        gbc_indexDirContainer.gridx = 1;
-        gbc_indexDirContainer.gridy = 2;
-        add(indexDirContainer, gbc_indexDirContainer);
+        GridBagConstraints indexDirContainerGBC = new GridBagConstraints();
+        indexDirContainerGBC.fill = GridBagConstraints.BOTH;
+        indexDirContainerGBC.insets = new Insets(0, 0, 5, 0);
+        indexDirContainerGBC.gridx = 1;
+        indexDirContainerGBC.gridy = 2;
+        add(indexDirContainer, indexDirContainerGBC);
         indexDirContainer
                 .setLayout(new BoxLayout(indexDirContainer, BoxLayout.X_AXIS));
 
@@ -136,27 +136,27 @@ public class OptionsTabPanel extends JPanel {
                 0.001);
         minScoreLbl = new JLabel("_Minimum score");
         minScoreLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-        GridBagConstraints gbc_minScoreLbl = new GridBagConstraints();
-        gbc_minScoreLbl.fill = GridBagConstraints.HORIZONTAL;
-        gbc_minScoreLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_minScoreLbl.gridx = 0;
-        gbc_minScoreLbl.gridy = 3;
-        add(minScoreLbl, gbc_minScoreLbl);
+        GridBagConstraints minScoreLblGBC = new GridBagConstraints();
+        minScoreLblGBC.fill = GridBagConstraints.HORIZONTAL;
+        minScoreLblGBC.insets = new Insets(0, 0, 5, 5);
+        minScoreLblGBC.gridx = 0;
+        minScoreLblGBC.gridy = 3;
+        add(minScoreLbl, minScoreLblGBC);
         minScoreField = new JSpinnerWithBlankValue(minScoreModel, "0.000");
 
         ((JSpinnerWithBlankValue) minScoreField)
                 .setBlankValue(Double.valueOf(0.0));
-        GridBagConstraints gbc_minScoreField = new GridBagConstraints();
-        gbc_minScoreField.anchor = GridBagConstraints.WEST;
-        gbc_minScoreField.insets = new Insets(0, 0, 5, 0);
-        gbc_minScoreField.gridx = 1;
-        gbc_minScoreField.gridy = 3;
-        add(minScoreField, gbc_minScoreField);
+        GridBagConstraints minScoreFieldGBC = new GridBagConstraints();
+        minScoreFieldGBC.anchor = GridBagConstraints.WEST;
+        minScoreFieldGBC.insets = new Insets(0, 0, 5, 0);
+        minScoreFieldGBC.gridx = 1;
+        minScoreFieldGBC.gridy = 3;
+        add(minScoreField, minScoreFieldGBC);
 
-        JSpinner.NumberEditor ne_minScoreField = (NumberEditor) minScoreField
+        JSpinner.NumberEditor minScoreFieldNE = (NumberEditor) minScoreField
                 .getEditor();
-        ne_minScoreField.setPreferredSize(new Dimension(122, 29));
-        ne_minScoreField.setRequestFocusEnabled(false);
+        minScoreFieldNE.setPreferredSize(new Dimension(122, 29));
+        minScoreFieldNE.setRequestFocusEnabled(false);
 
         // max rows
 
@@ -166,20 +166,20 @@ public class OptionsTabPanel extends JPanel {
         maxRowsLbl = new JLabel("_Only read first rows (A)");
         maxRowsLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         maxRowsLbl.setPreferredSize(new Dimension(150, 17));
-        GridBagConstraints gbc_maxRowsLbl = new GridBagConstraints();
-        gbc_maxRowsLbl.fill = GridBagConstraints.HORIZONTAL;
-        gbc_maxRowsLbl.insets = new Insets(0, 0, 0, 5);
-        gbc_maxRowsLbl.gridx = 0;
-        gbc_maxRowsLbl.gridy = 5;
-        add(maxRowsLbl, gbc_maxRowsLbl);
+        GridBagConstraints maxRowsLblGBC = new GridBagConstraints();
+        maxRowsLblGBC.fill = GridBagConstraints.HORIZONTAL;
+        maxRowsLblGBC.insets = new Insets(0, 0, 0, 5);
+        maxRowsLblGBC.gridx = 0;
+        maxRowsLblGBC.gridy = 5;
+        add(maxRowsLbl, maxRowsLblGBC);
         maxRowsField = new JSpinnerWithBlankValue(maxRowsModel, "0");
         ((JSpinnerWithBlankValue) maxRowsField)
                 .setBlankValue(Integer.MAX_VALUE);
-        GridBagConstraints gbc_maxRowsField = new GridBagConstraints();
-        gbc_maxRowsField.anchor = GridBagConstraints.WEST;
-        gbc_maxRowsField.gridx = 1;
-        gbc_maxRowsField.gridy = 5;
-        add(maxRowsField, gbc_maxRowsField);
+        GridBagConstraints maxRowsFieldGBC = new GridBagConstraints();
+        maxRowsFieldGBC.anchor = GridBagConstraints.WEST;
+        maxRowsFieldGBC.gridx = 1;
+        maxRowsFieldGBC.gridy = 5;
+        add(maxRowsField, maxRowsFieldGBC);
 
         // num threads
 
@@ -187,32 +187,32 @@ public class OptionsTabPanel extends JPanel {
 
         threadsLbl = new JLabel("_Number of threads");
         threadsLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-        GridBagConstraints gbc_threadsLbl = new GridBagConstraints();
-        gbc_threadsLbl.anchor = GridBagConstraints.EAST;
-        gbc_threadsLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_threadsLbl.gridx = 0;
-        gbc_threadsLbl.gridy = 4;
-        add(threadsLbl, gbc_threadsLbl);
+        GridBagConstraints threadsLblGBC = new GridBagConstraints();
+        threadsLblGBC.anchor = GridBagConstraints.EAST;
+        threadsLblGBC.insets = new Insets(0, 0, 5, 5);
+        threadsLblGBC.gridx = 0;
+        threadsLblGBC.gridy = 4;
+        add(threadsLbl, threadsLblGBC);
 
         JPanel threadsPanel = new JPanel();
         threadsPanel.setBorder(null);
-        GridBagConstraints gbc_threadsPanel = new GridBagConstraints();
-        gbc_threadsPanel.anchor = GridBagConstraints.WEST;
-        gbc_threadsPanel.fill = GridBagConstraints.VERTICAL;
-        gbc_threadsPanel.insets = new Insets(0, 0, 5, 0);
-        gbc_threadsPanel.gridx = 1;
-        gbc_threadsPanel.gridy = 4;
-        add(threadsPanel, gbc_threadsPanel);
+        GridBagConstraints threadsPanelGBC = new GridBagConstraints();
+        threadsPanelGBC.anchor = GridBagConstraints.WEST;
+        threadsPanelGBC.fill = GridBagConstraints.VERTICAL;
+        threadsPanelGBC.insets = new Insets(0, 0, 5, 0);
+        threadsPanelGBC.gridx = 1;
+        threadsPanelGBC.gridy = 4;
+        add(threadsPanel, threadsPanelGBC);
         threadsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
 
         threadsField = new JSpinnerWithBlankValue(threadsModel, "0");
         threadsPanel.add(threadsField);
         threadsField.setBlankValue(Integer.valueOf(0));
 
-        JSpinner.NumberEditor ne_threadsField = (NumberEditor) threadsField
+        JSpinner.NumberEditor threadsFieldEditor = (NumberEditor) threadsField
                 .getEditor();
-        ne_threadsField.setPreferredSize(new Dimension(122, 29));
-        ne_threadsField.setRequestFocusEnabled(false);
+        threadsFieldEditor.setPreferredSize(new Dimension(122, 29));
+        threadsFieldEditor.setRequestFocusEnabled(false);
 
         Component horizontalStrut = Box.createHorizontalStrut(20);
         threadsPanel.add(horizontalStrut);

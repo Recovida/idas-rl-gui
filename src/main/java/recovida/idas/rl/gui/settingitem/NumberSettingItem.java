@@ -13,7 +13,7 @@ import recovida.idas.rl.gui.listener.SettingItemChangeListener;
 import recovida.idas.rl.gui.undo.SetOptionCommand;
 import recovida.idas.rl.gui.undo.UndoHistory;
 
-public class NumberSettingItem extends SettingItem<Number, JSpinner> {
+public class NumberSettingItem extends AbstractSettingItem<Number, JSpinner> {
 
     protected boolean supressDocumentListener = false;
 

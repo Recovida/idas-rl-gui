@@ -13,7 +13,7 @@ import recovida.idas.rl.gui.undo.SetOptionCommand;
 import recovida.idas.rl.gui.undo.UndoHistory;
 
 public class StringSettingItemWithList
-        extends SettingItem<String, JComboBox<String>> {
+        extends AbstractSettingItem<String, JComboBox<String>> {
 
     protected boolean supressDocumentListener = false;
 
@@ -48,7 +48,7 @@ public class StringSettingItemWithList
                                         StringSettingItemWithList.this,
                                         getCurrentValue(), value, true));
                             onChange(value);
-                        } catch (BadLocationException e1) {
+                        } catch (BadLocationException ex) {
                         }
                     }
                 });
