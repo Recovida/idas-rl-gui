@@ -53,8 +53,8 @@ import recovida.idas.rl.gui.settingitem.AbstractSettingItem;
 import recovida.idas.rl.gui.settingitem.NumberSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItemWithList;
-import recovida.idas.rl.gui.ui.Translatable;
 import recovida.idas.rl.gui.ui.ErrorIconLabel;
+import recovida.idas.rl.gui.ui.Translatable;
 import recovida.idas.rl.gui.ui.container.DatasetsTabPanel;
 import recovida.idas.rl.gui.ui.container.ExecutionPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnButtonPanel;
@@ -352,6 +352,8 @@ public class MainWindow implements Translatable {
 
         if (fileToOpen != null)
             doOpen(fileToOpen);
+        else
+            doNew();
 
         // Initial validation
         SwingUtilities.invokeLater(() -> validateAllTabs());
@@ -362,8 +364,8 @@ public class MainWindow implements Translatable {
     }
 
     protected Icon getTabErrorIcon() {
-        return new ImageIcon(ErrorIconLabel.BUFFERED_IMAGE
-                .getScaledInstance(15, 15, Image.SCALE_SMOOTH));
+        return new ImageIcon(ErrorIconLabel.BUFFERED_IMAGE.getScaledInstance(15,
+                15, Image.SCALE_SMOOTH));
     }
 
     protected synchronized int validateDatasetsTabTopPart() {
@@ -550,7 +552,24 @@ public class MainWindow implements Translatable {
     protected synchronized int validateOptionsTab() {
         if (skipValidation)
             return -1;
-        return 0;
+        int errorCount = 0;
+        String linkageDir = (String) cf.getSettingItems().get("linkage_folder")
+                .getCurrentValue();
+        if (linkageDir == null || linkageDir.isEmpty()) {
+            optionsTabPanel.getLinkageDirWarningLbl().setVisible(true);
+            errorCount++;
+        } else
+            optionsTabPanel.getLinkageDirWarningLbl().setVisible(false);
+        String indexDir = (String) cf.getSettingItems().get("db_index")
+                .getCurrentValue();
+        if (indexDir == null || indexDir.isEmpty()) {
+            optionsTabPanel.getIndexDirWarningLbl().setVisible(true);
+            errorCount++;
+        } else
+            optionsTabPanel.getIndexDirWarningLbl().setVisible(false);
+        tabbedPane.setIconAt(tabbedPane.indexOfComponent(optionsTabPanel),
+                errorCount == 0 ? null : getTabErrorIcon());
+        return errorCount;
     }
 
     protected synchronized int validateLinkageColsTabSelectedRow(int rowIndex,
@@ -689,9 +708,17 @@ public class MainWindow implements Translatable {
                     || ans == JOptionPane.CLOSED_OPTION)
                 return;
         }
+        skipValidation = true;
         clearAllFields();
         executionTabPanel.clear();
         updateConfigFileName(null);
+        // auto-fill index dir and linkage dir
+        optionsTabPanel.getIndexDirField().setText("index_dir");
+        optionsTabPanel.getLinkageDirField().setText("linkage_dir");
+        SwingUtilities.invokeLater(() -> {
+            skipValidation = false;
+            validateAllTabs();
+        });
         history.clearAll();
         manager.reset();
     }

@@ -19,8 +19,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
-import recovida.idas.rl.gui.ui.Translatable;
 import recovida.idas.rl.gui.ui.ErrorIconLabel;
+import recovida.idas.rl.gui.ui.Translatable;
 import recovida.idas.rl.gui.ui.field.JSpinnerWithBlankValue;
 import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
 
@@ -50,6 +50,10 @@ public class OptionsTabPanel extends JPanel implements Translatable {
     private JLabel threadsLbl;
 
     private JLabel coresLabel;
+
+    private ErrorIconLabel linkageDirWarningLbl;
+
+    private ErrorIconLabel indexDirWarningLbl;
 
     // fields
 
@@ -109,12 +113,11 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         linkageDirContainer.setLayout(
                 new BoxLayout(linkageDirContainer, BoxLayout.X_AXIS));
 
-        JLabel linkageDirWarningLbl = new ErrorIconLabel();
-        linkageDirWarningLbl.setVisible(false);
-        linkageDirContainer.add(linkageDirWarningLbl);
+        linkageDirWarningLbl = new ErrorIconLabel();
+        getLinkageDirWarningLbl().setVisible(false);
+        linkageDirContainer.add(getLinkageDirWarningLbl());
 
         linkageDirField = new JTextFieldWithPlaceholder();
-        linkageDirField.setHorizontalAlignment(SwingConstants.TRAILING);
         linkageDirContainer.add(linkageDirField);
         linkageDirField.setColumns(10);
 
@@ -142,12 +145,11 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         indexDirContainer
                 .setLayout(new BoxLayout(indexDirContainer, BoxLayout.X_AXIS));
 
-        JLabel indexDirWarningLbl = new ErrorIconLabel();
-        indexDirContainer.add(indexDirWarningLbl);
-        indexDirWarningLbl.setVisible(false);
+        indexDirWarningLbl = new ErrorIconLabel();
+        indexDirContainer.add(getIndexDirWarningLbl());
+        getIndexDirWarningLbl().setVisible(false);
 
         indexDirField = new JTextFieldWithPlaceholder();
-        indexDirField.setHorizontalAlignment(SwingConstants.TRAILING);
         indexDirContainer.add(indexDirField);
         indexDirField.setColumns(10);
 
@@ -230,8 +232,8 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         threadsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
 
         threadsField = new JSpinnerWithBlankValue(threadsModel, "0");
-        threadsPanel.add(threadsField);
         threadsField.setBlankValue(Integer.valueOf(0));
+        threadsPanel.add(threadsField);
 
         JSpinner.NumberEditor threadsFieldEditor = (NumberEditor) threadsField
                 .getEditor();
@@ -315,6 +317,14 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
     public JSpinner getMaxRowsField() {
         return maxRowsField;
+    }
+
+    public ErrorIconLabel getLinkageDirWarningLbl() {
+        return linkageDirWarningLbl;
+    }
+
+    public ErrorIconLabel getIndexDirWarningLbl() {
+        return indexDirWarningLbl;
     }
 
 }

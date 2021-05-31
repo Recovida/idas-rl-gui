@@ -13,12 +13,11 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
+import recovida.idas.rl.gui.ui.ErrorIconLabel;
 import recovida.idas.rl.gui.ui.JComboBoxSuggestionProvider;
 import recovida.idas.rl.gui.ui.Translatable;
-import recovida.idas.rl.gui.ui.ErrorIconLabel;
 import recovida.idas.rl.gui.ui.field.EncodingComboBox;
 import recovida.idas.rl.gui.ui.field.JComboBoxWithPlaceholder;
 import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
@@ -172,7 +171,6 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
                 new BoxLayout(firstDatasetContainer, BoxLayout.X_AXIS));
 
         firstDatasetField = new JTextField();
-        firstDatasetField.setHorizontalAlignment(SwingConstants.TRAILING);
         firstDatasetContainer.add(firstDatasetField);
         firstDatasetField.setColumns(10);
 
@@ -191,13 +189,12 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
         secondDatasetContainer.setLayout(
                 new BoxLayout(secondDatasetContainer, BoxLayout.X_AXIS));
 
-        secondDatasetBtn = new JButton("_Select...");
-        secondDatasetContainer.add(secondDatasetBtn);
-
         secondDatasetField = new JTextField();
-        secondDatasetField.setHorizontalAlignment(SwingConstants.TRAILING);
         secondDatasetContainer.add(secondDatasetField);
         secondDatasetField.setColumns(10);
+
+        secondDatasetBtn = new JButton("_Select...");
+        secondDatasetContainer.add(secondDatasetBtn);
 
         secondDatasetWarningLbl = new ErrorIconLabel();
         GridBagConstraints secondDatasetWarningLblGBC = new GridBagConstraints();
