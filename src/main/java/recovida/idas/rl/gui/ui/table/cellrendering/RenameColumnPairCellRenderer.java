@@ -10,7 +10,9 @@ public class RenameColumnPairCellRenderer extends AbstractColumnPairCellRenderer
         implements TableCellRenderer {
 
     private static final long serialVersionUID = 4089960339928197149L;
+
     private String nameKey;
+
     private String suffix = "";
 
     public RenameColumnPairCellRenderer(String nameKey) {

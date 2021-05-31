@@ -6,7 +6,9 @@ import recovida.idas.rl.gui.pair.ColumnPairManager;
 public class DeleteColumnPairCommand extends AbstractCommand {
 
     private ColumnPairManager manager;
+
     int index = 0;
+
     private Object[] contents = new Object[0];
 
     public DeleteColumnPairCommand(ColumnPairManager manager, int index) {

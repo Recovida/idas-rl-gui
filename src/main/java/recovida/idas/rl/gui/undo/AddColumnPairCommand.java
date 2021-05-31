@@ -6,9 +6,13 @@ import recovida.idas.rl.gui.pair.ColumnPairManager;
 public class AddColumnPairCommand extends AbstractCommand {
 
     private ColumnPairManager manager;
+
     int index = 0;
+
     private String type;
+
     private String leftColumn;
+
     private String rightColumn;
 
     public AddColumnPairCommand(ColumnPairManager manager) {

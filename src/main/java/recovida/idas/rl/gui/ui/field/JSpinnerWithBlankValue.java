@@ -19,9 +19,13 @@ public class JSpinnerWithBlankValue extends JSpinner {
     private static final long serialVersionUID = -2440181440569958718L;
 
     private Object blankValue = new Object();
+
     private String blankText = "\u200b";
+
     private String decimalFormatPattern;
+
     private NumberFormat numberFormat;
+
     private NumberFormatter numberFormatter;
 
     public JSpinnerWithBlankValue(SpinnerModel model,
@@ -37,6 +41,7 @@ public class JSpinnerWithBlankValue extends JSpinner {
         // Based on "NumberEditorFormatter"
 
         private static final long serialVersionUID = -6275164348037924598L;
+
         private final SpinnerNumberModel model;
 
         CustomFormatter(SpinnerNumberModel model, NumberFormat format) {
@@ -45,20 +50,24 @@ public class JSpinnerWithBlankValue extends JSpinner {
             setValueClass(model.getValue().getClass());
         }
 
+        @Override
         @SuppressWarnings("rawtypes")
         public void setMinimum(Comparable min) {
             model.setMinimum(min);
         }
 
+        @Override
         public Comparable<?> getMinimum() {
             return model.getMinimum();
         }
 
+        @Override
         @SuppressWarnings("rawtypes")
         public void setMaximum(Comparable max) {
             model.setMaximum(max);
         }
 
+        @Override
         public Comparable<?> getMaximum() {
             return model.getMaximum();
         }

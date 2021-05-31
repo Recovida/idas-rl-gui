@@ -15,9 +15,13 @@ public class UndoHistory {
 
     protected static class HistoryPropertyState {
         boolean canRedo = false;
+
         boolean canUndo = false;
+
         boolean isClean = true;
+
         String undoSummary = null;
+
         String redoSummary = null;
 
         public static HistoryPropertyState get(UndoHistory h) {
@@ -48,8 +52,11 @@ public class UndoHistory {
     }
 
     protected List<AbstractCommand> commandList;
+
     protected ListIterator<AbstractCommand> commandListIterator;
+
     protected int cleanIndex;
+
     protected List<HistoryPropertyChangeEventListener> listeners;
 
     public UndoHistory() {

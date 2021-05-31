@@ -14,8 +14,11 @@ import recovida.idas.rl.gui.lang.MessageProvider;
 public class ExecutionPanel extends JPanel {
 
     private static final long serialVersionUID = -3897094344632347178L;
+
     private JLabel logWontBeSavedLbl;
+
     private JTabbedPane tabbedPane;
+
     private AtomicInteger tabCounter = new AtomicInteger(0);
 
     public ExecutionPanel() {

@@ -2,6 +2,8 @@ package recovida.idas.rl.gui.ui.window;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.util.LinkedHashMap;
@@ -11,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -18,18 +21,19 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.SwingConstants;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
-import java.awt.Dimension;
-import javax.swing.SwingConstants;
-import java.awt.Component;
-import javax.swing.ImageIcon;
 
 public class BulkCopyColumnInclusionDialogue extends JDialog {
     private static final long serialVersionUID = 1609116129275788504L;
+
     private JPanel rightPanel;
+
     private JPanel leftPanel;
+
     private Map<String, JCheckBox> leftMap = new LinkedHashMap<>();
+
     private Map<String, JCheckBox> rightMap = new LinkedHashMap<>();
 
     @SuppressWarnings("unchecked")

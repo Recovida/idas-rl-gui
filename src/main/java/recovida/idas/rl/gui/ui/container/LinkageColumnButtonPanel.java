@@ -6,17 +6,20 @@ import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
-import javax.swing.ImageIcon;
 
 public class LinkageColumnButtonPanel extends JPanel {
 
-    private static final long serialVersionUID = 3447357352169636148L;
+    private static final long serialVersionUID = 2571741194180359074L;
+
     private JButton addPairBtn;
+
     private JButton deletePairBtn;
+
     private JButton addCopyColsBtn;
 
     public JButton getAddPairBtn() {

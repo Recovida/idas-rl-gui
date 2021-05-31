@@ -15,12 +15,19 @@ import recovida.idas.rl.gui.ui.LanguageComboBox;
 public class MainToolBar extends JToolBar {
 
     protected JButton newFileBtn;
+
     protected JButton openFileBtn;
+
     protected JButton saveFileBtn;
+
     protected JSeparator sep1;
+
     protected JButton undoBtn;
+
     protected JButton redoBtn;
+
     protected JSeparator sep2;
+
     protected JButton runBtn;
 
     public MainToolBar() {
@@ -87,9 +94,13 @@ public class MainToolBar extends JToolBar {
     }
 
     private static final long serialVersionUID = 5509499175879481354L;
+
     private Component horizontalGlue;
+
     private JSeparator separator;
+
     private LanguageComboBox languageCbox;
+
     private JButton cancelBtn;
 
     public JButton getNewFileBtn() {

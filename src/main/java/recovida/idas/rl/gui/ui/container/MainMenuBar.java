@@ -27,28 +27,43 @@ public class MainMenuBar extends JMenuBar {
     private static final long serialVersionUID = -8153106866054489899L;
 
     // File
+
     private JMenu fileMenu;
+
     private JMenuItem newFileMenuItem;
+
     private JMenuItem openFileMenuItem;
+
     private JMenuItem saveFileMenuItem;
+
     private JMenuItem saveAsFileMenuItem;
+
     private JMenuItem exitMenuItem;
 
     // Edit
+
     private JMenu editMenu;
+
     private JMenuItem undoMenuItem;
+
     private JMenuItem redoMenuItem;
 
     // Run
+
     private JMenu runMenu;
+
     private JMenuItem runMenuItem;
 
     // Help
+
     private JMenu helpMenu;
+
     private JMenuItem aboutMenuItem;
 
     // File name
+
     private JLabel currentFileLbl;
+
     private JMenuItem cancelMenuItem;
 
     public MainMenuBar() {

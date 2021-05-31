@@ -11,8 +11,11 @@ import recovida.idas.rl.gui.ui.container.ExecutionInnerPanel;
 public class Execution {
 
     protected ExecutionInnerPanel panel;
+
     protected String configFileName;
+
     protected Main main;
+
     protected boolean alreadyExecuted = false;
 
     public Execution(ExecutionInnerPanel panel, String configFileName) {

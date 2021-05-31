@@ -53,33 +53,47 @@ import recovida.idas.rl.gui.undo.UndoHistory;
 public class ColumnPairManager {
 
     protected UndoHistory history;
+
     protected LinkageColumnButtonPanel buttonPanel;
+
     protected LinkageColumnEditingPanel editingPanel;
+
     protected JTable table;
+
     protected ColumnPairTableModel model;
+
     protected ListSelectionModel selectionModel;
 
     protected String firstRenameSuffix = "";
+
     protected String secondRenameSuffix = "";
 
     public static final int FIRST_NUMBER = 1;
+
     public static final int FIRST_COPY_NUMBER = 201;
 
     protected final AtomicInteger nextNumber = new AtomicInteger(FIRST_NUMBER);
+
     protected final AtomicInteger nextCopyNumber = new AtomicInteger(
             FIRST_COPY_NUMBER);
 
     protected boolean ignoreSelectionEvent = false;
+
     protected boolean ignoreChangeEvent = false;
+
     protected boolean completelyIgnoreChangeEvent = false; // don't even call
                                                            // onChange()
+
     protected Map<String, JComponent> fieldFromKey = new HashMap<>();
 
     protected Collection<String> firstDatasetColumnNames = null;
+
     protected Collection<String> secondDatasetColumnNames = null;
 
     protected List<ColumnPairSelectionListener> selectionListeners = new LinkedList<>();
+
     protected List<ColumnPairInclusionExclusionListener> rowInclusionExclusionListeners = new LinkedList<>();
+
     protected List<ColumnPairValueChangeListener> valueChangeListeners = new LinkedList<>();
 
     public ColumnPairManager(UndoHistory history,

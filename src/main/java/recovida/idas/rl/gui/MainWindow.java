@@ -49,8 +49,8 @@ import recovida.idas.rl.gui.listener.ColumnPairSelectionListener;
 import recovida.idas.rl.gui.listener.ColumnPairValueChangeListener;
 import recovida.idas.rl.gui.listener.SettingItemChangeListener;
 import recovida.idas.rl.gui.pair.ColumnPairManager;
-import recovida.idas.rl.gui.settingitem.NumberSettingItem;
 import recovida.idas.rl.gui.settingitem.AbstractSettingItem;
+import recovida.idas.rl.gui.settingitem.NumberSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItemWithList;
 import recovida.idas.rl.gui.ui.WarningIcon;
@@ -71,32 +71,55 @@ import recovida.idas.rl.gui.undo.UndoHistory;
 public class MainWindow {
 
     /* Non-GUI attributes */
+
     public static final String PROGRAM_NAME = "IDaS-RL";
+
     UndoHistory history = new UndoHistory();
+
     ConfigurationFile cf = new ConfigurationFile();
+
     String currentFileName = null;
+
     boolean dirty = false;
+
     boolean skipValidation = false; // while filling in values read from file
+
     FileChangeWatcher currentFileChangeWatcher = null;
+
     FileChangeWatcher datasetAFileChangeWatcher = null;
+
     FileChangeWatcher datasetBFileChangeWatcher = null;
+
     private ColumnPairManager manager;
+
     ConcurrentMap<String, ConcurrentMap<String, DatasetPeek>> peekFromFileNameAndEncoding = new ConcurrentHashMap<>();
+
     Execution execution = null;
 
     /* GUI components */
+
     private JFrame frame;
+
     private JTable linkageColsTable;
+
     private JTabbedPane tabbedPane;
+
     private DatasetsTabPanel datasetsTabPanel;
+
     private OptionsTabPanel optionsTabPanel;
+
     private LinkageColumnEditingPanel linkageColsEditingPanel;
+
     private LinkageColumnButtonPanel linkageColsButtonPanel;
+
     private ColumnPairTableModel columnPairTableModel;
+
     private JPanel linkageColsTabPanel;
 
     private ExecutionPanel executionTabPanel;
+
     private MainToolBar mainToolBar;
+
     private MainMenuBar menuBar;
 
     /**

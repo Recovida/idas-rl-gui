@@ -7,10 +7,15 @@ import recovida.idas.rl.gui.pair.ColumnPairManager;
 public class EditColumnPairFieldCommand<T> extends AbstractCommand {
 
     private ColumnPairManager manager;
+
     int index = 0;
+
     private T oldValue;
+
     private T newValue;
+
     private boolean skipField;
+
     private String key;
 
     public EditColumnPairFieldCommand(ColumnPairManager manager, int index,

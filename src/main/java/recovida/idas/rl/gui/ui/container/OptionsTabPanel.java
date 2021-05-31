@@ -28,20 +28,35 @@ public class OptionsTabPanel extends JPanel {
     private static final long serialVersionUID = -4785642571939247630L;
 
     // buttons
+
     private JButton linkageDirBtn;
+
     private JButton indexDirBtn;
 
     // labels
+
     private JLabel indexDirLbl;
+
     private JLabel minScoreLbl;
+
     private JLabel maxRowsLbl;
+
     private JLabel linkageDirLbl;
+
     private JLabel threadsLbl;
+
     private JLabel coresLabel;
+
+    // fields
+
     private JSpinnerWithBlankValue threadsField;
+
     private JTextFieldWithPlaceholder linkageDirField;
+
     private JTextFieldWithPlaceholder indexDirField;
+
     private JSpinner minScoreField;
+
     private JSpinner maxRowsField;
 
     public OptionsTabPanel() {

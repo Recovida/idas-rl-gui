@@ -12,12 +12,19 @@ import java.nio.file.WatchService;
 public class FileChangeWatcher {
 
     WatchService watchService;
+
     Path dir;
+
     Path file;
+
     WatchKey registeredKey;
+
     Thread t;
+
     boolean enabled = false;
+
     private Runnable callback;
+
     private boolean stopAfterCallback = false;
 
     public FileChangeWatcher(Path p, Runnable callback,

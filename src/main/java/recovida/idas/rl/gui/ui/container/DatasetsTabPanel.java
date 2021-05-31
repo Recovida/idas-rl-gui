@@ -28,34 +28,54 @@ public class DatasetsTabPanel extends JPanel {
 
     // fields
     private JTextField firstDatasetField;
+
     private JTextField secondDatasetField;
+
     private JComboBoxWithPlaceholder firstEncodingField;
+
     private JComboBoxWithPlaceholder secondEncodingField;
+
     private JTextFieldWithPlaceholder firstDatasetSuffixField;
+
     private JTextFieldWithPlaceholder secondDatasetSuffixField;
+
     private JTextFieldWithPlaceholder firstDatasetRowNumColField;
+
     private JTextFieldWithPlaceholder secondDatasetRowNumColField;
 
     // error icons
     private WarningIcon firstDatasetWarningLbl;
+
     private WarningIcon secondDatasetWarningLbl;
+
     private WarningIcon firstEncodingWarningLbl;
+
     private WarningIcon secondEncodingWarningLbl;
+
     private WarningIcon firstDatasetSuffixWarningLbl;
+
     private WarningIcon secondDatasetSuffixWarningLbl;
+
     private WarningIcon secondDatasetRowNumColWarningLbl;
+
     private WarningIcon firstDatasetRowNumColWarningLbl;
 
     // buttons
     private JButton firstDatasetBtn;
+
     private JButton secondDatasetBtn;
 
     // labels
     private JLabel firstDatasetLabel;
+
     private JLabel secondDatasetLabel;
+
     private JLabel fileNameLbl;
+
     private JLabel encodingLbl;
+
     private JLabel suffixLbl;
+
     private JLabel rowNumColLbl;
 
     public DatasetsTabPanel() {

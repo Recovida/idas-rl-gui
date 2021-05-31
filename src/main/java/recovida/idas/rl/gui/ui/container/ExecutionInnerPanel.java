@@ -49,11 +49,17 @@ import recovida.idas.rl.gui.lang.MessageProvider;
 
 public class ExecutionInnerPanel extends JPanel implements StatusLogger {
     private static final long serialVersionUID = -1501370560575937471L;
+
     private JTable table;
+
     private JButton copyLogBtn;
+
     private JButton saveLogBtn;
+
     private DefaultTableModel model;
+
     private JProgressBar progressBar;
+
     private JButton openDirBtn;
 
     protected enum LogExportStatus {
@@ -61,6 +67,7 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
     }
 
     private LogExportStatus logCopyingStatus = LogExportStatus.NONE;
+
     private LogExportStatus logSavingStatus = LogExportStatus.NONE;
 
     public ExecutionInnerPanel() {

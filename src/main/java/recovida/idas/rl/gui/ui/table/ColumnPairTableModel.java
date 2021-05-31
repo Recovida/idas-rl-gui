@@ -23,13 +23,17 @@ public class ColumnPairTableModel extends DefaultTableModel {
 
     private final String[] keys = { "number", "type", "weight", "phon_weight",
             "index_a", "rename_a", "index_b", "rename_b" };
+
     private final Class<?>[] types = { Integer.class, String.class,
             Double.class, Double.class, String.class, String.class,
             String.class, String.class };
+
     private Map<String, Integer> indexFromKey = new HashMap<>();
+
     protected Map<Integer, Collection<Integer>> numberToColIdx = new HashMap<>();
 
     protected Collection<String> firstDatasetColumnNames = null;
+
     protected Collection<String> secondDatasetColumnNames = null;
 
     protected Vector<boolean[]> valid = new Vector<>();

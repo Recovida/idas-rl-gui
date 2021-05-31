@@ -35,13 +35,17 @@ public abstract class AbstractSettingItem<V, F extends JComponent> {
     }
 
     protected V currentValue;
+
     protected V defaultValue;
+
     protected F guiComponent;
+
     protected List<SettingItemChangeListener> listeners;
+
     protected UndoHistory history;
 
-    public AbstractSettingItem(UndoHistory history, V currentValue, V defaultValue,
-            F guiComponent) {
+    public AbstractSettingItem(UndoHistory history, V currentValue,
+            V defaultValue, F guiComponent) {
         this.currentValue = currentValue;
         this.guiComponent = guiComponent;
         this.defaultValue = defaultValue;
@@ -49,8 +53,9 @@ public abstract class AbstractSettingItem<V, F extends JComponent> {
         this.listeners = new LinkedList<>();
     }
 
-    public AbstractSettingItem(UndoHistory history, V currentValue, V defaultValue,
-            F guiComponent, SettingItemChangeListener listener) {
+    public AbstractSettingItem(UndoHistory history, V currentValue,
+            V defaultValue, F guiComponent,
+            SettingItemChangeListener listener) {
         this(history, currentValue, defaultValue, guiComponent);
         this.listeners.add(listener);
     }

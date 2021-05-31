@@ -24,9 +24,13 @@ public class DatasetPeek {
     }
 
     private Path directory;
+
     private String fileName;
+
     private String encoding;
+
     Set<String> columnNames;
+
     DatasetPeekResult result = null;
 
     public DatasetPeek(Path directory, String fileName, String encoding) {

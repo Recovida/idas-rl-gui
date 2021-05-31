@@ -47,11 +47,14 @@ public class ConfigurationFile {
     }
 
     Map<String, AbstractSettingItem> settingItems;
+
     ColumnPairManager pairManager;
 
     public static final int MAX_NUMBER = 999;
+
     protected static final String[] COL_KEYS = { "type", "index_a", "index_b",
             "rename_a", "rename_b", "weight", "phon_weight" };
+
     protected static final Pattern COL_KEY_PATTERN = Pattern
             .compile("^[0-9]+_(" + String.join("|", COL_KEYS) + ")$");
 

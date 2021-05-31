@@ -17,7 +17,9 @@ import javax.swing.SwingUtilities;
 public class JComboBoxSuggestionProvider {
 
     private JComboBox<String> field;
+
     private JPopupMenu menu;
+
     private int limit = 20;
 
     static final Pattern ALPHANUMERIC = Pattern.compile("[^A-Za-z0-9]");

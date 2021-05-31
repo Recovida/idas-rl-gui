@@ -18,6 +18,7 @@ public class WarningIcon extends JLabel {
     private boolean ready = false;
 
     public static final Icon ICON = UIManager.getIcon("OptionPane.errorIcon");
+
     public static final BufferedImage BUFFERED_IMAGE = new BufferedImage(
             ICON.getIconWidth(), ICON.getIconHeight(),
             BufferedImage.TYPE_INT_ARGB);

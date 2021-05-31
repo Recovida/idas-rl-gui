@@ -18,6 +18,7 @@ public class MessageProvider {
 
     protected static Locale currentLocale = Locale
             .forLanguageTag(DEFAULT_LANGUAGE);
+
     protected static ResourceBundle bundle = createBundle(currentLocale);
 
     public static void setLocale(Locale locale) {

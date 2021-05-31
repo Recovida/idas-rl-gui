@@ -34,18 +34,31 @@ public class LinkageColumnEditingPanel extends JPanel {
             "gender", "numerical_id", "categorical" };
 
     private JTextFieldWithPlaceholder firstRenameField;
+
     private JTextFieldWithPlaceholder secondRenameField;
+
     private final Component rightHorizontalGlue = Box.createHorizontalGlue();
+
     private JSpinnerWithBlankValue weightField;
+
     private JSpinnerWithBlankValue phonWeightField;
+
     private JComboBox<String> typeField;
+
     private JComboBox<String> firstNameField;
+
     private JSpinner numberField;
+
     private JComboBox<String> secondNameField;
+
     private WarningIcon weightWarningLbl;
+
     private WarningIcon typeWarningLbl;
+
     private WarningIcon secondNameWarningLbl;
+
     private WarningIcon numberWarningLbl;
+
     private WarningIcon firstNameWarningLbl;
 
     private JLabel phonWeightLbl;
