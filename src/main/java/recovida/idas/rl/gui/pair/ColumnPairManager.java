@@ -475,8 +475,9 @@ public class ColumnPairManager {
         SwingUtilities.invokeLater(() -> {
             if (!skipField) {
                 ignoreChangeEvent = true;
-                if (table.getSelectedRow() != rowIndex)
-                    table.setRowSelectionInterval(rowIndex, rowIndex);
+                int viewIndex = table.convertRowIndexToView(rowIndex);
+                if (table.getSelectedRow() != viewIndex)
+                    table.setRowSelectionInterval(viewIndex, viewIndex);
                 JComponent field = fieldFromKey.get(key);
                 if (field instanceof JTextField) {
                     ((JTextField) field).setText((String) newValue);
