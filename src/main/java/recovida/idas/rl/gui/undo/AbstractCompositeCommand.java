@@ -6,8 +6,8 @@ import java.util.ListIterator;
 /**
  * This abstract class is a skeleton for composite commands, which are
  * successions of commands. Currently, the only unimplemented method is
- * <code>getSummary()</code>, which is a method (not a method argument) because
- * it has to be changed according to the current language.
+ * {@link #getSummary()}, which is a method (not a method argument) because it
+ * has to be changed according to the current language.
  */
 public abstract class AbstractCompositeCommand extends AbstractCommand {
 

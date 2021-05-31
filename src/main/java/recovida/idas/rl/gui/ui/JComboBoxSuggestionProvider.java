@@ -14,6 +14,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+/**
+ * Provides suggestions to a {@link JComboBox} as a pop-up menu.
+ */
 public class JComboBoxSuggestionProvider {
 
     private JComboBox<String> field;
@@ -24,6 +27,11 @@ public class JComboBoxSuggestionProvider {
 
     static final Pattern ALPHANUMERIC = Pattern.compile("[^A-Za-z0-9]");
 
+    /**
+     * Creates an instance.
+     *
+     * @param field the field to receive the suggestions
+     */
     public JComboBoxSuggestionProvider(JComboBox<String> field) {
         this.field = field;
         this.menu = new JPopupMenu();

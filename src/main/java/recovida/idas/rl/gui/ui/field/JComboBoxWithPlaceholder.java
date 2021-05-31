@@ -7,6 +7,9 @@ import javax.swing.BorderFactory;
 import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
 
+/**
+ * An editable {@link JComboBox} that shows a placeholder when empty.
+ */
 public class JComboBoxWithPlaceholder extends JComboBox<String>
         implements FieldWithPlaceholder {
 
@@ -14,10 +17,16 @@ public class JComboBoxWithPlaceholder extends JComboBox<String>
 
     protected String placeholder = "";
 
+    /**
+     * A custom editor for the combobox.
+     */
     public class ComboBoxEditorWithPlaceholder implements ComboBoxEditor {
 
         private JTextFieldWithPlaceholder component;
 
+        /**
+         * Creates an instance.
+         */
         public ComboBoxEditorWithPlaceholder() {
             component = new JTextFieldWithPlaceholder();
             component.setVerticalPlaceholderOffset(3);
@@ -59,9 +68,13 @@ public class JComboBoxWithPlaceholder extends JComboBox<String>
 
     }
 
+    /**
+     * Creates an instance of the combobox.
+     */
     public JComboBoxWithPlaceholder() {
         super();
         setEditor(new ComboBoxEditorWithPlaceholder());
+        setEditable(true);
     }
 
     @Override

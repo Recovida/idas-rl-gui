@@ -12,6 +12,9 @@ import javax.swing.SwingConstants;
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.Translatable;
 
+/**
+ * A panel to show the execution result to the user.
+ */
 public class ExecutionPanel extends JPanel implements Translatable {
 
     private static final long serialVersionUID = -3897094344632347178L;
@@ -22,6 +25,9 @@ public class ExecutionPanel extends JPanel implements Translatable {
 
     private AtomicInteger tabCounter = new AtomicInteger(0);
 
+    /**
+     * Creates an instance of the panel.
+     */
     public ExecutionPanel() {
 
         setLayout(new BorderLayout(0, 0));
@@ -35,6 +41,11 @@ public class ExecutionPanel extends JPanel implements Translatable {
 
     }
 
+    /**
+     * Creates and adds an execution panel, for a new execution.
+     *
+     * @return the created execution panel
+     */
     public ExecutionInnerPanel addExecutionPanel() {
         ExecutionInnerPanel p = new ExecutionInnerPanel();
         p.updateLocalisedStrings();
@@ -56,6 +67,9 @@ public class ExecutionPanel extends JPanel implements Translatable {
         }
     }
 
+    /**
+     * Removes the inner panels.
+     */
     public void clear() {
         tabbedPane.removeAll();
         tabCounter.set(0);

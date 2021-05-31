@@ -13,8 +13,13 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
+import recovida.idas.rl.gui.ui.Translatable;
 
-public class JSpinnerWithBlankValue extends JSpinner {
+/**
+ * A {@link JSpinner} that shows no text for a specific value. It is designed to
+ * work only with decimal (integer/float/double) values.
+ */
+public class JSpinnerWithBlankValue extends JSpinner implements Translatable {
 
     private static final long serialVersionUID = -2440181440569958718L;
 
@@ -28,14 +33,25 @@ public class JSpinnerWithBlankValue extends JSpinner {
 
     private NumberFormatter numberFormatter;
 
+    /**
+     * Creates an instance of the spinner.
+     *
+     * @param model                the spinner model
+     * @param decimalFormatPattern the display pattern
+     * @see DecimalFormat
+     */
     public JSpinnerWithBlankValue(SpinnerModel model,
             String decimalFormatPattern) {
         super(model);
         this.decimalFormatPattern = decimalFormatPattern;
-        refreshLocaleFormat();
+        updateLocalisedStrings();
         setEditor(getEditor());
     }
 
+    /**
+     * Custom number formatter based on {@link JSpinner}'s
+     * <code>NumberEditorFormatter</code>.
+     */
     private class CustomFormatter extends NumberFormatter {
 
         // Based on "NumberEditorFormatter"
@@ -85,7 +101,8 @@ public class JSpinnerWithBlankValue extends JSpinner {
         }
     }
 
-    public void refreshLocaleFormat() {
+    @Override
+    public void updateLocalisedStrings() {
         numberFormat = NumberFormat.getInstance(MessageProvider.getLocale());
         if (numberFormat instanceof DecimalFormat)
             ((DecimalFormat) numberFormat).applyPattern(decimalFormatPattern);

@@ -8,7 +8,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
-import recovida.idas.rl.gui.ui.WarningIcon;
+import recovida.idas.rl.gui.ui.ErrorIconLabel;
 import recovida.idas.rl.gui.ui.table.ColumnPairTable;
 import recovida.idas.rl.gui.ui.table.ColumnPairTableModel;
 
@@ -46,7 +46,7 @@ public abstract class AbstractColumnPairCellRenderer extends JLabel
     }
 
     protected void showErrorIcon(JTable table, JLabel c) {
-        WarningIcon.applyIconToLabel(c, table.getRowHeight() * 4 / 5);
+        ErrorIconLabel.applyIconToLabel(c, table.getRowHeight() * 4 / 5);
     }
 
     protected void showErrorIcon(JTable table, Component c) {

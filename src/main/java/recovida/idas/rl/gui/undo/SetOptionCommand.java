@@ -28,9 +28,9 @@ public class SetOptionCommand<T> extends AbstractCommand {
      * @param settingItem the corresponding setting item
      * @param oldValue    value of the field prior to the change
      * @param newValue    value of the field after the change
-     * @param skipFirst   whether the first <code>redo()</code> call should have
-     *                    no effect (this is useful to avoid an infinite loop
-     *                    when the change was already made by the user)
+     * @param skipFirst   whether the first {@link #redo()} call should have no
+     *                    effect (this is useful to avoid an infinite loop when
+     *                    the change was already made by the user)
      */
     @SuppressWarnings("unchecked")
     public SetOptionCommand(AbstractSettingItem<T, ?> settingItem, T oldValue,

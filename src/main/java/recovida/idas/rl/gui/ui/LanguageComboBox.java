@@ -9,10 +9,18 @@ import javax.swing.JList;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
 
+/**
+ * A {@link JComboBox} filled with the supported languages.
+ *
+ * @see MessageProvider
+ */
 public class LanguageComboBox extends JComboBox<Locale> {
 
     private static final long serialVersionUID = -3549865108104546786L;
 
+    /**
+     * Creates an instance of the combo box.
+     */
     public LanguageComboBox() {
         setRenderer(new DefaultListCellRenderer() {
 

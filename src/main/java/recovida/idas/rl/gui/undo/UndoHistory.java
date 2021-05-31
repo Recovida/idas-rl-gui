@@ -12,8 +12,8 @@ import java.util.Objects;
 public class UndoHistory {
 
     /**
-     * Exception that is thrown after an attempt to <code>undo</code> or
-     * <code>redo</code> when such action is not available.
+     * Exception that is thrown after an attempt to {@link UndoHistory#undo()}
+     * or {@link UndoHistory#redo()} when such action is not available.
      */
     public static class UndoException extends RuntimeException {
 
@@ -39,7 +39,7 @@ public class UndoHistory {
          * Builds a snapshot of the current state.
          *
          * @param history the history
-         * @return a snapshot of <code>history</code>
+         * @return a snapshot of the history
          */
         public static HistoryPropertyState get(UndoHistory history) {
             HistoryPropertyState s = new HistoryPropertyState();
@@ -97,8 +97,7 @@ public class UndoHistory {
     /**
      * Checks whether an undo action is possible.
      *
-     * @return <code>true</code> if and only if <code>undo()</code> can be
-     *         called
+     * @return <code>true</code> if and only if {@link #undo()} can be called
      */
     public boolean canUndo() {
         return commandListIterator.hasPrevious();
@@ -107,7 +106,7 @@ public class UndoHistory {
     /**
      * Checks whether a redo action is possible.
      *
-     * @return <code>true</code> if and only if <code>reo()</code> can be called
+     * @return <code>true</code> if and only if {@link #redo()} can be called
      */
     public boolean canRedo() {
         return commandListIterator.hasNext();

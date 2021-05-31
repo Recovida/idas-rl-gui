@@ -20,10 +20,13 @@ import javax.swing.SwingConstants;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.Translatable;
-import recovida.idas.rl.gui.ui.WarningIcon;
+import recovida.idas.rl.gui.ui.ErrorIconLabel;
 import recovida.idas.rl.gui.ui.field.JSpinnerWithBlankValue;
 import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
 
+/**
+ * A panel to let the user edit some linkage options.
+ */
 public class OptionsTabPanel extends JPanel implements Translatable {
 
     private static final long serialVersionUID = -4785642571939247630L;
@@ -60,6 +63,9 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
     private JSpinner maxRowsField;
 
+    /**
+     * Creates an instance of the panel.
+     */
     public OptionsTabPanel() {
 
         // layout
@@ -103,7 +109,8 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         linkageDirContainer.setLayout(
                 new BoxLayout(linkageDirContainer, BoxLayout.X_AXIS));
 
-        JLabel linkageDirWarningLbl = new WarningIcon();
+        JLabel linkageDirWarningLbl = new ErrorIconLabel();
+        linkageDirWarningLbl.setVisible(false);
         linkageDirContainer.add(linkageDirWarningLbl);
 
         linkageDirField = new JTextFieldWithPlaceholder();
@@ -135,8 +142,9 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         indexDirContainer
                 .setLayout(new BoxLayout(indexDirContainer, BoxLayout.X_AXIS));
 
-        JLabel indexDirWarningLbl = new WarningIcon();
+        JLabel indexDirWarningLbl = new ErrorIconLabel();
         indexDirContainer.add(indexDirWarningLbl);
+        indexDirWarningLbl.setVisible(false);
 
         indexDirField = new JTextFieldWithPlaceholder();
         indexDirField.setHorizontalAlignment(SwingConstants.TRAILING);

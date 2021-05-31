@@ -8,12 +8,28 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+/**
+ * A class that deals with i18n and provides translated messages.
+ */
 public class MessageProvider {
 
+    /**
+     * List of supported language tags.
+     */
     public static final List<String> SUPPORTED_LANGUAGES = Collections
-            .unmodifiableList(
-                    Arrays.asList(new String[] { "en", "es", "pt-BR" }));
+            .unmodifiableList(Arrays.asList(new String[] { // currently:
+                    "en", // English
+                    "es", // Spanish
+                    "pt-BR" // Brazilian Portuguese
+            }));
 
+    /**
+     * The language tag of the system language, if present
+     * {@link #SUPPORTED_LANGUAGES}; or the some language tag in
+     * {@link #SUPPORTED_LANGUAGES} that matches the system language (even if
+     * the country does not match), if available; or English ("en"), as a
+     * fallback.
+     */
     public static final String DEFAULT_LANGUAGE = getBestLanguage();
 
     protected static Locale currentLocale = Locale

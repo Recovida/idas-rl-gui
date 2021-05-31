@@ -16,11 +16,47 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This class provides methods to "peek" into dataset files and read their
+ * column names.
+ */
 public class DatasetPeek {
 
+    /**
+     * Represents a result of the "peek".
+     */
     public enum DatasetPeekResult {
-        BLANK_NAME, FILE_NOT_FOUND, UNSUPPORTED_FORMAT, IO_ERROR,
-        UNSUPPORTED_CONTENTS, SUCCESS
+
+        /**
+         * File name is blank.
+         */
+        BLANK_NAME,
+
+        /**
+         * File does not exist.
+         */
+        FILE_NOT_FOUND,
+
+        /**
+         * Format is not supported.
+         */
+        UNSUPPORTED_FORMAT,
+
+        /**
+         * Error when reading.
+         */
+        IO_ERROR,
+
+        /**
+         * Contents are not supported. Possibly the specified encoding is
+         * incorrect, or the file contents don't correspond to its extension.
+         */
+        UNSUPPORTED_CONTENTS,
+
+        /**
+         * Column names read successfully.
+         */
+        SUCCESS
     }
 
     private Path directory;
@@ -33,6 +69,13 @@ public class DatasetPeek {
 
     DatasetPeekResult result = null;
 
+    /**
+     * Creates an instance.
+     *
+     * @param directory directory where the file is saved
+     * @param fileName  name of the file (without the path)
+     * @param encoding  the encoding of the file
+     */
     public DatasetPeek(Path directory, String fileName, String encoding) {
         this.fileName = fileName;
         this.directory = directory;
@@ -43,6 +86,11 @@ public class DatasetPeek {
         this.columnNames = null;
     }
 
+    /**
+     * Tries to read column names from the dataset.
+     *
+     * @return the result of the operation
+     */
     public DatasetPeekResult peek() {
         result = peek0();
         return result;
@@ -69,10 +117,16 @@ public class DatasetPeek {
         return DatasetPeekResult.UNSUPPORTED_FORMAT;
     }
 
+    /**
+     * Character categories in a CSV file.
+     */
     private enum CsvChar {
         QUOTE, COMMA, NEWLINE, OTHER
     }
 
+    /**
+     * Parsing state.
+     */
     private enum CsvLineParseState {
         START, UNQUOTED_FIELD, QUOTED_FIELD, POST_QUOTED_FIELD, FINAL
     }

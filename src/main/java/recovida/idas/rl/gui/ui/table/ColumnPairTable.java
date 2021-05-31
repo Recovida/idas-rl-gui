@@ -17,12 +17,21 @@ import recovida.idas.rl.gui.ui.table.cellrendering.RenameColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.table.cellrendering.TypeColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.table.cellrendering.WeightColumnPairCellRenderer;
 
+/**
+ * A specific implementation of {@link JTable} to represent dataset column
+ * pairs.
+ */
 public class ColumnPairTable extends JTable {
 
     private static final long serialVersionUID = -7568545759297132632L;
 
     protected ColumnPairTableModel model;
 
+    /**
+     * Creates an instance with a given model.
+     *
+     * @param model the table model
+     */
     public ColumnPairTable(ColumnPairTableModel model) {
         super(model);
         this.model = model;

@@ -33,10 +33,10 @@ public class EditColumnPairFieldCommand<T> extends AbstractCommand {
      * @param key                  the key of the field
      * @param oldValue             value prior to the change
      * @param newValue             value after the change
-     * @param skipFieldOnFirstTime whether the first <code>redo()</code> call
-     *                             should have no effect (this is useful to
-     *                             avoid an infinite loop when the change was
-     *                             already made by the user)
+     * @param skipFieldOnFirstTime whether the first {@link #redo()} call should
+     *                             have no effect (this is useful to avoid an
+     *                             infinite loop when the change was already
+     *                             made by the user)
      */
     public EditColumnPairFieldCommand(ColumnPairManager manager, int index,
             String key, T oldValue, T newValue, boolean skipFieldOnFirstTime) {

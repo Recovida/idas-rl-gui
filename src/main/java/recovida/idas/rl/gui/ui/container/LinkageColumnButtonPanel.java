@@ -12,7 +12,11 @@ import javax.swing.JPanel;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.Translatable;
+import recovida.idas.rl.gui.ui.table.ColumnPairTable;
 
+/**
+ * A panel with action buttons above a {@link ColumnPairTable}.
+ */
 public class LinkageColumnButtonPanel extends JPanel implements Translatable {
 
     private static final long serialVersionUID = 2571741194180359074L;
@@ -35,6 +39,9 @@ public class LinkageColumnButtonPanel extends JPanel implements Translatable {
         return addCopyColsBtn;
     }
 
+    /**
+     * Creates an instance of the panel.
+     */
     public LinkageColumnButtonPanel() {
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));

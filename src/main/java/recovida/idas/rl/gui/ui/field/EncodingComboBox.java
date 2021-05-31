@@ -6,14 +6,22 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * A {@link JComboBoxWithPlaceholder} filled with the supported encodings
+ * (including "ANSI", an unofficial alias for "Cp1252"), and showing "UTF-8" as
+ * a default value when blank.
+ */
 public class EncodingComboBox extends JComboBoxWithPlaceholder {
 
     private static final long serialVersionUID = 4839916568723114826L;
 
+    /**
+     * Creates an instance.
+     */
     public EncodingComboBox() {
         fillEncodings();
     }

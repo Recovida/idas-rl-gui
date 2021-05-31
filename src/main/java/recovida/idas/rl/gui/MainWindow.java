@@ -54,7 +54,7 @@ import recovida.idas.rl.gui.settingitem.NumberSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItemWithList;
 import recovida.idas.rl.gui.ui.Translatable;
-import recovida.idas.rl.gui.ui.WarningIcon;
+import recovida.idas.rl.gui.ui.ErrorIconLabel;
 import recovida.idas.rl.gui.ui.container.DatasetsTabPanel;
 import recovida.idas.rl.gui.ui.container.ExecutionPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnButtonPanel;
@@ -130,7 +130,11 @@ public class MainWindow implements Translatable {
     private MainMenuBar menuBar;
 
     /**
-     * Launch the application.
+     * Launches the application. If exactly one argument is provided and it is
+     * the name of an existing configuration file, then it is automatically
+     * opened.
+     *
+     * @param args command-line arguments
      */
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -148,6 +152,8 @@ public class MainWindow implements Translatable {
     /**
      * Creates and shows the main window, without opening any configuration
      * files.
+     *
+     * @wbp.parser.entryPoint
      */
     public MainWindow() {
         this(null);
@@ -168,7 +174,7 @@ public class MainWindow implements Translatable {
             }
         } catch (Exception e) {
         }
-        initialize();
+        init();
 
         // Tab: DATASETS
         SettingItemChangeListener datasetsTabEventListenerTop = o -> {
@@ -356,8 +362,8 @@ public class MainWindow implements Translatable {
     }
 
     protected Icon getTabErrorIcon() {
-        return new ImageIcon(WarningIcon.BUFFERED_IMAGE.getScaledInstance(15,
-                15, Image.SCALE_SMOOTH));
+        return new ImageIcon(ErrorIconLabel.BUFFERED_IMAGE
+                .getScaledInstance(15, 15, Image.SCALE_SMOOTH));
     }
 
     protected synchronized int validateDatasetsTabTopPart() {
@@ -886,9 +892,9 @@ public class MainWindow implements Translatable {
     }
 
     /**
-     * Initialize the contents of the frame.
+     * Initialise the contents of the frame.
      */
-    private void initialize() {
+    private void init() {
         frame = new JFrame();
         frame.setPreferredSize(new Dimension(900, 500));
         frame.setMinimumSize(new Dimension(900, 400));

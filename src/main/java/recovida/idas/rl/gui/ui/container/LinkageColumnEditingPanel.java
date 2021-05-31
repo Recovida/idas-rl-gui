@@ -23,10 +23,15 @@ import javax.swing.SwingConstants;
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.JComboBoxSuggestionProvider;
 import recovida.idas.rl.gui.ui.Translatable;
-import recovida.idas.rl.gui.ui.WarningIcon;
+import recovida.idas.rl.gui.ui.ErrorIconLabel;
 import recovida.idas.rl.gui.ui.field.JSpinnerWithBlankValue;
 import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
+import recovida.idas.rl.gui.ui.table.ColumnPairTable;
 
+/**
+ * A panel to let the user edit the column pair fields in a
+ * {@link ColumnPairTable} (outside the table).
+ */
 public class LinkageColumnEditingPanel extends JPanel implements Translatable {
 
     private static final long serialVersionUID = 1L;
@@ -52,21 +57,21 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
 
     private JComboBox<String> secondNameField;
 
-    private WarningIcon weightWarningLbl;
+    private ErrorIconLabel weightWarningLbl;
 
-    private WarningIcon typeWarningLbl;
+    private ErrorIconLabel typeWarningLbl;
 
-    private WarningIcon secondNameWarningLbl;
+    private ErrorIconLabel secondNameWarningLbl;
 
-    private WarningIcon numberWarningLbl;
+    private ErrorIconLabel numberWarningLbl;
 
-    private WarningIcon firstNameWarningLbl;
+    private ErrorIconLabel firstNameWarningLbl;
 
     private JLabel phonWeightLbl;
 
     private JLabel weightLbl;
 
-    private WarningIcon phonWeightWarningLbl;
+    private ErrorIconLabel phonWeightWarningLbl;
 
     private JLabel typeLbl;
 
@@ -112,6 +117,9 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         return secondNameField;
     }
 
+    /**
+     * Creates an instance of the panel.
+     */
     public LinkageColumnEditingPanel() {
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -175,7 +183,7 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         firstNameField.setEditable(true);
         new JComboBoxSuggestionProvider(firstNameField);
 
-        firstNameWarningLbl = new WarningIcon();
+        firstNameWarningLbl = new ErrorIconLabel();
         GridBagConstraints firstNameWarningLblGBC = new GridBagConstraints();
         firstNameWarningLblGBC.anchor = GridBagConstraints.WEST;
         firstNameWarningLblGBC.insets = new Insets(0, 0, 5, 5);
@@ -218,7 +226,8 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
                 .setBlankValue(Integer.valueOf(-1));
         numberField.setPreferredSize(new Dimension(40, 30));
 
-        numberWarningLbl = new WarningIcon();
+        numberWarningLbl = new ErrorIconLabel();
+        numberWarningLbl.setVisible(false);
         GridBagConstraints numberWarningLblGBC = new GridBagConstraints();
         numberWarningLblGBC.anchor = GridBagConstraints.WEST;
         numberWarningLblGBC.insets = new Insets(0, 0, 5, 5);
@@ -253,7 +262,7 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         secondNameField.setEditable(true);
         new JComboBoxSuggestionProvider(secondNameField);
 
-        secondNameWarningLbl = new WarningIcon();
+        secondNameWarningLbl = new ErrorIconLabel();
         GridBagConstraints secondNameWarningLblGBC = new GridBagConstraints();
         secondNameWarningLblGBC.anchor = GridBagConstraints.WEST;
         secondNameWarningLblGBC.insets = new Insets(0, 0, 5, 5);
@@ -341,7 +350,8 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
 
         Double zero = 0.0;
 
-        typeWarningLbl = new WarningIcon();
+        typeWarningLbl = new ErrorIconLabel();
+        typeWarningLbl.setVisible(false);
         GridBagConstraints typeWarningLblGBC = new GridBagConstraints();
         typeWarningLblGBC.anchor = GridBagConstraints.WEST;
         typeWarningLblGBC.insets = new Insets(0, 0, 5, 5);
@@ -366,7 +376,8 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         weightField.setPreferredSize(new Dimension(65, 30));
         weightField.setMinimumSize(new Dimension(50, 30));
 
-        weightWarningLbl = new WarningIcon();
+        weightWarningLbl = new ErrorIconLabel();
+        weightWarningLbl.setVisible(false);
         GridBagConstraints weightWarningLblGBC = new GridBagConstraints();
         weightWarningLblGBC.anchor = GridBagConstraints.WEST;
         weightWarningLblGBC.insets = new Insets(0, 0, 5, 5);
@@ -392,7 +403,8 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         phonWeightField.setPreferredSize(new Dimension(65, 30));
         phonWeightField.setMinimumSize(new Dimension(50, 30));
 
-        phonWeightWarningLbl = new WarningIcon();
+        phonWeightWarningLbl = new ErrorIconLabel();
+        phonWeightWarningLbl.setVisible(false);
         GridBagConstraints phonWeightWarningLblGBC = new GridBagConstraints();
         phonWeightWarningLblGBC.anchor = GridBagConstraints.WEST;
         phonWeightWarningLblGBC.insets = new Insets(0, 0, 5, 5);
@@ -434,27 +446,27 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         }
     }
 
-    public WarningIcon getPhonWeightWarningLbl() {
+    public ErrorIconLabel getPhonWeightWarningLbl() {
         return phonWeightWarningLbl;
     }
 
-    public WarningIcon getWeightWarningLbl() {
+    public ErrorIconLabel getWeightWarningLbl() {
         return weightWarningLbl;
     }
 
-    public WarningIcon getTypeWarningLbl() {
+    public ErrorIconLabel getTypeWarningLbl() {
         return typeWarningLbl;
     }
 
-    public WarningIcon getSecondNameWarningLbl() {
+    public ErrorIconLabel getSecondNameWarningLbl() {
         return secondNameWarningLbl;
     }
 
-    public WarningIcon getNumberWarningLbl() {
+    public ErrorIconLabel getNumberWarningLbl() {
         return numberWarningLbl;
     }
 
-    public WarningIcon getFirstNameWarningLbl() {
+    public ErrorIconLabel getFirstNameWarningLbl() {
         return firstNameWarningLbl;
     }
 
@@ -485,8 +497,8 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         weightLbl.setText(MessageProvider.getMessage("columns.editing.weight"));
         phonWeightLbl.setText(
                 MessageProvider.getMessage("columns.editing.phonweight"));
-        weightField.refreshLocaleFormat();
-        phonWeightField.refreshLocaleFormat();
+        weightField.updateLocalisedStrings();
+        phonWeightField.updateLocalisedStrings();
     }
 
 }

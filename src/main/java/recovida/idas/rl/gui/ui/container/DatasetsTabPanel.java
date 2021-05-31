@@ -18,11 +18,14 @@ import javax.swing.SwingConstants;
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.JComboBoxSuggestionProvider;
 import recovida.idas.rl.gui.ui.Translatable;
-import recovida.idas.rl.gui.ui.WarningIcon;
+import recovida.idas.rl.gui.ui.ErrorIconLabel;
 import recovida.idas.rl.gui.ui.field.EncodingComboBox;
 import recovida.idas.rl.gui.ui.field.JComboBoxWithPlaceholder;
 import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
 
+/**
+ * A panel to let the user enter information about the datasets.
+ */
 public class DatasetsTabPanel extends JPanel implements Translatable {
 
     private static final long serialVersionUID = -2753754491877596410L;
@@ -45,21 +48,21 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
     private JTextFieldWithPlaceholder secondDatasetRowNumColField;
 
     // error icons
-    private WarningIcon firstDatasetWarningLbl;
+    private ErrorIconLabel firstDatasetWarningLbl;
 
-    private WarningIcon secondDatasetWarningLbl;
+    private ErrorIconLabel secondDatasetWarningLbl;
 
-    private WarningIcon firstEncodingWarningLbl;
+    private ErrorIconLabel firstEncodingWarningLbl;
 
-    private WarningIcon secondEncodingWarningLbl;
+    private ErrorIconLabel secondEncodingWarningLbl;
 
-    private WarningIcon firstDatasetSuffixWarningLbl;
+    private ErrorIconLabel firstDatasetSuffixWarningLbl;
 
-    private WarningIcon secondDatasetSuffixWarningLbl;
+    private ErrorIconLabel secondDatasetSuffixWarningLbl;
 
-    private WarningIcon secondDatasetRowNumColWarningLbl;
+    private ErrorIconLabel secondDatasetRowNumColWarningLbl;
 
-    private WarningIcon firstDatasetRowNumColWarningLbl;
+    private ErrorIconLabel firstDatasetRowNumColWarningLbl;
 
     // buttons
     private JButton firstDatasetBtn;
@@ -79,6 +82,9 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
 
     private JLabel rowNumColLbl;
 
+    /**
+     * Creates an instance of the panel.
+     */
     public DatasetsTabPanel() {
 
         // layout
@@ -147,7 +153,7 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
 
         // file name (A)
 
-        firstDatasetWarningLbl = new WarningIcon();
+        firstDatasetWarningLbl = new ErrorIconLabel();
         GridBagConstraints firstDatasetWarningLblGBC = new GridBagConstraints();
         firstDatasetWarningLblGBC.anchor = GridBagConstraints.EAST;
         firstDatasetWarningLblGBC.insets = new Insets(0, 0, 5, 5);
@@ -193,7 +199,7 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
         secondDatasetContainer.add(secondDatasetField);
         secondDatasetField.setColumns(10);
 
-        secondDatasetWarningLbl = new WarningIcon();
+        secondDatasetWarningLbl = new ErrorIconLabel();
         GridBagConstraints secondDatasetWarningLblGBC = new GridBagConstraints();
         secondDatasetWarningLblGBC.anchor = GridBagConstraints.WEST;
         secondDatasetWarningLblGBC.insets = new Insets(0, 0, 5, 0);
@@ -212,7 +218,7 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
 
         // encoding (A)
 
-        firstEncodingWarningLbl = new WarningIcon();
+        firstEncodingWarningLbl = new ErrorIconLabel();
         GridBagConstraints firstEncodingWarningLblGBC = new GridBagConstraints();
         firstEncodingWarningLblGBC.anchor = GridBagConstraints.EAST;
         firstEncodingWarningLblGBC.insets = new Insets(0, 0, 5, 5);
@@ -231,7 +237,6 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
                 new BoxLayout(firstEncodingContainer, BoxLayout.X_AXIS));
 
         firstEncodingField = new EncodingComboBox();
-        firstEncodingField.setEditable(true);
         new JComboBoxSuggestionProvider(firstEncodingField);
         firstEncodingContainer.add(firstEncodingField);
 
@@ -248,11 +253,10 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
                 new BoxLayout(secondEncodingContainer, BoxLayout.X_AXIS));
 
         secondEncodingField = new EncodingComboBox();
-        secondEncodingField.setEditable(true);
         new JComboBoxSuggestionProvider(secondEncodingField);
         secondEncodingContainer.add(secondEncodingField);
 
-        secondEncodingWarningLbl = new WarningIcon();
+        secondEncodingWarningLbl = new ErrorIconLabel();
         GridBagConstraints secondEncodingWarningLblGBC = new GridBagConstraints();
         secondEncodingWarningLblGBC.anchor = GridBagConstraints.WEST;
         secondEncodingWarningLblGBC.insets = new Insets(0, 0, 5, 0);
@@ -271,7 +275,7 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
 
         // suffix (A)
 
-        firstDatasetSuffixWarningLbl = new WarningIcon();
+        firstDatasetSuffixWarningLbl = new ErrorIconLabel();
         GridBagConstraints firstDatasetSuffixWarningLblGBC = new GridBagConstraints();
         firstDatasetSuffixWarningLblGBC.anchor = GridBagConstraints.EAST;
         firstDatasetSuffixWarningLblGBC.insets = new Insets(0, 0, 5, 5);
@@ -309,7 +313,7 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
         secondDatasetSuffixContainer.add(secondDatasetSuffixField);
         secondDatasetSuffixField.setColumns(10);
 
-        secondDatasetSuffixWarningLbl = new WarningIcon();
+        secondDatasetSuffixWarningLbl = new ErrorIconLabel();
         GridBagConstraints secondDatasetSuffixWarningLblGBC = new GridBagConstraints();
         secondDatasetSuffixWarningLblGBC.anchor = GridBagConstraints.WEST;
         secondDatasetSuffixWarningLblGBC.insets = new Insets(0, 0, 5, 0);
@@ -342,7 +346,7 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
         firstDatasetRowNumColContainer.add(firstDatasetRowNumColField);
         firstDatasetRowNumColField.setColumns(10);
 
-        firstDatasetRowNumColWarningLbl = new WarningIcon();
+        firstDatasetRowNumColWarningLbl = new ErrorIconLabel();
         GridBagConstraints firstDatasetRowNumColWarningLblGBC = new GridBagConstraints();
         firstDatasetRowNumColWarningLblGBC.anchor = GridBagConstraints.EAST;
         firstDatasetRowNumColWarningLblGBC.insets = new Insets(0, 0, 5, 5);
@@ -368,7 +372,7 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
         secondDatasetRowNumColContainer.add(secondDatasetRowNumColField);
         secondDatasetRowNumColField.setColumns(10);
 
-        secondDatasetRowNumColWarningLbl = new WarningIcon();
+        secondDatasetRowNumColWarningLbl = new ErrorIconLabel();
         GridBagConstraints secondDatasetRowNumColWarningLblGBC = new GridBagConstraints();
         secondDatasetRowNumColWarningLblGBC.anchor = GridBagConstraints.WEST;
         secondDatasetRowNumColWarningLblGBC.insets = new Insets(0, 0, 5, 0);
@@ -427,35 +431,35 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
         return secondDatasetRowNumColField;
     }
 
-    public WarningIcon getFirstDatasetWarningLbl() {
+    public ErrorIconLabel getFirstDatasetWarningLbl() {
         return firstDatasetWarningLbl;
     }
 
-    public WarningIcon getSecondDatasetWarningLbl() {
+    public ErrorIconLabel getSecondDatasetWarningLbl() {
         return secondDatasetWarningLbl;
     }
 
-    public WarningIcon getFirstEncodingWarningLbl() {
+    public ErrorIconLabel getFirstEncodingWarningLbl() {
         return firstEncodingWarningLbl;
     }
 
-    public WarningIcon getSecondEncodingWarningLbl() {
+    public ErrorIconLabel getSecondEncodingWarningLbl() {
         return secondEncodingWarningLbl;
     }
 
-    public WarningIcon getFirstDatasetSuffixWarningLbl() {
+    public ErrorIconLabel getFirstDatasetSuffixWarningLbl() {
         return firstDatasetSuffixWarningLbl;
     }
 
-    public WarningIcon getSecondDatasetSuffixWarningLbl() {
+    public ErrorIconLabel getSecondDatasetSuffixWarningLbl() {
         return secondDatasetSuffixWarningLbl;
     }
 
-    public WarningIcon getSecondDatasetRowNumColWarningLbl() {
+    public ErrorIconLabel getSecondDatasetRowNumColWarningLbl() {
         return secondDatasetRowNumColWarningLbl;
     }
 
-    public WarningIcon getFirstDatasetRowNumColWarningLbl() {
+    public ErrorIconLabel getFirstDatasetRowNumColWarningLbl() {
         return firstDatasetRowNumColWarningLbl;
     }
 

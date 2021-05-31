@@ -34,6 +34,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -48,6 +49,9 @@ import recovida.idas.rl.core.util.StatusReporter.StatusLogger;
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.Translatable;
 
+/**
+ * A panel to display information about a specific execution of the algorithm.
+ */
 public class ExecutionInnerPanel extends JPanel
         implements StatusLogger, Translatable {
     private static final long serialVersionUID = -1501370560575937471L;
@@ -64,6 +68,9 @@ public class ExecutionInnerPanel extends JPanel
 
     private JButton openDirBtn;
 
+    /**
+     * Represents the status of the log export (copy/save) operation.
+     */
     protected enum LogExportStatus {
         NONE, DOING, DONE, FAILED
     }
@@ -72,18 +79,25 @@ public class ExecutionInnerPanel extends JPanel
 
     private LogExportStatus logSavingStatus = LogExportStatus.NONE;
 
+    /**
+     * Creates an instance of the panel.
+     */
     public ExecutionInnerPanel() {
 
         setLayout(new BorderLayout(0, 0));
 
         JPanel topPanel = new JPanel();
-        add(topPanel, BorderLayout.NORTH);
+        topPanel.setMinimumSize(new Dimension(10, 40));
+        JScrollPane topPanelScrollPane = new JScrollPane(topPanel);
+        topPanelScrollPane.setVerticalScrollBarPolicy(
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        add(topPanelScrollPane, BorderLayout.NORTH);
         topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
         copyLogBtn = new JButton("_Copy log");
         copyLogBtn.setIcon(new ImageIcon(ExecutionInnerPanel.class
                 .getResource("/toolbarButtonGraphics/general/Copy24.gif")));
-        copyLogBtn.setPreferredSize(new Dimension(280, 30));
+        copyLogBtn.setPreferredSize(new Dimension(270, 30));
         copyLogBtn.setMaximumSize(new Dimension(500, 50));
         copyLogBtn.setMinimumSize(new Dimension(250, 30));
         topPanel.add(copyLogBtn);
@@ -91,7 +105,7 @@ public class ExecutionInnerPanel extends JPanel
         saveLogBtn = new JButton("_Save log");
         saveLogBtn.setIcon(new ImageIcon(ExecutionInnerPanel.class
                 .getResource("/toolbarButtonGraphics/general/Export24.gif")));
-        saveLogBtn.setPreferredSize(new Dimension(280, 30));
+        saveLogBtn.setPreferredSize(new Dimension(270, 30));
         saveLogBtn.setMaximumSize(new Dimension(500, 50));
         saveLogBtn.setMinimumSize(new Dimension(250, 30));
         topPanel.add(saveLogBtn);
@@ -99,7 +113,7 @@ public class ExecutionInnerPanel extends JPanel
         openDirBtn = new JButton("_Show result");
         openDirBtn.setIcon(new ImageIcon(ExecutionInnerPanel.class
                 .getResource("/toolbarButtonGraphics/general/History24.gif")));
-        openDirBtn.setPreferredSize(new Dimension(280, 30));
+        openDirBtn.setPreferredSize(new Dimension(270, 30));
         openDirBtn.setMaximumSize(new Dimension(500, 50));
         openDirBtn.setMinimumSize(new Dimension(250, 30));
         openDirBtn.setEnabled(false);
@@ -244,6 +258,12 @@ public class ExecutionInnerPanel extends JPanel
         });
     }
 
+    /**
+     * Copies a string to the system clipboard.
+     *
+     * @param s the string to copy
+     * @return whether the operation succeeded
+     */
     public static boolean copyToClipboard(String s) {
         try {
             Toolkit.getDefaultToolkit().getSystemClipboard()
@@ -254,10 +274,23 @@ public class ExecutionInnerPanel extends JPanel
         }
     }
 
+    /**
+     * Copies the execution log to the system clipboard.
+     *
+     * @param log the log lines to copy
+     * @return whether the operation succeeded
+     */
     public static boolean copyLogToClipboard(String[] log) {
         return copyToClipboard(String.join(System.lineSeparator(), log));
     }
 
+    /**
+     * Exports the execution log to a text file.
+     *
+     * @param log      the log lines
+     * @param fileName the file name where the log will be saved
+     * @return whether the operation succeeded
+     */
     public static boolean saveLogToFile(String[] log, String fileName) {
         try (DatasetWriter writer = new CSVDatasetWriter(fileName, '\t')) {
             for (String l : log)
@@ -344,10 +377,21 @@ public class ExecutionInnerPanel extends JPanel
         progressBar.setVisible(true);
     }
 
+    /**
+     * Changes the visibility state of the progress bar.
+     *
+     * @param show whether the progress bar should be visible
+     */
     public void showProgress(boolean show) {
         progressBar.setVisible(show);
     }
 
+    /**
+     * Called when the algorithm finishes successfully. Enables the "open
+     * result" button.
+     *
+     * @param resultDir the directory that contains the output
+     */
     public void success(String resultDir) {
         openDirBtn.addActionListener(l -> {
             try {

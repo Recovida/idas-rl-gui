@@ -13,6 +13,9 @@ import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.LanguageComboBox;
 import recovida.idas.rl.gui.ui.Translatable;
 
+/**
+ * A toolbar for the main window.
+ */
 public class MainToolBar extends JToolBar implements Translatable {
 
     protected JButton newFileBtn;
@@ -31,6 +34,9 @@ public class MainToolBar extends JToolBar implements Translatable {
 
     protected JButton runBtn;
 
+    /**
+     * Creates an instance.
+     */
     public MainToolBar() {
 
         newFileBtn = new JButton("");

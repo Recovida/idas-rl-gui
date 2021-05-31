@@ -8,6 +8,9 @@ import recovida.idas.rl.core.Main;
 import recovida.idas.rl.core.util.StatusReporter;
 import recovida.idas.rl.gui.ui.container.ExecutionInnerPanel;
 
+/**
+ * Represents and deals with an execution of the algorithm.
+ */
 public class Execution {
 
     protected ExecutionInnerPanel panel;
@@ -18,12 +21,24 @@ public class Execution {
 
     protected boolean alreadyExecuted = false;
 
+    /**
+     * Creates an instance.
+     *
+     * @param panel          the execution panel corresponding to this execution
+     * @param configFileName the name of the configuration file
+     */
     public Execution(ExecutionInnerPanel panel, String configFileName) {
         this.panel = panel;
         this.configFileName = configFileName;
         this.main = new Main(configFileName, 100);
     }
 
+    /**
+     * Starts the linkage algorithm.
+     *
+     * @return a {@link CompletableFuture} object that will hold a boolean
+     *         representing the success result
+     */
     public synchronized CompletableFuture<Boolean> start() {
         if (alreadyExecuted)
             throw new IllegalStateException();
@@ -39,13 +54,13 @@ public class Execution {
             @Override
             public void infoCompleted(String resultPath) {
                 super.infoCompleted(resultPath);
-                panel.success(resultPath);
+                SwingUtilities.invokeLater(() -> panel.success(resultPath));
             }
 
             @Override
             public void errorUnexpectedError(String message) {
                 super.errorUnexpectedError(message);
-                panel.showProgress(false);
+                SwingUtilities.invokeLater(() -> panel.showProgress(false));
             }
 
         };
@@ -66,9 +81,18 @@ public class Execution {
         return f;
     }
 
+    /**
+     * Cancels the execution.
+     */
     public void cancel() {
-        if (main != null)
-            main.interrupt();
+        if (main != null) {
+            Thread t = new Thread(() -> main.interrupt());
+            t.start();
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+            }
+        }
     }
 
 }

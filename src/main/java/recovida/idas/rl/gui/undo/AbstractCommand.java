@@ -3,19 +3,19 @@ package recovida.idas.rl.gui.undo;
 /**
  * This abstract class represents a command in command design pattern.
  *
- * If <code>redo()</code> changes the history state from A to B, then calling
- * <code>undo()</code> at B <b>must</b> revert it back to A.
+ * If {@link #redo()} changes the history state from A to B, then calling
+ * {@link #undo()} at B <b>must</b> revert it back to A.
  */
 public abstract class AbstractCommand {
 
     /**
-     * Undoes the operation, reverting what was done by <code>redo()</code>.
+     * Undoes the operation, reverting what was done by {@link #redo()}.
      */
     public abstract void undo();
 
     /**
      * Performs the operation, either for the first time or after an
-     * <code>undo()</code>.
+     * {@link #undo()}.
      */
     public abstract void redo();
 
