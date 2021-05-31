@@ -8,6 +8,12 @@ import javax.swing.JComponent;
 import recovida.idas.rl.gui.listener.SettingItemChangeListener;
 import recovida.idas.rl.gui.undo.UndoHistory;
 
+/**
+ * Represents and deals with a setting item, its field and value.
+ *
+ * @param <V> the type of the item
+ * @param <F> the type of the field
+ */
 public abstract class AbstractSettingItem<V, F extends JComponent> {
 
     public V getCurrentValue() {
@@ -44,6 +50,14 @@ public abstract class AbstractSettingItem<V, F extends JComponent> {
 
     protected UndoHistory history;
 
+    /**
+     * Creates an instance.
+     *
+     * @param history      the undo history
+     * @param currentValue the current value
+     * @param defaultValue the default value
+     * @param guiComponent the field
+     */
     public AbstractSettingItem(UndoHistory history, V currentValue,
             V defaultValue, F guiComponent) {
         this.currentValue = currentValue;
@@ -53,6 +67,15 @@ public abstract class AbstractSettingItem<V, F extends JComponent> {
         this.listeners = new LinkedList<>();
     }
 
+    /**
+     * Creates an instance.
+     *
+     * @param history      the undo history
+     * @param currentValue the current value
+     * @param defaultValue the default value
+     * @param guiComponent the field
+     * @param listener     a change listener
+     */
     public AbstractSettingItem(UndoHistory history, V currentValue,
             V defaultValue, F guiComponent,
             SettingItemChangeListener listener) {
@@ -64,13 +87,21 @@ public abstract class AbstractSettingItem<V, F extends JComponent> {
 
     public abstract void setValueFromString(String newValue);
 
+    /**
+     * Sets the new value and notifies listeners.
+     *
+     * @param newValue the new value
+     */
     public abstract void onChange(V newValue);
 
+    /**
+     * Adds a listener to be notified whenever the value of this setting item
+     * changes.
+     *
+     * @param listener the listener to add
+     */
     public void addChangeListener(SettingItemChangeListener listener) {
         listeners.add(listener);
-    }
-
-    public void onLeave() {
     }
 
 }

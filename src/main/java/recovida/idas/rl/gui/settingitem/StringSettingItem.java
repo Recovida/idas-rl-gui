@@ -11,10 +11,21 @@ import recovida.idas.rl.gui.ui.field.FieldWithPlaceholder;
 import recovida.idas.rl.gui.undo.SetOptionCommand;
 import recovida.idas.rl.gui.undo.UndoHistory;
 
+/**
+ * Represents and deals with a string setting item, its field and value.
+ */
 public class StringSettingItem extends AbstractSettingItem<String, JTextField> {
 
     protected boolean supressDocumentListener = false;
 
+    /**
+     * Creates an instance.
+     *
+     * @param history      the undo history
+     * @param currentValue the current value
+     * @param defaultValue the default value
+     * @param guiComponent the field
+     */
     public StringSettingItem(UndoHistory history, String currentValue,
             String defaultValue, JTextField guiComponent) {
         super(history, currentValue, defaultValue, guiComponent);
@@ -52,6 +63,15 @@ public class StringSettingItem extends AbstractSettingItem<String, JTextField> {
         });
     }
 
+    /**
+     * Creates an instance.
+     *
+     * @param history      the undo history
+     * @param currentValue the current value
+     * @param defaultValue the default value
+     * @param guiComponent the field
+     * @param listener     a change listener
+     */
     public StringSettingItem(UndoHistory history, String currentValue,
             String defaultValue, JTextField guiComponent,
             SettingItemChangeListener listener) {

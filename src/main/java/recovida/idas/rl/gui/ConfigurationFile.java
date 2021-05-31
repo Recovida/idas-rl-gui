@@ -17,17 +17,24 @@ import java.util.regex.Pattern;
 import recovida.idas.rl.gui.pair.ColumnPairManager;
 import recovida.idas.rl.gui.settingitem.AbstractSettingItem;
 
+/**
+ * Represents a configuration file and provides methods for reading and saving
+ * configuration files.
+ */
 @SuppressWarnings("rawtypes")
 public class ConfigurationFile {
 
     /**
-     *
+     * A custom {@link FilterOutputStream} that ignores the first line. It is
+     * used to avoid the timestamp that {@link Properties} generates.
      */
     private final class SkipFirstLineOutputStream extends FilterOutputStream {
         private boolean ignore = true;
 
         /**
-         * @param out
+         * Creates an instance.
+         *
+         * @param out the original stream
          */
         private SkipFirstLineOutputStream(OutputStream out) {
             super(out);
@@ -50,6 +57,10 @@ public class ConfigurationFile {
 
     ColumnPairManager pairManager;
 
+    /**
+     * The maximum number a column pair may use. The numbers are used as
+     * prefixes of the keys.
+     */
     public static final int MAX_NUMBER = 999;
 
     protected static final String[] COL_KEYS = { "type", "index_a", "index_b",
@@ -58,18 +69,38 @@ public class ConfigurationFile {
     protected static final Pattern COL_KEY_PATTERN = Pattern
             .compile("^[0-9]+_(" + String.join("|", COL_KEYS) + ")$");
 
+    /**
+     * Creates an instance.
+     */
     public ConfigurationFile() {
         settingItems = new LinkedHashMap<>();
     }
 
+    /**
+     * Adds a setting item to the configuration file.
+     *
+     * @param key         the setting key
+     * @param settingItem the setting item
+     */
     public void addSettingItem(String key, AbstractSettingItem settingItem) {
         settingItems.put(key, settingItem);
     }
 
+    /**
+     * Sets the column pair manager.
+     *
+     * @param pairManager the pair manager
+     */
     public void setPairPanager(ColumnPairManager pairManager) {
         this.pairManager = pairManager;
     }
 
+    /**
+     * Loads the contents of a configuration file.
+     *
+     * @param fileName the file name
+     * @return whether the file was successfully read
+     */
     public boolean load(String fileName) {
         Properties props = new Properties();
         try (FileInputStream in = new FileInputStream(fileName)) {
@@ -118,6 +149,12 @@ public class ConfigurationFile {
         return Collections.unmodifiableMap(settingItems);
     }
 
+    /**
+     * Saves the contents of this configuration file to a .properties file.
+     *
+     * @param fileName the output file name
+     * @return whether the file was successfully saved
+     */
     public boolean save(String fileName) {
         try (OutputStream output = new FileOutputStream(fileName)) {
             SkipFirstLineOutputStream skipTimestampOutput = new SkipFirstLineOutputStream(
