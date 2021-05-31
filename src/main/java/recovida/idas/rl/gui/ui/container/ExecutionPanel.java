@@ -10,8 +10,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
+import recovida.idas.rl.gui.ui.Translatable;
 
-public class ExecutionPanel extends JPanel {
+public class ExecutionPanel extends JPanel implements Translatable {
 
     private static final long serialVersionUID = -3897094344632347178L;
 
@@ -44,6 +45,7 @@ public class ExecutionPanel extends JPanel {
         return p;
     }
 
+    @Override
     public void updateLocalisedStrings() {
         logWontBeSavedLbl.setText(MessageProvider.getMessage(
                 tabbedPane.getTabCount() == 0 ? "execution.noexecutions"

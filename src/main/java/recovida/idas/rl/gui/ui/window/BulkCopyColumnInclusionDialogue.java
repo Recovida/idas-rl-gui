@@ -24,7 +24,12 @@ import javax.swing.JSplitPane;
 import javax.swing.SwingConstants;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
+import recovida.idas.rl.gui.ui.table.ColumnPairTable;
 
+/**
+ * This dialogue is used to ask the user which columns (represented in rows) of
+ * type "copy" should be added to a {@link ColumnPairTable}.
+ */
 public class BulkCopyColumnInclusionDialogue extends JDialog {
     private static final long serialVersionUID = 1609116129275788504L;
 
@@ -40,6 +45,11 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
     LinkedList<String>[] result = new LinkedList[] { new LinkedList<>(),
             new LinkedList<>() };
 
+    /**
+     * Creates the dialogue.
+     *
+     * @param parent the parent frame
+     */
     public BulkCopyColumnInclusionDialogue(Frame parent) {
         super(parent);
         setFont(parent.getFont());
@@ -130,12 +140,26 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
 
     private final JPanel mainPanel = new JPanel();
 
+    /**
+     * Adds a column to the laft panel.
+     *
+     * @param item the column name
+     * @param grey whether it should be greyed (but still selectable)
+     * @return the created checkbox
+     */
     public JCheckBox addItemToLeftPanel(String item, boolean grey) {
         JCheckBox cb = addItem(leftPanel, item, grey);
         leftMap.put(item, cb);
         return cb;
     }
 
+    /**
+     * Adds a column to the right panel.
+     *
+     * @param item the column name
+     * @param grey whether it should be greyed (but still selectable)
+     * @return the created checkbox
+     */
     public JCheckBox addItemToRightPanel(String item, boolean grey) {
         JCheckBox cb = addItem(rightPanel, item, grey);
         rightMap.put(item, cb);
@@ -150,6 +174,13 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
         return cb;
     }
 
+    /**
+     * Shows the dialogue and obtains the input from the user.
+     *
+     * @return a two-element array of lists of columns that the user has
+     *         selected (the indices 0 and 1 contain the left and right lists,
+     *         respectively)
+     */
     public List<String>[] run() {
         pack();
         setVisible(true);

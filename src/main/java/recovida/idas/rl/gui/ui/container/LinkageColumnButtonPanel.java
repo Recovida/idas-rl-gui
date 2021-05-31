@@ -11,8 +11,9 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
+import recovida.idas.rl.gui.ui.Translatable;
 
-public class LinkageColumnButtonPanel extends JPanel {
+public class LinkageColumnButtonPanel extends JPanel implements Translatable {
 
     private static final long serialVersionUID = 2571741194180359074L;
 
@@ -75,6 +76,7 @@ public class LinkageColumnButtonPanel extends JPanel {
 
     }
 
+    @Override
     public void updateLocalisedStrings() {
         deletePairBtn.setText(MessageProvider.getMessage("columns.delete"));
         addPairBtn.setText(MessageProvider.getMessage("columns.add"));

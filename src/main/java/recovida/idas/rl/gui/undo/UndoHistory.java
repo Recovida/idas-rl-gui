@@ -6,13 +6,24 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 
+/**
+ * This class is a command manager for command design pattern.
+ */
 public class UndoHistory {
 
-    @SuppressWarnings("serial")
+    /**
+     * Exception that is thrown after an attempt to <code>undo</code> or
+     * <code>redo</code> when such action is not available.
+     */
     public static class UndoException extends RuntimeException {
+
+        private static final long serialVersionUID = -5362766944453158884L;
 
     }
 
+    /**
+     * Represents a state {@link UndoHistory}.
+     */
     protected static class HistoryPropertyState {
         boolean canRedo = false;
 
@@ -24,16 +35,30 @@ public class UndoHistory {
 
         String redoSummary = null;
 
-        public static HistoryPropertyState get(UndoHistory h) {
+        /**
+         * Builds a snapshot of the current state.
+         *
+         * @param history the history
+         * @return a snapshot of <code>history</code>
+         */
+        public static HistoryPropertyState get(UndoHistory history) {
             HistoryPropertyState s = new HistoryPropertyState();
-            s.canRedo = h.canRedo();
-            s.canUndo = h.canUndo();
-            s.isClean = h.isClean();
-            s.undoSummary = h.getUndoSummary();
-            s.redoSummary = h.getRedoSummary();
+            s.canRedo = history.canRedo();
+            s.canUndo = history.canUndo();
+            s.isClean = history.isClean();
+            s.undoSummary = history.getUndoSummary();
+            s.redoSummary = history.getRedoSummary();
             return s;
         }
 
+        /**
+         * Sends notification to listeners if the state given in the parameter
+         * differs from this state.
+         *
+         * @param that      the other state
+         * @param listeners a collection of listeners to be notified if the
+         *                  states are different
+         */
         public void notifyIfChanged(HistoryPropertyState that,
                 Collection<HistoryPropertyChangeEventListener> listeners) {
             for (HistoryPropertyChangeEventListener listener : listeners) {
@@ -59,6 +84,9 @@ public class UndoHistory {
 
     protected List<HistoryPropertyChangeEventListener> listeners;
 
+    /**
+     * Creates an empty undo history.
+     */
     public UndoHistory() {
         commandList = new LinkedList<>();
         commandListIterator = commandList.listIterator();
@@ -66,14 +94,30 @@ public class UndoHistory {
         listeners = new LinkedList<>();
     }
 
+    /**
+     * Checks whether an undo action is possible.
+     *
+     * @return <code>true</code> if and only if <code>undo()</code> can be
+     *         called
+     */
     public boolean canUndo() {
         return commandListIterator.hasPrevious();
     }
 
+    /**
+     * Checks whether a redo action is possible.
+     *
+     * @return <code>true</code> if and only if <code>reo()</code> can be called
+     */
     public boolean canRedo() {
         return commandListIterator.hasNext();
     }
 
+    /**
+     * Does or redoes an action. Listeners are notified.
+     *
+     * @throws UndoException if there is no action to redo
+     */
     public void redo() {
         if (!canRedo())
             throw new UndoException();
@@ -82,6 +126,11 @@ public class UndoHistory {
         HistoryPropertyState.get(this).notifyIfChanged(oldState, listeners);
     }
 
+    /**
+     * Undoes an action. Listeners are notified.
+     *
+     * @throws UndoException if there is no action to undo.
+     */
     public void undo() {
         if (!canUndo())
             throw new UndoException();
@@ -90,6 +139,12 @@ public class UndoHistory {
         HistoryPropertyState.get(this).notifyIfChanged(oldState, listeners);
     }
 
+    /**
+     * Pushes a command to the list and executes its action. Listeners are
+     * notified.
+     *
+     * @param command the command to be added
+     */
     public void push(AbstractCommand command) {
         HistoryPropertyState oldState = HistoryPropertyState.get(this);
         if (cleanIndex > commandListIterator.nextIndex())
@@ -125,11 +180,23 @@ public class UndoHistory {
         return cleanIndex;
     }
 
+    /**
+     * Adds a listener that will be notified when state changes.
+     *
+     * @param listener the listener to add
+     */
     public void addPropertyChangeListener(
             HistoryPropertyChangeEventListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Gets a short description of the action that can be undone (to be
+     * displayed on a menu or button tooltip). Uses the current language.
+     *
+     * @return <code>null</code> if it is impossible to undo, or a short summary
+     *         of the action that can be undone
+     */
     public String getUndoSummary() {
         if (!canUndo())
             return null;
@@ -138,6 +205,13 @@ public class UndoHistory {
         return summary;
     }
 
+    /**
+     * Gets a short description of the action that can be redone (to be
+     * displayed on a menu or button tooltip). Uses the current language.
+     *
+     * @return <code>null</code> if it is impossible to redo, or a short summary
+     *         of the action that can be undone
+     */
     public String getRedoSummary() {
         if (!canRedo())
             return null;
@@ -146,6 +220,10 @@ public class UndoHistory {
         return summary;
     }
 
+    /**
+     * Clears the history, making it equivalent to a fresh instance. If the
+     * history was not previously empty, listeners are notified.
+     */
     public void clearAll() {
         HistoryPropertyState oldState = HistoryPropertyState.get(this);
         commandList = new LinkedList<>();

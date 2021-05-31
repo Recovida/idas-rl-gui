@@ -53,6 +53,7 @@ import recovida.idas.rl.gui.settingitem.AbstractSettingItem;
 import recovida.idas.rl.gui.settingitem.NumberSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItemWithList;
+import recovida.idas.rl.gui.ui.Translatable;
 import recovida.idas.rl.gui.ui.WarningIcon;
 import recovida.idas.rl.gui.ui.container.DatasetsTabPanel;
 import recovida.idas.rl.gui.ui.container.ExecutionPanel;
@@ -68,10 +69,16 @@ import recovida.idas.rl.gui.ui.window.AboutWindow;
 import recovida.idas.rl.gui.undo.HistoryPropertyChangeEventListener;
 import recovida.idas.rl.gui.undo.UndoHistory;
 
-public class MainWindow {
+/**
+ * The main class of the GUI.
+ */
+public class MainWindow implements Translatable {
 
     /* Non-GUI attributes */
 
+    /**
+     * The name of the program as shown on the title bar.
+     */
     public static final String PROGRAM_NAME = "IDaS-RL";
 
     UndoHistory history = new UndoHistory();
@@ -138,12 +145,18 @@ public class MainWindow {
 
     }
 
+    /**
+     * Creates and shows the main window, without opening any configuration
+     * files.
+     */
     public MainWindow() {
         this(null);
     }
 
     /**
-     * Create the application.
+     * Creates and shows the main window, and also loads a configuration file.
+     *
+     * @param fileToOpen the name of the file to be loaded
      */
     public MainWindow(String fileToOpen) {
         try {
@@ -347,7 +360,7 @@ public class MainWindow {
                 15, Image.SCALE_SMOOTH));
     }
 
-    public synchronized int validateDatasetsTabTopPart() {
+    protected synchronized int validateDatasetsTabTopPart() {
         if (skipValidation)
             return -1;
 
@@ -464,7 +477,7 @@ public class MainWindow {
         return errorCount;
     }
 
-    public synchronized int validateDatasetsTabBottomPart() {
+    protected synchronized int validateDatasetsTabBottomPart() {
         if (skipValidation)
             return -1;
 
@@ -528,13 +541,13 @@ public class MainWindow {
         return errorCount;
     }
 
-    public synchronized int validateOptionsTab() {
+    protected synchronized int validateOptionsTab() {
         if (skipValidation)
             return -1;
         return 0;
     }
 
-    public synchronized int validateLinkageColsTabSelectedRow(int rowIndex,
+    protected synchronized int validateLinkageColsTabSelectedRow(int rowIndex,
             String key) {
         if (skipValidation)
             return -1;
@@ -573,7 +586,7 @@ public class MainWindow {
         return error ? 1 : 0;
     }
 
-    public synchronized int validateLinkageColsTabSelectedRow(int index) {
+    protected synchronized int validateLinkageColsTabSelectedRow(int index) {
         if (skipValidation)
             return -1;
         int errorCount = 0;
@@ -584,7 +597,7 @@ public class MainWindow {
         return errorCount;
     }
 
-    public synchronized int validateLinkageColsTab() {
+    protected synchronized int validateLinkageColsTab() {
         if (skipValidation)
             return -1;
         int index = linkageColsTable.getSelectedRow();
@@ -597,13 +610,13 @@ public class MainWindow {
         return errorCount;
     }
 
-    public int validateAllTabs() {
+    protected int validateAllTabs() {
         return validateDatasetsTabTopPart() + validateDatasetsTabBottomPart()
                 + validateOptionsTab() + validateLinkageColsTab();
     }
 
-    public static String getDatasetHeaderErrorMessage(DatasetPeekResult result,
-            String fileName) {
+    protected static String getDatasetHeaderErrorMessage(
+            DatasetPeekResult result, String fileName) {
         switch (result) {
         case BLANK_NAME:
             return MessageProvider.getMessage("datasets.blankfilename");
@@ -620,6 +633,9 @@ public class MainWindow {
         }
     }
 
+    /**
+     * Clears every field on each tab, including the linkage column table.
+     */
     @SuppressWarnings("unchecked")
     public void clearAllFields() {
         for (AbstractSettingItem<?, ?> item : cf.getSettingItems().values()) {
@@ -1034,20 +1050,21 @@ public class MainWindow {
                 + " - " + PROGRAM_NAME);
     }
 
-    public void updateUndoMenuText(String summary) {
+    protected void updateUndoMenuText(String summary) {
         String txt = MessageProvider.getMessage("menu.edit.undo")
                 + (summary != null ? String.format(" (%s)", summary) : "");
         menuBar.getUndoMenuItem().setText(txt);
         mainToolBar.getUndoBtn().setToolTipText(txt);
     }
 
-    public void updateRedoMenuText(String summary) {
+    protected void updateRedoMenuText(String summary) {
         String txt = MessageProvider.getMessage("menu.edit.redo")
                 + (summary != null ? String.format(" (%s)", summary) : "");
         menuBar.getRedoMenuItem().setText(txt);
         mainToolBar.getRedoBtn().setToolTipText(txt);
     }
 
+    @Override
     public void updateLocalisedStrings() {
         // menu bar
         menuBar.updateLocalisedStrings();

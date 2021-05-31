@@ -17,12 +17,13 @@ import javax.swing.SwingConstants;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.JComboBoxSuggestionProvider;
+import recovida.idas.rl.gui.ui.Translatable;
 import recovida.idas.rl.gui.ui.WarningIcon;
 import recovida.idas.rl.gui.ui.field.EncodingComboBox;
 import recovida.idas.rl.gui.ui.field.JComboBoxWithPlaceholder;
 import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
 
-public class DatasetsTabPanel extends JPanel {
+public class DatasetsTabPanel extends JPanel implements Translatable {
 
     private static final long serialVersionUID = -2753754491877596410L;
 
@@ -378,6 +379,7 @@ public class DatasetsTabPanel extends JPanel {
 
     }
 
+    @Override
     public void updateLocalisedStrings() {
         firstDatasetLabel
                 .setText(MessageProvider.getMessage("datasets.dataseta"));

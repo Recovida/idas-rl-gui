@@ -6,6 +6,12 @@ import java.util.Optional;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+import recovida.idas.rl.gui.ui.table.ColumnPairTable;
+
+/**
+ * Renderer for "rename" fields in a {@link ColumnPairTable}, which shows the
+ * default value when blank.
+ */
 public class RenameColumnPairCellRenderer extends AbstractColumnPairCellRenderer
         implements TableCellRenderer {
 
@@ -15,6 +21,13 @@ public class RenameColumnPairCellRenderer extends AbstractColumnPairCellRenderer
 
     private String suffix = "";
 
+    /**
+     * Creates the renderer given the key of the corresponding name field.
+     *
+     * @param nameKey the key of the corresponding field name (e.g. if this
+     *                class renders <code>rename_a</code> field, then this
+     *                parameter is <code>index_a</code>)
+     */
     public RenameColumnPairCellRenderer(String nameKey) {
         super();
         this.nameKey = nameKey;
@@ -39,7 +52,7 @@ public class RenameColumnPairCellRenderer extends AbstractColumnPairCellRenderer
         return c;
     }
 
-    public boolean shouldBeBlank(JTable table, int viewRowIndex) {
+    protected boolean shouldBeBlank(JTable table, int viewRowIndex) {
         return Optional
                 .ofNullable((String) getValue(table, viewRowIndex, nameKey))
                 .orElse("").isEmpty();

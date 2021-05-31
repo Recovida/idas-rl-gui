@@ -22,11 +22,12 @@ import javax.swing.SwingConstants;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.JComboBoxSuggestionProvider;
+import recovida.idas.rl.gui.ui.Translatable;
 import recovida.idas.rl.gui.ui.WarningIcon;
 import recovida.idas.rl.gui.ui.field.JSpinnerWithBlankValue;
 import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
 
-public class LinkageColumnEditingPanel extends JPanel {
+public class LinkageColumnEditingPanel extends JPanel implements Translatable {
 
     private static final long serialVersionUID = 1L;
 
@@ -469,6 +470,7 @@ public class LinkageColumnEditingPanel extends JPanel {
         return weightLbl;
     }
 
+    @Override
     public void updateLocalisedStrings() {
         numberLbl.setText(MessageProvider.getMessage("columns.editing.number"));
         nameFirstLbl

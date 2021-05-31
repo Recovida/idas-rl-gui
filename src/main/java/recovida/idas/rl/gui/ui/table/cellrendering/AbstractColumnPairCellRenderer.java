@@ -9,8 +9,13 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 import recovida.idas.rl.gui.ui.WarningIcon;
+import recovida.idas.rl.gui.ui.table.ColumnPairTable;
 import recovida.idas.rl.gui.ui.table.ColumnPairTableModel;
 
+/**
+ * This abstract class provides the skeleton of {@link TableCellRenderer} that
+ * renders the cells of a {@link ColumnPairTable}, highlighting errors in red.
+ */
 public abstract class AbstractColumnPairCellRenderer extends JLabel
         implements TableCellRenderer {
 

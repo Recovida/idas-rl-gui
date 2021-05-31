@@ -21,8 +21,9 @@ import javax.swing.SwingConstants;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.JMenuWithBorder;
+import recovida.idas.rl.gui.ui.Translatable;
 
-public class MainMenuBar extends JMenuBar {
+public class MainMenuBar extends JMenuBar implements Translatable {
 
     private static final long serialVersionUID = -8153106866054489899L;
 
@@ -177,6 +178,7 @@ public class MainMenuBar extends JMenuBar {
         setVisible(true);
     }
 
+    @Override
     public void updateLocalisedStrings() {
         // file
         fileMenu.setText(MessageProvider.getMessage("menu.file"));

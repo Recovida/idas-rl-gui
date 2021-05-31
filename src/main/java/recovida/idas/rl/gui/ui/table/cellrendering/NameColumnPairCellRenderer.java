@@ -8,7 +8,11 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
+import recovida.idas.rl.gui.ui.table.ColumnPairTable;
 
+/**
+ * Renderer for names in a {@link ColumnPairTable}.
+ */
 public class NameColumnPairCellRenderer extends AbstractColumnPairCellRenderer
         implements TableCellRenderer {
 

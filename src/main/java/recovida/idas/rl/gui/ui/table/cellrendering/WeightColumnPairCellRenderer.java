@@ -7,7 +7,12 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
+import recovida.idas.rl.gui.ui.table.ColumnPairTable;
 
+/**
+ * Renderer for weight fields in a {@link ColumnPairTable}. The decimal
+ * separator is chosen according to the current language.
+ */
 public class WeightColumnPairCellRenderer extends AbstractColumnPairCellRenderer
         implements TableCellRenderer {
 
@@ -32,7 +37,7 @@ public class WeightColumnPairCellRenderer extends AbstractColumnPairCellRenderer
         return c;
     }
 
-    public boolean shouldBeBlank(JTable table, int row) {
+    protected boolean shouldBeBlank(JTable table, int row) {
         return "copy".equals(getValue(table, row, "type"));
     }
 

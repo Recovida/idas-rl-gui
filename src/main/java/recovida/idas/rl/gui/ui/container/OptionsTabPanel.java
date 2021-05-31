@@ -19,11 +19,12 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
+import recovida.idas.rl.gui.ui.Translatable;
 import recovida.idas.rl.gui.ui.WarningIcon;
 import recovida.idas.rl.gui.ui.field.JSpinnerWithBlankValue;
 import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
 
-public class OptionsTabPanel extends JPanel {
+public class OptionsTabPanel extends JPanel implements Translatable {
 
     private static final long serialVersionUID = -4785642571939247630L;
 
@@ -238,6 +239,7 @@ public class OptionsTabPanel extends JPanel {
 
     }
 
+    @Override
     public void updateLocalisedStrings() {
         indexDirLbl
                 .setText(MessageProvider.getMessage("options.indexlocation"));

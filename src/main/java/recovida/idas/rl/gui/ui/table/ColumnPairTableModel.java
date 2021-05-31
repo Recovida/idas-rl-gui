@@ -13,10 +13,14 @@ import java.util.stream.IntStream;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.container.LinkageColumnEditingPanel;
 
+/**
+ * An implementation of {@link TableModel} for a {@link ColumnPairTable}.
+ */
 public class ColumnPairTableModel extends DefaultTableModel {
 
     private static final long serialVersionUID = 1L;
@@ -38,6 +42,9 @@ public class ColumnPairTableModel extends DefaultTableModel {
 
     protected Vector<boolean[]> valid = new Vector<>();
 
+    /**
+     * Creates the model.
+     */
     public ColumnPairTableModel() {
         for (int i = 0; i < keys.length; i++)
             indexFromKey.put(keys[i], i);
@@ -125,6 +132,11 @@ public class ColumnPairTableModel extends DefaultTableModel {
         return indexFromKey.get(key);
     }
 
+    /**
+     * Updates the localised texts on the table.
+     *
+     * @param cm the column model
+     */
     public void updateLocalisedStrings(TableColumnModel cm) {
         String[] displayNames = new String[keys.length];
         for (int i = 0; i < displayNames.length; i++)
@@ -134,12 +146,12 @@ public class ColumnPairTableModel extends DefaultTableModel {
             fireTableRowsUpdated(0, getRowCount() - 1);
     }
 
-    public void updateValidation() {
+    protected void updateValidation() {
         for (int i = 0; i < getRowCount(); i++)
             updateRowValidation(i);
     }
 
-    public void updateRowValidation(int rowIndex) {
+    protected void updateRowValidation(int rowIndex) {
         if (valid.get(rowIndex) == null)
             valid.set(rowIndex, new boolean[keys.length]);
         boolean[] v = valid.get(rowIndex);
@@ -181,18 +193,23 @@ public class ColumnPairTableModel extends DefaultTableModel {
                         .size() == 1;
     }
 
+    /**
+     * Checks if all cells contain valid values.
+     *
+     * @return <code>true</code> if and only if no cells contain invalid values
+     */
     public boolean isValid() {
         return valid.stream().allMatch(v -> v != null
                 && IntStream.range(0, v.length).allMatch(i -> v[i]));
     }
 
-    public boolean isRowValid(int rowIndex) {
-        if (rowIndex < 0 || rowIndex >= getRowCount())
-            return false;
-        boolean[] v = valid.get(rowIndex);
-        return v != null && IntStream.range(0, v.length).allMatch(i -> v[i]);
-    }
-
+    /**
+     * Checks if a cell contains a valid value.
+     *
+     * @param rowIndex the row index (as in the model)
+     * @param colIndex the column index (as in the model)
+     * @return <code>true</code> if and only if the cell contains a valid value
+     */
     public boolean isCellValid(int rowIndex, int colIndex) {
         if (rowIndex < 0 || rowIndex >= getRowCount() || colIndex < 0
                 || colIndex >= keys.length)
@@ -201,11 +218,23 @@ public class ColumnPairTableModel extends DefaultTableModel {
         return v != null && v[colIndex];
     }
 
+    /**
+     * Checks if a cell contains a valid value.
+     *
+     * @param rowIndex the row index (as in the model)
+     * @param key      the key of the field
+     * @return <code>true</code> if and only if the cell contains a valid value
+     */
     public boolean isCellValid(int rowIndex, String key) {
         return isCellValid(rowIndex, indexFromKey.getOrDefault(key, -1));
     }
 
-    public void updateCellsWithNumber(int number) {
+    /**
+     * Refreshes all rows whose field "number" have a given value.
+     *
+     * @param number value of the number
+     */
+    public void updateRowsWithNumber(int number) {
         for (int i = 0; i < getRowCount(); i++)
             if (Objects.equals(Integer.valueOf(number),
                     getValue(i, "number"))) {
@@ -250,9 +279,9 @@ public class ColumnPairTableModel extends DefaultTableModel {
             fireTableCellUpdated(rowIndex, getColumnIndex("rename_b"));
         else if (colIndex == getColumnIndex("number")) {
             if (oldNumber != null)
-                updateCellsWithNumber(oldNumber);
+                updateRowsWithNumber(oldNumber);
             if (newNumber != null)
-                updateCellsWithNumber(newNumber);
+                updateRowsWithNumber(newNumber);
         }
     }
 
@@ -269,7 +298,7 @@ public class ColumnPairTableModel extends DefaultTableModel {
         valid.remove(row);
         super.removeRow(row);
         if (number != null)
-            updateCellsWithNumber(number);
+            updateRowsWithNumber(number);
     }
 
     @Override
@@ -289,9 +318,15 @@ public class ColumnPairTableModel extends DefaultTableModel {
         valid.insertElementAt(null, row);
         super.insertRow(row, rowData);
         updateRowValidation(row);
-        updateCellsWithNumber(number);
+        updateRowsWithNumber(number);
     }
 
+    /**
+     * Checks whether the table contains duplicate values for the field
+     * "number".
+     *
+     * @return <code>true</code> if and only if all "number" values are unique
+     */
     public boolean hasDuplicateNumbers() {
         return numberToColIdx.values().stream().anyMatch(x -> x.size() > 1);
     }

@@ -11,8 +11,9 @@ import javax.swing.SwingConstants;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.LanguageComboBox;
+import recovida.idas.rl.gui.ui.Translatable;
 
-public class MainToolBar extends JToolBar {
+public class MainToolBar extends JToolBar implements Translatable {
 
     protected JButton newFileBtn;
 
@@ -135,6 +136,7 @@ public class MainToolBar extends JToolBar {
         return languageCbox;
     }
 
+    @Override
     public void updateLocalisedStrings() {
         newFileBtn.setToolTipText(MessageProvider.getMessage("menu.file.new"));
         openFileBtn

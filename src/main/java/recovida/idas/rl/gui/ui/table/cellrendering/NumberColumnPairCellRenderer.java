@@ -8,7 +8,12 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
+import recovida.idas.rl.gui.ui.table.ColumnPairTable;
 
+/**
+ * Renders the "number" field in a {@link ColumnPairTable}. The text is bold and
+ * right-aligned.
+ */
 public class NumberColumnPairCellRenderer extends AbstractColumnPairCellRenderer
         implements TableCellRenderer {
 

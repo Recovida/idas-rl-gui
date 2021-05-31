@@ -6,6 +6,12 @@ import javax.swing.JComponent;
 
 import recovida.idas.rl.gui.settingitem.AbstractSettingItem;
 
+/**
+ * This class represents the command of setting the value of a field (this is
+ * not used for column-related fields).
+ *
+ * @param <T> the type of the field
+ */
 public class SetOptionCommand<T> extends AbstractCommand {
 
     private T oldValue;
@@ -16,6 +22,16 @@ public class SetOptionCommand<T> extends AbstractCommand {
 
     private boolean skip;
 
+    /**
+     * Creates an instance of this command.
+     *
+     * @param settingItem the corresponding setting item
+     * @param oldValue    value of the field prior to the change
+     * @param newValue    value of the field after the change
+     * @param skipFirst   whether the first <code>redo()</code> call should have
+     *                    no effect (this is useful to avoid an infinite loop
+     *                    when the change was already made by the user)
+     */
     @SuppressWarnings("unchecked")
     public SetOptionCommand(AbstractSettingItem<T, ?> settingItem, T oldValue,
             T newValue, boolean skipFirst) {

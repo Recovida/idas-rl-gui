@@ -46,8 +46,10 @@ import recovida.idas.rl.core.io.write.CSVDatasetWriter;
 import recovida.idas.rl.core.io.write.DatasetWriter;
 import recovida.idas.rl.core.util.StatusReporter.StatusLogger;
 import recovida.idas.rl.gui.lang.MessageProvider;
+import recovida.idas.rl.gui.ui.Translatable;
 
-public class ExecutionInnerPanel extends JPanel implements StatusLogger {
+public class ExecutionInnerPanel extends JPanel
+        implements StatusLogger, Translatable {
     private static final long serialVersionUID = -1501370560575937471L;
 
     private JTable table;
@@ -323,6 +325,7 @@ public class ExecutionInnerPanel extends JPanel implements StatusLogger {
 
     }
 
+    @Override
     public void updateLocalisedStrings() {
         updateCopyBtnText();
         saveLogBtn.setText(MessageProvider.getMessage("execution.savelog"));
