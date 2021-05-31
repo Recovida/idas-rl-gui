@@ -16,6 +16,7 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -77,6 +78,8 @@ public class MainWindow {
     boolean dirty = false;
     boolean skipValidation = false; // while filling in values read from file
     FileChangeWatcher currentFileChangeWatcher = null;
+    FileChangeWatcher datasetAFileChangeWatcher = null;
+    FileChangeWatcher datasetBFileChangeWatcher = null;
     private ColumnPairManager manager;
     ConcurrentMap<String, ConcurrentMap<String, DatasetPeek>> peekFromFileNameAndEncoding = new ConcurrentHashMap<>();
     Execution execution = null;
@@ -380,10 +383,14 @@ public class MainWindow {
             p.peek();
             if (fn1 != null && !fn1.isEmpty()) {
                 m.put(enc1, p);
-                new FileChangeWatcher(Paths.get(fn1), () -> {
-                    peekFromFileNameAndEncoding.remove(fn1);
-                    validateDatasetsTabTopPart();
-                }, true).enable();
+                if (datasetAFileChangeWatcher != null)
+                    datasetAFileChangeWatcher.disable();
+                datasetAFileChangeWatcher = new FileChangeWatcher(
+                        Paths.get(fn1), () -> {
+                            peekFromFileNameAndEncoding.remove(fn1);
+                            validateDatasetsTabTopPart();
+                        }, true);
+                datasetAFileChangeWatcher.enable();
             }
         }
         DatasetPeekResult result = p.getResult();
@@ -406,10 +413,14 @@ public class MainWindow {
             p.peek();
             if (fn2 != null && !fn2.isEmpty()) {
                 m.put(enc2, p);
-                new FileChangeWatcher(Paths.get(fn2), () -> {
-                    peekFromFileNameAndEncoding.remove(fn2);
-                    validateDatasetsTabTopPart();
-                }, true).enable();
+                if (datasetBFileChangeWatcher != null)
+                    datasetBFileChangeWatcher.disable();
+                datasetBFileChangeWatcher = new FileChangeWatcher(
+                        Paths.get(fn2), () -> {
+                            peekFromFileNameAndEncoding.remove(fn2);
+                            validateDatasetsTabTopPart();
+                        }, true);
+                datasetBFileChangeWatcher.enable();
             }
         }
         result = p.getResult();
@@ -737,6 +748,9 @@ public class MainWindow {
                     || ans == JOptionPane.CLOSED_OPTION)
                 return;
         }
+        Arrays.stream(new FileChangeWatcher[] { datasetAFileChangeWatcher,
+                datasetBFileChangeWatcher, currentFileChangeWatcher })
+                .filter(w -> w != null).forEach(w -> w.disable());
         frame.dispose();
     }
 
