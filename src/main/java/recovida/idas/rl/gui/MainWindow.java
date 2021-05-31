@@ -103,18 +103,28 @@ public class MainWindow {
             @Override
             public void run() {
                 try {
-                    new MainWindow();
+                    String fn = null;
+                    if (args.length == 1) {
+                        File f = new File(args[0]);
+                        if (f.isFile())
+                            fn = f.getAbsoluteFile().toString();
+                    }
+                    new MainWindow(fn);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
     }
+    
+    public MainWindow() {
+        this(null);
+    }
 
     /**
      * Create the application.
      */
-    public MainWindow() {
+    public MainWindow(String fileToOpen) {
         try {
             for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -269,12 +279,16 @@ public class MainWindow {
 
         updateConfigFileLabel();
         updateLocalisedStrings();
+        
+        if (fileToOpen != null)
+            doOpen(fileToOpen);
+
+        // Initial validation
+        SwingUtilities.invokeLater(() -> validateAllTabs());
 
         // show frame
         frame.setVisible(true);
 
-        // Initial validation
-        SwingUtilities.invokeLater(() -> validateAllTabs());
 
     }
 
