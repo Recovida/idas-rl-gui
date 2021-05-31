@@ -12,13 +12,19 @@ public class Execution {
 
     protected ExecutionInnerPanel panel;
     protected String configFileName;
+    protected Main main;
+    protected boolean alreadyExecuted = false;
 
     public Execution(ExecutionInnerPanel panel, String configFileName) {
         this.panel = panel;
         this.configFileName = configFileName;
+        this.main = new Main(configFileName, 100);
     }
 
-    public CompletableFuture<Boolean> start() {
+    public synchronized CompletableFuture<Boolean> start() {
+        if (alreadyExecuted)
+            throw new IllegalStateException();
+        alreadyExecuted = true;
         StatusReporter reporter = new StatusReporter() {
 
             @Override
@@ -33,12 +39,21 @@ public class Execution {
                 panel.success(resultPath);
             }
 
+            @Override
+            public void errorUnexpectedError(String message) {
+                super.errorUnexpectedError(message);
+                panel.showProgress(false);
+            }
+
         };
         reporter.setLogger(panel);
         StatusReporter.set(reporter);
 
         CompletableFuture<Boolean> f = CompletableFuture.supplyAsync(() -> {
-            return Main.execute(configFileName, 100);
+            boolean result = main.execute();
+            if (!result)
+                SwingUtilities.invokeLater(() -> panel.showProgress(false));
+            return result;
         }).exceptionally(e -> {
             e.printStackTrace();
             SwingUtilities.invokeLater(() -> panel.showProgress(false));
@@ -46,6 +61,11 @@ public class Execution {
         });
 
         return f;
+    }
+
+    public void cancel() {
+        if (main != null)
+            main.interrupt();
     }
 
 }

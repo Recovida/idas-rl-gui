@@ -58,14 +58,14 @@ import recovida.idas.rl.gui.ui.container.ExecutionPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnButtonPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnEditingPanel;
 import recovida.idas.rl.gui.ui.container.MainMenuBar;
+import recovida.idas.rl.gui.ui.container.MainToolBar;
+import recovida.idas.rl.gui.ui.container.OptionsTabPanel;
 import recovida.idas.rl.gui.ui.field.JSpinnerWithBlankValue;
 import recovida.idas.rl.gui.ui.table.ColumnPairTable;
 import recovida.idas.rl.gui.ui.table.ColumnPairTableModel;
 import recovida.idas.rl.gui.ui.window.AboutWindow;
 import recovida.idas.rl.gui.undo.HistoryPropertyChangeEventListener;
 import recovida.idas.rl.gui.undo.UndoHistory;
-import recovida.idas.rl.gui.ui.container.MainToolBar;
-import recovida.idas.rl.gui.ui.container.OptionsTabPanel;
 
 public class MainWindow {
 
@@ -79,6 +79,7 @@ public class MainWindow {
     FileChangeWatcher currentFileChangeWatcher = null;
     private ColumnPairManager manager;
     ConcurrentMap<String, ConcurrentMap<String, DatasetPeek>> peekFromFileNameAndEncoding = new ConcurrentHashMap<>();
+    Execution execution = null;
 
     /* GUI components */
     private JFrame frame;
@@ -99,24 +100,18 @@ public class MainWindow {
      * Launch the application.
      */
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String fn = null;
-                    if (args.length == 1) {
-                        File f = new File(args[0]);
-                        if (f.isFile())
-                            fn = f.getAbsoluteFile().toString();
-                    }
-                    new MainWindow(fn);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        EventQueue.invokeLater(() -> {
+            String fn = null;
+            if (args.length == 1) {
+                File f = new File(args[0]);
+                if (f.isFile())
+                    fn = f.getAbsoluteFile().toString();
             }
+            new MainWindow(fn);
         });
+
     }
-    
+
     public MainWindow() {
         this(null);
     }
@@ -148,23 +143,39 @@ public class MainWindow {
             validateDatasetsTabBottomPart();
         };
 
-        cf.addSettingItem("db_a", new StringSettingItem(history, "", "", datasetsTabPanel.getFirstDatasetField(),
-                datasetsTabEventListenerTop));
-        cf.addSettingItem("encoding_a", new StringSettingItemWithList(history, "", "UTF-8",
-                datasetsTabPanel.getFirstEncodingField(), datasetsTabEventListenerTop));
-        cf.addSettingItem("suffix_a", new StringSettingItem(history, "", "_dsa",
-                datasetsTabPanel.getFirstDatasetSuffixField(), datasetsTabEventListenerBottom));
-        cf.addSettingItem("row_num_col_a", new StringSettingItem(history, "", "#A",
-                datasetsTabPanel.getFirstDatasetRowNumColField(), datasetsTabEventListenerBottom));
+        cf.addSettingItem("db_a",
+                new StringSettingItem(history, "", "",
+                        datasetsTabPanel.getFirstDatasetField(),
+                        datasetsTabEventListenerTop));
+        cf.addSettingItem("encoding_a",
+                new StringSettingItemWithList(history, "", "UTF-8",
+                        datasetsTabPanel.getFirstEncodingField(),
+                        datasetsTabEventListenerTop));
+        cf.addSettingItem("suffix_a",
+                new StringSettingItem(history, "", "_dsa",
+                        datasetsTabPanel.getFirstDatasetSuffixField(),
+                        datasetsTabEventListenerBottom));
+        cf.addSettingItem("row_num_col_a",
+                new StringSettingItem(history, "", "#A",
+                        datasetsTabPanel.getFirstDatasetRowNumColField(),
+                        datasetsTabEventListenerBottom));
 
-        cf.addSettingItem("db_b", new StringSettingItem(history, "", "", datasetsTabPanel.getSecondDatasetField(),
-                datasetsTabEventListenerTop));
-        cf.addSettingItem("encoding_b", new StringSettingItemWithList(history, "", "UTF-8",
-                datasetsTabPanel.getSecondEncodingField(), datasetsTabEventListenerTop));
-        cf.addSettingItem("suffix_b", new StringSettingItem(history, "", "_dsb",
-                datasetsTabPanel.getSecondDatasetSuffixField(), datasetsTabEventListenerBottom));
-        cf.addSettingItem("row_num_col_b", new StringSettingItem(history, "", "#B",
-                datasetsTabPanel.getSecondDatasetRowNumColField(), datasetsTabEventListenerBottom));
+        cf.addSettingItem("db_b",
+                new StringSettingItem(history, "", "",
+                        datasetsTabPanel.getSecondDatasetField(),
+                        datasetsTabEventListenerTop));
+        cf.addSettingItem("encoding_b",
+                new StringSettingItemWithList(history, "", "UTF-8",
+                        datasetsTabPanel.getSecondEncodingField(),
+                        datasetsTabEventListenerTop));
+        cf.addSettingItem("suffix_b",
+                new StringSettingItem(history, "", "_dsb",
+                        datasetsTabPanel.getSecondDatasetSuffixField(),
+                        datasetsTabEventListenerBottom));
+        cf.addSettingItem("row_num_col_b",
+                new StringSettingItem(history, "", "#B",
+                        datasetsTabPanel.getSecondDatasetRowNumColField(),
+                        datasetsTabEventListenerBottom));
 
         // Tab: OPTIONS
         SettingItemChangeListener optionsTabEventListener = (o) -> {
@@ -172,18 +183,24 @@ public class MainWindow {
                 tabbedPane.setSelectedComponent(optionsTabPanel);
             validateOptionsTab();
         };
-        cf.addSettingItem("db_index",
-                new StringSettingItem(history, "", "", optionsTabPanel.getIndexDirField(), optionsTabEventListener));
+        cf.addSettingItem("db_index", new StringSettingItem(history, "", "",
+                optionsTabPanel.getIndexDirField(), optionsTabEventListener));
         cf.addSettingItem("linkage_folder",
-                new StringSettingItem(history, "", "", optionsTabPanel.getLinkageDirField(), optionsTabEventListener));
-        cf.addSettingItem("min_score",
-                new NumberSettingItem(history, 0.0, 0.0, optionsTabPanel.getMinScoreField(), optionsTabEventListener));
-        cf.addSettingItem("num_threads", new NumberSettingItem(history, 0, 0, optionsTabPanel.getThreadsField()));
-        cf.addSettingItem("max_rows", new NumberSettingItem(history, Integer.MAX_VALUE, Integer.MAX_VALUE,
-                optionsTabPanel.getMaxRowsField(), optionsTabEventListener));
+                new StringSettingItem(history, "", "",
+                        optionsTabPanel.getLinkageDirField(),
+                        optionsTabEventListener));
+        cf.addSettingItem("min_score", new NumberSettingItem(history, 0.0, 0.0,
+                optionsTabPanel.getMinScoreField(), optionsTabEventListener));
+        cf.addSettingItem("num_threads", new NumberSettingItem(history, 0, 0,
+                optionsTabPanel.getThreadsField()));
+        cf.addSettingItem("max_rows",
+                new NumberSettingItem(history, Integer.MAX_VALUE,
+                        Integer.MAX_VALUE, optionsTabPanel.getMaxRowsField(),
+                        optionsTabEventListener));
 
         // Tab: COLUMNS
-        ColumnPairValueChangeListener linkageColsTabAddDelEventListener = (int index, String key, Object newValue) -> {
+        ColumnPairValueChangeListener linkageColsTabAddDelEventListener = (
+                int index, String key, Object newValue) -> {
             if (!skipValidation)
                 tabbedPane.setSelectedComponent(linkageColsTabPanel);
             validateLinkageColsTab();
@@ -200,17 +217,21 @@ public class MainWindow {
                 validateLinkageColsTab();
             }
         };
-        ColumnPairSelectionListener linkageColsTabSelChangeEventListener = (int index) -> {
+        ColumnPairSelectionListener linkageColsTabSelChangeEventListener = (
+                int index) -> {
             validateLinkageColsTabSelectedRow(index);
         };
-        manager = new ColumnPairManager(history, linkageColsButtonPanel, linkageColsEditingPanel, linkageColsTable);
+        manager = new ColumnPairManager(history, linkageColsButtonPanel,
+                linkageColsEditingPanel, linkageColsTable);
 
         // Tab: EXECUTION
         executionTabPanel = new ExecutionPanel();
         tabbedPane.addTab("_Execution", null, executionTabPanel, null);
-        manager.addInclusionExclusionListener(linkageColsTabValueChangeEventListener);
+        manager.addInclusionExclusionListener(
+                linkageColsTabValueChangeEventListener);
         manager.addSelectionListener(linkageColsTabSelChangeEventListener);
-        manager.addValueChangeSelectionListener(linkageColsTabAddDelEventListener);
+        manager.addValueChangeSelectionListener(
+                linkageColsTabAddDelEventListener);
         cf.setPairPanager(manager);
 
         // Menus
@@ -224,6 +245,7 @@ public class MainWindow {
         menuBar.getUndoMenuItem().addActionListener(e -> doUndo());
         menuBar.getAboutMenuItem().addActionListener(e -> doAbout());
         menuBar.getRunMenuItem().addActionListener(e -> doRun());
+        menuBar.getCancelMenuItem().addActionListener(e -> doCancel());
 
         // Toolbar buttons
 
@@ -233,53 +255,56 @@ public class MainWindow {
         mainToolBar.getRedoBtn().addActionListener(e -> doRedo());
         mainToolBar.getUndoBtn().addActionListener(e -> doUndo());
         mainToolBar.getRunBtn().addActionListener(e -> doRun());
+        mainToolBar.getCancelBtn().addActionListener(e -> doCancel());
 
         // Undo - changed state
 
-        history.addPropertyChangeListener(new HistoryPropertyChangeEventListener() {
+        history.addPropertyChangeListener(
+                new HistoryPropertyChangeEventListener() {
 
-            @Override
-            public void cleanChanged(boolean isClean) {
-                dirty = !isClean;
-                updateConfigFileLabel();
-            }
+                    @Override
+                    public void cleanChanged(boolean isClean) {
+                        dirty = !isClean;
+                        updateConfigFileLabel();
+                    }
 
-            @Override
-            public void canUndoChanged(boolean canUndo) {
-                menuBar.getUndoMenuItem().setEnabled(canUndo);
-                mainToolBar.getUndoBtn().setEnabled(canUndo);
-            }
+                    @Override
+                    public void canUndoChanged(boolean canUndo) {
+                        menuBar.getUndoMenuItem().setEnabled(canUndo);
+                        mainToolBar.getUndoBtn().setEnabled(canUndo);
+                    }
 
-            @Override
-            public void canRedoChanged(boolean canRedo) {
-                menuBar.getRedoMenuItem().setEnabled(canRedo);
-                mainToolBar.getRedoBtn().setEnabled(canRedo);
-            }
+                    @Override
+                    public void canRedoChanged(boolean canRedo) {
+                        menuBar.getRedoMenuItem().setEnabled(canRedo);
+                        mainToolBar.getRedoBtn().setEnabled(canRedo);
+                    }
 
-            @Override
-            public void undoSummaryChanged(String summary) {
-                updateUndoMenuText(summary);
-            }
+                    @Override
+                    public void undoSummaryChanged(String summary) {
+                        updateUndoMenuText(summary);
+                    }
 
-            @Override
-            public void redoSummaryChanged(String summary) {
-                updateRedoMenuText(summary);
-            }
-        });
+                    @Override
+                    public void redoSummaryChanged(String summary) {
+                        updateRedoMenuText(summary);
+                    }
+                });
 
         // LANGUAGE
-        
+
         mainToolBar.getLanguageCBox().addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 MessageProvider.setLocale((Locale) e.getItem());
-                recovida.idas.rl.core.lang.MessageProvider.setLocale((Locale) e.getItem());
+                recovida.idas.rl.core.lang.MessageProvider
+                        .setLocale((Locale) e.getItem());
                 updateLocalisedStrings();
             }
         });
 
         updateConfigFileLabel();
         updateLocalisedStrings();
-        
+
         if (fileToOpen != null)
             doOpen(fileToOpen);
 
@@ -289,11 +314,11 @@ public class MainWindow {
         // show frame
         frame.setVisible(true);
 
-
     }
 
     protected Icon getTabErrorIcon() {
-        return new ImageIcon(WarningIcon.BUFFERED_IMAGE.getScaledInstance(15, 15, Image.SCALE_SMOOTH));
+        return new ImageIcon(WarningIcon.BUFFERED_IMAGE.getScaledInstance(15,
+                15, Image.SCALE_SMOOTH));
     }
 
     public synchronized int validateDatasetsTabTopPart() {
@@ -313,16 +338,16 @@ public class MainWindow {
         if (enc2 == null || enc2.isEmpty())
             enc2 = (String) items.get("encoding_b").getDefaultValue();
         if (!isValidEncoding(enc1)) {
-            datasetsTabPanel.getFirstEncodingWarningLbl()
-                    .setToolTipText(MessageProvider.getMessage("datasets.badencoding"));
+            datasetsTabPanel.getFirstEncodingWarningLbl().setToolTipText(
+                    MessageProvider.getMessage("datasets.badencoding"));
             datasetsTabPanel.getFirstEncodingWarningLbl().setVisible(true);
             errorCount++;
         } else {
             datasetsTabPanel.getFirstEncodingWarningLbl().setVisible(false);
         }
         if (!isValidEncoding(enc2)) {
-            datasetsTabPanel.getSecondEncodingWarningLbl()
-                    .setToolTipText(MessageProvider.getMessage("datasets.badencoding"));
+            datasetsTabPanel.getSecondEncodingWarningLbl().setToolTipText(
+                    MessageProvider.getMessage("datasets.badencoding"));
             datasetsTabPanel.getSecondEncodingWarningLbl().setVisible(true);
             errorCount++;
         } else {
@@ -330,7 +355,8 @@ public class MainWindow {
         }
 
         // File names
-        Path dir = currentFileName == null ? null : Paths.get(currentFileName).getParent();
+        Path dir = currentFileName == null ? null
+                : Paths.get(currentFileName).getParent();
         String f1 = (String) items.get("db_a").getCurrentValue();
         String f2 = (String) items.get("db_b").getCurrentValue();
         String fn1, fn2;
@@ -343,8 +369,10 @@ public class MainWindow {
         }
         DatasetPeek p;
         if (!peekFromFileNameAndEncoding.containsKey(fn1))
-            peekFromFileNameAndEncoding.put(fn1, new ConcurrentHashMap<String, DatasetPeek>());
-        ConcurrentMap<String, DatasetPeek> m = peekFromFileNameAndEncoding.get(fn1);
+            peekFromFileNameAndEncoding.put(fn1,
+                    new ConcurrentHashMap<String, DatasetPeek>());
+        ConcurrentMap<String, DatasetPeek> m = peekFromFileNameAndEncoding
+                .get(fn1);
         if (m.containsKey(enc1)) {
             p = m.get(enc1);
         } else {
@@ -361,13 +389,15 @@ public class MainWindow {
         DatasetPeekResult result = p.getResult();
         if (result != DatasetPeekResult.SUCCESS) {
             errorCount++;
-            datasetsTabPanel.getFirstDatasetWarningLbl().setToolTipText(getDatasetHeaderErrorMessage(result, fn1));
+            datasetsTabPanel.getFirstDatasetWarningLbl()
+                    .setToolTipText(getDatasetHeaderErrorMessage(result, fn1));
             datasetsTabPanel.getFirstDatasetWarningLbl().setVisible(true);
         } else
             datasetsTabPanel.getFirstDatasetWarningLbl().setVisible(false);
         manager.setFirstDatasetColumnNames(p.getColumnNames());
         if (!peekFromFileNameAndEncoding.containsKey(fn2))
-            peekFromFileNameAndEncoding.put(fn2, new ConcurrentHashMap<String, DatasetPeek>());
+            peekFromFileNameAndEncoding.put(fn2,
+                    new ConcurrentHashMap<String, DatasetPeek>());
         m = peekFromFileNameAndEncoding.get(fn2);
         if (m.containsKey(enc2)) {
             p = m.get(enc2);
@@ -385,15 +415,18 @@ public class MainWindow {
         result = p.getResult();
         if (result != DatasetPeekResult.SUCCESS) {
             errorCount++;
-            datasetsTabPanel.getSecondDatasetWarningLbl().setToolTipText(getDatasetHeaderErrorMessage(result, fn2));
+            datasetsTabPanel.getSecondDatasetWarningLbl()
+                    .setToolTipText(getDatasetHeaderErrorMessage(result, fn2));
             datasetsTabPanel.getSecondDatasetWarningLbl().setVisible(true);
         } else
             datasetsTabPanel.getSecondDatasetWarningLbl().setVisible(false);
         manager.setSecondDatasetColumnNames(p.getColumnNames());
         if (manager.getColumnPairCount() > 0)
-            manager.getTableModel().fireTableRowsUpdated(0, manager.getColumnPairCount() - 1);
+            manager.getTableModel().fireTableRowsUpdated(0,
+                    manager.getColumnPairCount() - 1);
         validateLinkageColsTab();
-        tabbedPane.setIconAt(tabbedPane.indexOfComponent(datasetsTabPanel), errorCount == 0 ? null : getTabErrorIcon());
+        tabbedPane.setIconAt(tabbedPane.indexOfComponent(datasetsTabPanel),
+                errorCount == 0 ? null : getTabErrorIcon());
         return errorCount;
     }
 
@@ -414,15 +447,21 @@ public class MainWindow {
         if (s2 == null || s2.isEmpty())
             s2 = (String) items.get("suffix_b").getDefaultValue();
         if (s1.equals(s2)) {
-            String msg = MessageProvider.getMessage("datasets.identicalprefixes");
-            datasetsTabPanel.getFirstDatasetSuffixWarningLbl().setToolTipText(msg);
-            datasetsTabPanel.getSecondDatasetSuffixWarningLbl().setToolTipText(msg);
+            String msg = MessageProvider
+                    .getMessage("datasets.identicalprefixes");
+            datasetsTabPanel.getFirstDatasetSuffixWarningLbl()
+                    .setToolTipText(msg);
+            datasetsTabPanel.getSecondDatasetSuffixWarningLbl()
+                    .setToolTipText(msg);
             datasetsTabPanel.getFirstDatasetSuffixWarningLbl().setVisible(true);
-            datasetsTabPanel.getSecondDatasetSuffixWarningLbl().setVisible(true);
+            datasetsTabPanel.getSecondDatasetSuffixWarningLbl()
+                    .setVisible(true);
             errorCount++;
         } else {
-            datasetsTabPanel.getFirstDatasetSuffixWarningLbl().setVisible(false);
-            datasetsTabPanel.getSecondDatasetSuffixWarningLbl().setVisible(false);
+            datasetsTabPanel.getFirstDatasetSuffixWarningLbl()
+                    .setVisible(false);
+            datasetsTabPanel.getSecondDatasetSuffixWarningLbl()
+                    .setVisible(false);
         }
         manager.setFirstRenameSuffix(s1);
         manager.setSecondRenameSuffix(s2);
@@ -435,15 +474,22 @@ public class MainWindow {
         if (s2 == null || s2.isEmpty())
             s2 = (String) items.get("row_num_col_b").getDefaultValue();
         if (s1.equals(s2)) {
-            String msg = MessageProvider.getMessage("datasets.identicalrownumcolnames");
-            datasetsTabPanel.getFirstDatasetRowNumColWarningLbl().setToolTipText(msg);
-            datasetsTabPanel.getSecondDatasetRowNumColWarningLbl().setToolTipText(msg);
-            datasetsTabPanel.getFirstDatasetRowNumColWarningLbl().setVisible(true);
-            datasetsTabPanel.getSecondDatasetRowNumColWarningLbl().setVisible(true);
+            String msg = MessageProvider
+                    .getMessage("datasets.identicalrownumcolnames");
+            datasetsTabPanel.getFirstDatasetRowNumColWarningLbl()
+                    .setToolTipText(msg);
+            datasetsTabPanel.getSecondDatasetRowNumColWarningLbl()
+                    .setToolTipText(msg);
+            datasetsTabPanel.getFirstDatasetRowNumColWarningLbl()
+                    .setVisible(true);
+            datasetsTabPanel.getSecondDatasetRowNumColWarningLbl()
+                    .setVisible(true);
             errorCount++;
         } else {
-            datasetsTabPanel.getFirstDatasetRowNumColWarningLbl().setVisible(false);
-            datasetsTabPanel.getSecondDatasetRowNumColWarningLbl().setVisible(false);
+            datasetsTabPanel.getFirstDatasetRowNumColWarningLbl()
+                    .setVisible(false);
+            datasetsTabPanel.getSecondDatasetRowNumColWarningLbl()
+                    .setVisible(false);
         }
         return errorCount;
     }
@@ -454,26 +500,33 @@ public class MainWindow {
         return 0;
     }
 
-    public synchronized int validateLinkageColsTabSelectedRow(int rowIndex, String key) {
+    public synchronized int validateLinkageColsTabSelectedRow(int rowIndex,
+            String key) {
         if (skipValidation)
             return -1;
-        boolean error = rowIndex >= 0 && !columnPairTableModel.isCellValid(rowIndex, key);
+        boolean error = rowIndex >= 0
+                && !columnPairTableModel.isCellValid(rowIndex, key);
         JLabel lbl;
         switch (key) {
         case "index_a":
             lbl = linkageColsEditingPanel.getFirstNameWarningLbl();
             lbl.setVisible(error);
-            lbl.setToolTipText(error ? MessageProvider.getMessage("columns.badcolumn") : "");
+            lbl.setToolTipText(
+                    error ? MessageProvider.getMessage("columns.badcolumn")
+                            : "");
             break;
         case "index_b":
             lbl = linkageColsEditingPanel.getSecondNameWarningLbl();
             lbl.setVisible(error);
-            lbl.setToolTipText(error ? MessageProvider.getMessage("columns.badcolumn") : "");
+            lbl.setToolTipText(
+                    error ? MessageProvider.getMessage("columns.badcolumn")
+                            : "");
             break;
         case "type":
             lbl = linkageColsEditingPanel.getTypeWarningLbl();
             lbl.setVisible(error);
-            lbl.setToolTipText(error ? MessageProvider.getMessage("columns.badtype") : "");
+            lbl.setToolTipText(
+                    error ? MessageProvider.getMessage("columns.badtype") : "");
             break;
         case "weight":
         case "phon_weight":
@@ -490,7 +543,8 @@ public class MainWindow {
         if (skipValidation)
             return -1;
         int errorCount = 0;
-        String[] keys = { "number", "index_a", "index_b", "type", "weight", "phon_weight", "rename_a", "rename_b" };
+        String[] keys = { "number", "index_a", "index_b", "type", "weight",
+                "phon_weight", "rename_a", "rename_b" };
         for (String key : keys)
             errorCount += validateLinkageColsTabSelectedRow(index, key);
         return errorCount;
@@ -510,11 +564,12 @@ public class MainWindow {
     }
 
     public int validateAllTabs() {
-        return validateDatasetsTabTopPart() + validateDatasetsTabBottomPart() + validateOptionsTab()
-                + validateLinkageColsTab();
+        return validateDatasetsTabTopPart() + validateDatasetsTabBottomPart()
+                + validateOptionsTab() + validateLinkageColsTab();
     }
 
-    public static String getDatasetHeaderErrorMessage(DatasetPeekResult result, String fileName) {
+    public static String getDatasetHeaderErrorMessage(DatasetPeekResult result,
+            String fileName) {
         switch (result) {
         case BLANK_NAME:
             return MessageProvider.getMessage("datasets.blankfilename");
@@ -537,10 +592,13 @@ public class MainWindow {
             JComponent component = item.getGuiComponent();
             if (component instanceof JTextField)
                 ((JTextField) component).setText("");
-            else if (component instanceof JComboBox<?> && ((JComboBox<String>) component).isEditable())
-                ((JComboBox<String>) item.getGuiComponent()).setSelectedItem("");
+            else if (component instanceof JComboBox<?>
+                    && ((JComboBox<String>) component).isEditable())
+                ((JComboBox<String>) item.getGuiComponent())
+                        .setSelectedItem("");
             else if (component instanceof JSpinnerWithBlankValue)
-                ((JSpinnerWithBlankValue) component).setValue(((JSpinnerWithBlankValue) component).getBlankValue());
+                ((JSpinnerWithBlankValue) component).setValue(
+                        ((JSpinnerWithBlankValue) component).getBlankValue());
         }
         columnPairTableModel.setRowCount(0);
     }
@@ -549,7 +607,8 @@ public class MainWindow {
         if (enc == null)
             return false;
         try {
-            return enc.toUpperCase().replaceAll("[^A-Z0-9]", "").equals("ANSI") || Charset.isSupported(enc);
+            return enc.toUpperCase().replaceAll("[^A-Z0-9]", "").equals("ANSI")
+                    || Charset.isSupported(enc);
         } catch (IllegalCharsetNameException e) {
             return false;
         }
@@ -570,7 +629,8 @@ public class MainWindow {
             int ans = promptToSaveChanges();
             if (ans == JOptionPane.YES_OPTION)
                 doSave();
-            else if (ans == JOptionPane.CANCEL_OPTION || ans == JOptionPane.CLOSED_OPTION)
+            else if (ans == JOptionPane.CANCEL_OPTION
+                    || ans == JOptionPane.CLOSED_OPTION)
                 return;
         }
         clearAllFields();
@@ -585,11 +645,13 @@ public class MainWindow {
             int ans = promptToSaveChanges();
             if (ans == JOptionPane.YES_OPTION)
                 doSave();
-            else if (ans == JOptionPane.CANCEL_OPTION || ans == JOptionPane.CLOSED_OPTION)
+            else if (ans == JOptionPane.CANCEL_OPTION
+                    || ans == JOptionPane.CLOSED_OPTION)
                 return;
         }
-        String newConfigFileName = selectConfigFile(
-                currentFileName == null ? null : Paths.get(currentFileName).toAbsolutePath().toString());
+        String newConfigFileName = selectConfigFile(currentFileName == null
+                ? null
+                : Paths.get(currentFileName).toAbsolutePath().toString());
         if (newConfigFileName != null) {
             doOpen(newConfigFileName);
         }
@@ -605,8 +667,10 @@ public class MainWindow {
             history.clearAll();
             linkageColsTable.clearSelection();
         } else {
-            JOptionPane.showMessageDialog(frame, MessageProvider.getMessage("menu.file.open.cantopen"),
-                    MessageProvider.getMessage("menu.file.open.error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame,
+                    MessageProvider.getMessage("menu.file.open.cantopen"),
+                    MessageProvider.getMessage("menu.file.open.error"),
+                    JOptionPane.ERROR_MESSAGE);
         }
         SwingUtilities.invokeLater(() -> {
             skipValidation = false;
@@ -630,11 +694,16 @@ public class MainWindow {
             updateConfigFileName(currentFileName);
             history.setClean();
             if (validateAllTabs() > 0 && wasDirty)
-                JOptionPane.showMessageDialog(frame, MessageProvider.getMessage("menu.file.save.containserrors"),
-                        MessageProvider.getMessage("menu.file.save.warning"), JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(frame,
+                        MessageProvider
+                                .getMessage("menu.file.save.containserrors"),
+                        MessageProvider.getMessage("menu.file.save.warning"),
+                        JOptionPane.WARNING_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(frame, MessageProvider.getMessage("menu.file.save.cantsave"),
-                    MessageProvider.getMessage("menu.file.save.error"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame,
+                    MessageProvider.getMessage("menu.file.save.cantsave"),
+                    MessageProvider.getMessage("menu.file.save.error"),
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -653,8 +722,10 @@ public class MainWindow {
     }
 
     protected void showDuplicateNumbersWarning() {
-        JOptionPane.showMessageDialog(frame, MessageProvider.getMessage("menu.file.save.duplicatenumbers"),
-                MessageProvider.getMessage("menu.file.save.error"), JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(frame,
+                MessageProvider.getMessage("menu.file.save.duplicatenumbers"),
+                MessageProvider.getMessage("menu.file.save.error"),
+                JOptionPane.ERROR_MESSAGE);
     }
 
     protected void doExit() {
@@ -662,7 +733,8 @@ public class MainWindow {
             int ans = promptToSaveChanges();
             if (ans == JOptionPane.YES_OPTION)
                 doSave();
-            else if (ans == JOptionPane.CANCEL_OPTION || ans == JOptionPane.CLOSED_OPTION)
+            else if (ans == JOptionPane.CANCEL_OPTION
+                    || ans == JOptionPane.CLOSED_OPTION)
                 return;
         }
         frame.dispose();
@@ -671,18 +743,32 @@ public class MainWindow {
     protected void doRun() {
         mainToolBar.getRunBtn().setEnabled(false);
         menuBar.getRunMenuItem().setEnabled(false);
+        mainToolBar.getCancelBtn().setEnabled(true);
+        menuBar.getCancelMenuItem().setEnabled(true);
         if (dirty)
             doSave();
-        Execution ex = new Execution(executionTabPanel.addExecutionPanel(), currentFileName);
+        execution = new Execution(executionTabPanel.addExecutionPanel(),
+                currentFileName);
         tabbedPane.setSelectedComponent(executionTabPanel);
-        CompletableFuture<Boolean> f = ex.start();
+        CompletableFuture<Boolean> f = execution.start();
         f.thenAccept((Boolean success) -> {
             SwingUtilities.invokeLater(() -> {
                 mainToolBar.getRunBtn().setEnabled(true);
                 menuBar.getRunMenuItem().setEnabled(true);
+                mainToolBar.getCancelBtn().setEnabled(false);
+                menuBar.getCancelMenuItem().setEnabled(false);
                 f.join();
             });
         });
+    }
+
+    protected void doCancel() {
+        mainToolBar.getCancelBtn().setEnabled(false);
+        menuBar.getCancelMenuItem().setEnabled(false);
+        if (execution != null) {
+            execution.cancel();
+        }
+        execution = null;
     }
 
     protected void doAbout() {
@@ -694,13 +780,14 @@ public class MainWindow {
             currentFileChangeWatcher.disable();
         if (fn != null) {
             if (!fn.equals(currentFileName) || currentFileChangeWatcher == null)
-                currentFileChangeWatcher = new FileChangeWatcher(Paths.get(fn), () -> {
-                    int result = promptToSaveChangesAfterChangeOnDisk();
-                    if (result == JOptionPane.YES_OPTION)
-                        doSave();
-                    else if (result == JOptionPane.NO_OPTION)
-                        doOpen(currentFileName);
-                });
+                currentFileChangeWatcher = new FileChangeWatcher(Paths.get(fn),
+                        () -> {
+                            int result = promptToSaveChangesAfterChangeOnDisk();
+                            if (result == JOptionPane.YES_OPTION)
+                                doSave();
+                            else if (result == JOptionPane.NO_OPTION)
+                                doOpen(currentFileName);
+                        });
             currentFileChangeWatcher.enable();
         } else
             currentFileChangeWatcher = null;
@@ -712,23 +799,35 @@ public class MainWindow {
     }
 
     protected int promptToSaveChanges() {
-        String msg = (currentFileName == null ? MessageProvider.getMessage("menu.file.save.savechangesnofile")
-                : MessageFormat.format(MessageProvider.getMessage("menu.file.save.savechangesfile"), currentFileName));
-        return JOptionPane.showOptionDialog(this.frame, msg, MessageProvider.getMessage("menu.file.save.savechanges"),
-                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+        String msg = (currentFileName == null
+                ? MessageProvider.getMessage("menu.file.save.savechangesnofile")
+                : MessageFormat.format(
+                        MessageProvider
+                                .getMessage("menu.file.save.savechangesfile"),
+                        currentFileName));
+        return JOptionPane.showOptionDialog(this.frame, msg,
+                MessageProvider.getMessage("menu.file.save.savechanges"),
+                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, null, null);
     }
 
     protected int promptToSaveChangesAfterChangeOnDisk() {
         String[] opt = new String[] {
-                MessageProvider.getMessage("menu.file.save." + (dirty ? "saveandoverwrite" : "overwrite")),
-                MessageProvider.getMessage("menu.file.save." + (dirty ? "discardandreload" : "reload")) };
-        String msg = MessageFormat.format(MessageProvider.getMessage("menu.file.save.changedondisk"),
-                currentFileName == null ? "" : Paths.get(currentFileName).getFileName());
-        String title = MessageProvider.getMessage("menu.file.save.changedexternally");
+                MessageProvider.getMessage("menu.file.save."
+                        + (dirty ? "saveandoverwrite" : "overwrite")),
+                MessageProvider.getMessage("menu.file.save."
+                        + (dirty ? "discardandreload" : "reload")) };
+        String msg = MessageFormat.format(
+                MessageProvider.getMessage("menu.file.save.changedondisk"),
+                currentFileName == null ? ""
+                        : Paths.get(currentFileName).getFileName());
+        String title = MessageProvider
+                .getMessage("menu.file.save.changedexternally");
         int result;
         do {
-            result = JOptionPane.showOptionDialog(this.frame, msg, title, JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, null, opt, null);
+            result = JOptionPane.showOptionDialog(this.frame, msg, title,
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, opt, null);
         } while (result == JOptionPane.CLOSED_OPTION);
         return result;
     }
@@ -743,6 +842,7 @@ public class MainWindow {
         frame.setBounds(100, 100, 799, 481);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent e) {
                 doExit();
             }
@@ -757,19 +857,24 @@ public class MainWindow {
 
         datasetsTabPanel.getFirstDatasetBtn().addActionListener(e -> {
             String current = datasetsTabPanel.getFirstDatasetField().getText();
-            String result = selectDatasetFile(current.isEmpty() ? null : current);
+            String result = selectDatasetFile(
+                    current.isEmpty() ? null : current);
             if (result != null)
                 datasetsTabPanel.getFirstDatasetField().setText(result);
         });
-        datasetsTabPanel.getSecondDatasetBtn().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String current = datasetsTabPanel.getSecondDatasetField().getText();
-                String result = selectDatasetFile(current.isEmpty() ? null : current);
-                if (result != null)
-                    datasetsTabPanel.getSecondDatasetField().setText(result);
-            }
-        });
+        datasetsTabPanel.getSecondDatasetBtn()
+                .addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String current = datasetsTabPanel
+                                .getSecondDatasetField().getText();
+                        String result = selectDatasetFile(
+                                current.isEmpty() ? null : current);
+                        if (result != null)
+                            datasetsTabPanel.getSecondDatasetField()
+                                    .setText(result);
+                    }
+                });
 
         optionsTabPanel = new OptionsTabPanel();
         tabbedPane.addTab("_Options", null, optionsTabPanel, null);
@@ -824,13 +929,17 @@ public class MainWindow {
         JFileChooser chooser = new JFileChooser();
         Path dir = currentFileName == null ? Paths.get(".").toAbsolutePath()
                 : Paths.get(currentFileName).toAbsolutePath().getParent();
-        chooser.setCurrentDirectory(currentName != null ? dir.resolve(currentName).getParent().toFile() : dir.toFile());
+        chooser.setCurrentDirectory(currentName != null
+                ? dir.resolve(currentName).getParent().toFile()
+                : dir.toFile());
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                MessageProvider.getMessage("datasets.supportedformats"), "csv", "dbf");
+                MessageProvider.getMessage("datasets.supportedformats"), "csv",
+                "dbf");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            Path here = currentFileName == null ? null : Paths.get(currentFileName).toAbsolutePath().getParent();
+            Path here = currentFileName == null ? null
+                    : Paths.get(currentFileName).toAbsolutePath().getParent();
             String f = chooser.getSelectedFile().getAbsolutePath();
             if (here != null && f.startsWith(here.toString() + File.separator))
                 return here.relativize(Paths.get(f)).toString();
@@ -843,13 +952,17 @@ public class MainWindow {
     private String selectConfigFile(String fileName, boolean save) {
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(
-                fileName != null ? new File(fileName).getParentFile() : new File(".").getAbsoluteFile());
+                fileName != null ? new File(fileName).getParentFile()
+                        : new File(".").getAbsoluteFile());
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                MessageProvider.getMessage(save ? "menu.file.save.propertiesfile" : "menu.file.open.propertiesfile"),
+                MessageProvider
+                        .getMessage(save ? "menu.file.save.propertiesfile"
+                                : "menu.file.open.propertiesfile"),
                 "properties", "ini");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
-        int result = save ? chooser.showSaveDialog(frame) : chooser.showOpenDialog(frame);
+        int result = save ? chooser.showSaveDialog(frame)
+                : chooser.showOpenDialog(frame);
         if (result == JFileChooser.APPROVE_OPTION)
             return chooser.getSelectedFile().getAbsolutePath();
         return null;
@@ -859,7 +972,9 @@ public class MainWindow {
         JFileChooser chooser = new JFileChooser();
         Path dir = currentFileName == null ? Paths.get(".").toAbsolutePath()
                 : Paths.get(currentFileName).toAbsolutePath().getParent();
-        chooser.setCurrentDirectory(fileName != null ? dir.resolve(fileName).getParent().toFile() : dir.toFile());
+        chooser.setCurrentDirectory(
+                fileName != null ? dir.resolve(fileName).getParent().toFile()
+                        : dir.toFile());
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setAcceptAllFileFilterUsed(true);
         int result = chooser.showSaveDialog(frame);
@@ -874,9 +989,11 @@ public class MainWindow {
 
     private void updateConfigFileLabel() {
         String unsaved = MessageProvider.getMessage("menu.unsavedfile");
-        menuBar.getCurrentFileLbl()
-                .setText((dirty ? "[*] " : "") + (currentFileName == null ? unsaved : currentFileName));
-        frame.setTitle((dirty ? "[*] " : "") + (currentFileName == null ? unsaved : new File(currentFileName).getName())
+        menuBar.getCurrentFileLbl().setText((dirty ? "[*] " : "")
+                + (currentFileName == null ? unsaved : currentFileName));
+        frame.setTitle((dirty ? "[*] " : "")
+                + (currentFileName == null ? unsaved
+                        : new File(currentFileName).getName())
                 + " - " + PROGRAM_NAME);
     }
 
@@ -919,7 +1036,8 @@ public class MainWindow {
                 " " + MessageProvider.getMessage("columns") + " ");
         linkageColsEditingPanel.updateLocalisedStrings();
         linkageColsButtonPanel.updateLocalisedStrings();
-        ColumnPairTableModel model = (ColumnPairTableModel) linkageColsTable.getModel();
+        ColumnPairTableModel model = (ColumnPairTableModel) linkageColsTable
+                .getModel();
         model.updateLocalisedStrings(linkageColsTable.getColumnModel());
 
         // tab - execution
