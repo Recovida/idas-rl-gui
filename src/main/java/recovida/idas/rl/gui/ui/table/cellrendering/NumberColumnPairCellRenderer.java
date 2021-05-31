@@ -3,6 +3,7 @@ package recovida.idas.rl.gui.ui.table.cellrendering;
 import java.awt.Component;
 import java.awt.Font;
 
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
@@ -29,7 +30,8 @@ public class NumberColumnPairCellRenderer extends ColumnPairCellRenderer
             c.setForeground(getErrorColour(isSelected));
             if (italic)
                 c.setFont(c.getFont().deriveFont(Font.ITALIC));
-        }
+        } else if (c instanceof JLabel)
+            ((JLabel) c).setHorizontalAlignment(JLabel.RIGHT);
         return c;
     }
 

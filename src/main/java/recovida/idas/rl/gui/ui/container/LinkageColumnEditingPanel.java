@@ -198,7 +198,7 @@ public class LinkageColumnEditingPanel extends JPanel {
                 .setLayout(new BoxLayout(numberContainer, BoxLayout.X_AXIS));
 
         numberField = new JSpinnerWithBlankValue(
-                new SpinnerNumberModel(0, -1, Integer.MAX_VALUE, 1));
+                new SpinnerNumberModel(0, -1, Integer.MAX_VALUE, 1), "0");
         numberContainer.add(numberField);
         ((JSpinnerWithBlankValue) numberField)
                 .setBlankValue(Integer.valueOf(-1));
@@ -346,9 +346,8 @@ public class LinkageColumnEditingPanel extends JPanel {
         weightContainer
                 .setLayout(new BoxLayout(weightContainer, BoxLayout.X_AXIS));
         weightField = new JSpinnerWithBlankValue(
-                new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1));
+                new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1), "0.0000");
         weightContainer.add(weightField);
-        weightField.setEditor(new JSpinner.NumberEditor(weightField, "0.0000"));
         weightField.setPreferredSize(new Dimension(65, 30));
         weightField.setMinimumSize(new Dimension(50, 30));
 
@@ -371,11 +370,9 @@ public class LinkageColumnEditingPanel extends JPanel {
                 new BoxLayout(phonWeightContainer, BoxLayout.X_AXIS));
 
         phonWeightField = new JSpinnerWithBlankValue(
-                new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1));
+                new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, 0.1), "0.0000");
         phonWeightContainer.add(phonWeightField);
         phonWeightField.setBlankValue(zero);
-        phonWeightField.setEditor(
-                new JSpinner.NumberEditor(phonWeightField, "0.0000"));
         phonWeightField.setPreferredSize(new Dimension(65, 30));
         phonWeightField.setMinimumSize(new Dimension(50, 30));
 
@@ -471,6 +468,8 @@ public class LinkageColumnEditingPanel extends JPanel {
         weightLbl.setText(MessageProvider.getMessage("columns.editing.weight"));
         phonWeightLbl.setText(
                 MessageProvider.getMessage("columns.editing.phonweight"));
+        weightField.refreshLocaleFormat();
+        phonWeightField.refreshLocaleFormat();
     }
 
 }

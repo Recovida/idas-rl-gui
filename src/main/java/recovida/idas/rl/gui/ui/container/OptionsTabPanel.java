@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JSpinner.NumberEditor;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
@@ -137,7 +138,7 @@ public class OptionsTabPanel extends JPanel {
         gbc_minScoreLbl.gridx = 0;
         gbc_minScoreLbl.gridy = 3;
         add(minScoreLbl, gbc_minScoreLbl);
-        minScoreField = new JSpinnerWithBlankValue(minScoreModel);
+        minScoreField = new JSpinnerWithBlankValue(minScoreModel, "0.000");
 
         ((JSpinnerWithBlankValue) minScoreField).setBlankValue(Double.valueOf(0.0));
         GridBagConstraints gbc_minScoreField = new GridBagConstraints();
@@ -147,10 +148,9 @@ public class OptionsTabPanel extends JPanel {
         gbc_minScoreField.gridy = 3;
         add(minScoreField, gbc_minScoreField);
 
-        JSpinner.NumberEditor ne_minScoreField = new JSpinner.NumberEditor(minScoreField, "0.000");
+        JSpinner.NumberEditor ne_minScoreField = (NumberEditor) minScoreField.getEditor();
         ne_minScoreField.setPreferredSize(new Dimension(122, 29));
         ne_minScoreField.setRequestFocusEnabled(false);
-        minScoreField.setEditor(ne_minScoreField);
 
         // max rows
 
@@ -165,7 +165,7 @@ public class OptionsTabPanel extends JPanel {
         gbc_maxRowsLbl.gridx = 0;
         gbc_maxRowsLbl.gridy = 5;
         add(maxRowsLbl, gbc_maxRowsLbl);
-        maxRowsField = new JSpinnerWithBlankValue(maxRowsModel);
+        maxRowsField = new JSpinnerWithBlankValue(maxRowsModel, "0");
         ((JSpinnerWithBlankValue) maxRowsField).setBlankValue(Integer.MAX_VALUE);
         GridBagConstraints gbc_maxRowsField = new GridBagConstraints();
         gbc_maxRowsField.anchor = GridBagConstraints.WEST;
@@ -173,8 +173,6 @@ public class OptionsTabPanel extends JPanel {
         gbc_maxRowsField.gridy = 5;
         add(maxRowsField, gbc_maxRowsField);
 
-        JSpinner.NumberEditor ne_maxRowsField = new JSpinner.NumberEditor(maxRowsField, "0");
-        maxRowsField.setEditor(ne_maxRowsField);
 
         // num threads
 
@@ -200,14 +198,13 @@ public class OptionsTabPanel extends JPanel {
         add(threadsPanel, gbc_threadsPanel);
         threadsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
 
-        threadsField = new JSpinnerWithBlankValue(threadsModel);
+        threadsField = new JSpinnerWithBlankValue(threadsModel, "0");
         threadsPanel.add(threadsField);
         threadsField.setBlankValue(Integer.valueOf(0));
 
-        JSpinner.NumberEditor ne_threadsField = new JSpinner.NumberEditor(threadsField, "0");
+        JSpinner.NumberEditor ne_threadsField = (NumberEditor) threadsField.getEditor();
         ne_threadsField.setPreferredSize(new Dimension(122, 29));
         ne_threadsField.setRequestFocusEnabled(false);
-        threadsField.setEditor(ne_threadsField);
 
         Component horizontalStrut = Box.createHorizontalStrut(20);
         threadsPanel.add(horizontalStrut);
