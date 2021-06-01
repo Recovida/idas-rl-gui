@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.NumberEditor;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
@@ -51,9 +52,13 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
     private final JLabel coresLabel;
 
+    private JLabel cleaningRegexLbl;
+
     private final ErrorIconLabel linkageDirWarningLbl;
 
     private final ErrorIconLabel indexDirWarningLbl;
+
+    private ErrorIconLabel cleaningRegexWarningLbl;
 
     // fields
 
@@ -67,6 +72,8 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
     private final JSpinnerWithBlankValue maxRowsField;
 
+    private JTextField cleaningRegexField;
+
     /**
      * Creates an instance of the panel.
      */
@@ -76,9 +83,9 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
         GridBagLayout gbl = new GridBagLayout();
         gbl.columnWidths = new int[] { 250, 500 };
-        gbl.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+        gbl.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
         gbl.columnWeights = new double[] { 0.0, 1.0 };
-        gbl.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        gbl.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 Double.MIN_VALUE };
         setLayout(gbl);
 
@@ -193,13 +200,14 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         maxRowsLbl.setPreferredSize(new Dimension(150, 17));
         GridBagConstraints maxRowsLblGBC = new GridBagConstraints();
         maxRowsLblGBC.fill = GridBagConstraints.HORIZONTAL;
-        maxRowsLblGBC.insets = new Insets(0, 0, 0, 5);
+        maxRowsLblGBC.insets = new Insets(0, 0, 5, 5);
         maxRowsLblGBC.gridx = 0;
         maxRowsLblGBC.gridy = 5;
         add(maxRowsLbl, maxRowsLblGBC);
         maxRowsField = new JSpinnerWithBlankValue(maxRowsModel, "0");
         maxRowsField.setBlankValue(Integer.MAX_VALUE);
         GridBagConstraints maxRowsFieldGBC = new GridBagConstraints();
+        maxRowsFieldGBC.insets = new Insets(0, 0, 5, 0);
         maxRowsFieldGBC.anchor = GridBagConstraints.WEST;
         maxRowsFieldGBC.gridx = 1;
         maxRowsFieldGBC.gridy = 5;
@@ -245,6 +253,36 @@ public class OptionsTabPanel extends JPanel implements Translatable {
                 "_On this computer, this number should ideally be at most n.");
         threadsPanel.add(coresLabel);
 
+        // cleaning regex
+
+        cleaningRegexLbl = new JLabel("_Cleaning regex");
+        cleaningRegexLbl.setPreferredSize(new Dimension(150, 17));
+        cleaningRegexLbl.setHorizontalAlignment(SwingConstants.TRAILING);
+        GridBagConstraints cleaningRegexLblGBC = new GridBagConstraints();
+        cleaningRegexLblGBC.anchor = GridBagConstraints.EAST;
+        cleaningRegexLblGBC.insets = new Insets(0, 0, 0, 5);
+        cleaningRegexLblGBC.gridx = 0;
+        cleaningRegexLblGBC.gridy = 6;
+        add(cleaningRegexLbl, cleaningRegexLblGBC);
+
+        JPanel cleaningRegexContainer;
+        cleaningRegexContainer = new JPanel();
+        GridBagConstraints cleaningRegexContainerGBC = new GridBagConstraints();
+        cleaningRegexContainerGBC.fill = GridBagConstraints.BOTH;
+        cleaningRegexContainerGBC.gridx = 1;
+        cleaningRegexContainerGBC.gridy = 6;
+        add(cleaningRegexContainer, cleaningRegexContainerGBC);
+        cleaningRegexContainer.setLayout(
+                new BoxLayout(cleaningRegexContainer, BoxLayout.X_AXIS));
+
+        cleaningRegexWarningLbl = new ErrorIconLabel();
+        getCleaningRegexWarningLbl().setVisible(false);
+        cleaningRegexContainer.add(getCleaningRegexWarningLbl());
+
+        cleaningRegexField = new JTextField();
+        cleaningRegexContainer.add(cleaningRegexField);
+        cleaningRegexField.setColumns(10);
+
     }
 
     @Override
@@ -263,6 +301,8 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         coresLabel.setText(MessageFormat.format(
                 MessageProvider.getMessage("options.threads.cores"),
                 Runtime.getRuntime().availableProcessors()));
+        cleaningRegexLbl
+                .setText(MessageProvider.getMessage("options.cleaningregex"));
         minScoreField.updateLocalisedStrings();
         maxRowsField.updateLocalisedStrings();
         threadsField.updateLocalisedStrings();
@@ -312,6 +352,10 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         return indexDirField;
     }
 
+    public JTextField getCleaningRegexField() {
+        return cleaningRegexField;
+    }
+
     public JSpinner getMinScoreField() {
         return minScoreField;
     }
@@ -326,6 +370,10 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
     public ErrorIconLabel getIndexDirWarningLbl() {
         return indexDirWarningLbl;
+    }
+
+    public ErrorIconLabel getCleaningRegexWarningLbl() {
+        return cleaningRegexWarningLbl;
     }
 
 }

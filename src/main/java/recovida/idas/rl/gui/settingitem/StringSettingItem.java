@@ -85,8 +85,9 @@ public class StringSettingItem extends AbstractSettingItem<String, JTextField> {
             return;
         currentValue = newValue;
         for (SettingItemChangeListener listener : listeners)
-            if (listener != null)
+            if (listener != null) {
                 listener.changed(newValue);
+            }
     }
 
     @Override

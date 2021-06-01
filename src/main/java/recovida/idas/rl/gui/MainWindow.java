@@ -17,9 +17,12 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -235,7 +238,11 @@ public class MainWindow implements Translatable {
         cf.addSettingItem("min_score", new NumberSettingItem(history, 0.0, 0.0,
                 optionsTabPanel.getMinScoreField(), optionsTabEventListener));
         cf.addSettingItem("num_threads", new NumberSettingItem(history, 0, 0,
-                optionsTabPanel.getThreadsField()));
+                optionsTabPanel.getThreadsField(), optionsTabEventListener));
+        cf.addSettingItem("cleaning_regex",
+                new StringSettingItem(history, "", "",
+                        optionsTabPanel.getCleaningRegexField(),
+                        optionsTabEventListener));
         cf.addSettingItem("max_rows",
                 new NumberSettingItem(history, Integer.MAX_VALUE,
                         Integer.MAX_VALUE, optionsTabPanel.getMaxRowsField(),
@@ -565,6 +572,15 @@ public class MainWindow implements Translatable {
             errorCount++;
         } else
             optionsTabPanel.getIndexDirWarningLbl().setVisible(false);
+        try {
+            String r = (String) Optional.ofNullable(cf.getSettingItems()
+                    .get("cleaning_regex").getCurrentValue()).orElse("");
+            Pattern.compile(r);
+            optionsTabPanel.getCleaningRegexWarningLbl().setVisible(false);
+        } catch (PatternSyntaxException e) {
+            errorCount++;
+            optionsTabPanel.getCleaningRegexWarningLbl().setVisible(true);
+        }
         tabbedPane.setIconAt(tabbedPane.indexOfComponent(optionsTabPanel),
                 errorCount == 0 ? null : getTabErrorIcon());
         return errorCount;
