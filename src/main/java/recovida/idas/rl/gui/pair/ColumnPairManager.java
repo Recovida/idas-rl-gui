@@ -362,7 +362,6 @@ public class ColumnPairManager {
      */
     public synchronized void onChange(int rowIndex, String key,
             Object newValue) {
-        System.out.format("%d_%s = “%s”%n", rowIndex, key, newValue);
         ignoreSelectionEvent = true;
         model.setValue(rowIndex, key, newValue);
         ignoreSelectionEvent = false;
