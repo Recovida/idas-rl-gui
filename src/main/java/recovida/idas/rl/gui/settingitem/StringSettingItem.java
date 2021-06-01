@@ -76,7 +76,7 @@ public class StringSettingItem extends AbstractSettingItem<String, JTextField> {
             String defaultValue, JTextField guiComponent,
             SettingItemChangeListener listener) {
         this(history, currentValue, defaultValue, guiComponent);
-        this.listeners.add(listener);
+        listeners.add(listener);
     }
 
     @Override
@@ -91,15 +91,11 @@ public class StringSettingItem extends AbstractSettingItem<String, JTextField> {
 
     @Override
     public synchronized void setValue(String newValue) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                supressDocumentListener = true;
-                guiComponent.setText(newValue);
-                guiComponent.grabFocus();
-                supressDocumentListener = false;
-            }
+        SwingUtilities.invokeLater(() -> {
+            supressDocumentListener = true;
+            guiComponent.setText(newValue);
+            guiComponent.grabFocus();
+            supressDocumentListener = false;
         });
     }
 

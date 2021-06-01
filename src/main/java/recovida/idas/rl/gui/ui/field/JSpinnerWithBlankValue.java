@@ -25,9 +25,9 @@ public class JSpinnerWithBlankValue extends JSpinner implements Translatable {
 
     private Object blankValue = new Object();
 
-    private String blankText = "\u200b";
+    private final String blankText = "\u200b";
 
-    private String decimalFormatPattern;
+    private final String decimalFormatPattern;
 
     private NumberFormat numberFormat;
 

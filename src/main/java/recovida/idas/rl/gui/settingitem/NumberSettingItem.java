@@ -59,7 +59,7 @@ public class NumberSettingItem extends AbstractSettingItem<Number, JSpinner> {
             Number defaultValue, JSpinner guiComponent,
             SettingItemChangeListener listener) {
         this(history, currentValue, defaultValue, guiComponent);
-        this.listeners.add(listener);
+        listeners.add(listener);
     }
 
     @Override
@@ -74,15 +74,11 @@ public class NumberSettingItem extends AbstractSettingItem<Number, JSpinner> {
 
     @Override
     public synchronized void setValue(Number newValue) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                supressDocumentListener = true;
-                guiComponent.setValue(newValue);
-                guiComponent.grabFocus();
-                supressDocumentListener = false;
-            }
+        SwingUtilities.invokeLater(() -> {
+            supressDocumentListener = true;
+            guiComponent.setValue(newValue);
+            guiComponent.grabFocus();
+            supressDocumentListener = false;
         });
     }
 

@@ -18,7 +18,6 @@ public class JMenuWithBorder extends JMenu {
      * Creates an instance.
      */
     public JMenuWithBorder() {
-        super();
         init();
     }
 

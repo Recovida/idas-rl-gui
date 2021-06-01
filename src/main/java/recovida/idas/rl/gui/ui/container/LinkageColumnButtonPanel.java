@@ -21,11 +21,11 @@ public class LinkageColumnButtonPanel extends JPanel implements Translatable {
 
     private static final long serialVersionUID = 2571741194180359074L;
 
-    private JButton addPairBtn;
+    private final JButton addPairBtn;
 
-    private JButton deletePairBtn;
+    private final JButton deletePairBtn;
 
-    private JButton addCopyColsBtn;
+    private final JButton addCopyColsBtn;
 
     public JButton getAddPairBtn() {
         return addPairBtn;

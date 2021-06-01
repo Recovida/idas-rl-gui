@@ -59,11 +59,11 @@ public class DatasetPeek {
         SUCCESS
     }
 
-    private Path directory;
+    private final Path directory;
 
-    private String fileName;
+    private final String fileName;
 
-    private String encoding;
+    private final String encoding;
 
     Set<String> columnNames;
 
@@ -83,7 +83,7 @@ public class DatasetPeek {
                 .replaceAll("[^A-Z0-9]", "").equals("ANSI"))
             encoding = "Cp1252";
         this.encoding = encoding;
-        this.columnNames = null;
+        columnNames = null;
     }
 
     /**
@@ -226,7 +226,7 @@ public class DatasetPeek {
                     break;
                 }
                 if (currentColumnName.length() > 10000) {
-                    this.columnNames = null;
+                    columnNames = null;
                     return DatasetPeekResult.UNSUPPORTED_CONTENTS;
                 }
             }
@@ -234,13 +234,13 @@ public class DatasetPeek {
                 columnNames.add(currentColumnName.toString());
             }
         } catch (FileNotFoundException e) {
-            this.columnNames = null;
+            columnNames = null;
             return DatasetPeekResult.FILE_NOT_FOUND;
         } catch (IOException e) {
-            this.columnNames = null;
+            columnNames = null;
             return DatasetPeekResult.IO_ERROR;
         } catch (UnsupportedCharsetException e) {
-            this.columnNames = null;
+            columnNames = null;
             return DatasetPeekResult.UNSUPPORTED_CONTENTS;
         }
         return DatasetPeekResult.SUCCESS;
@@ -251,7 +251,7 @@ public class DatasetPeek {
         try (FileInputStream is = new FileInputStream(fileName)) {
             int firstByte = is.read();
             if (firstByte == -1) {
-                this.columnNames = null;
+                columnNames = null;
                 return DatasetPeekResult.UNSUPPORTED_CONTENTS;
             }
             int bytesInHeaderBeforeColNames, bytesInHeaderPerColumn,
@@ -267,7 +267,7 @@ public class DatasetPeek {
             }
             byte[] bytes = new byte[bytesInHeaderBeforeColNames - 1];
             if (is.read(bytes) != bytes.length) {
-                this.columnNames = null;
+                columnNames = null;
                 return DatasetPeekResult.UNSUPPORTED_CONTENTS;
             }
             bytes = new byte[bytesInHeaderPerColumn];
@@ -279,10 +279,10 @@ public class DatasetPeek {
                 columnNames.add(colName);
             }
         } catch (FileNotFoundException e) {
-            this.columnNames = null;
+            columnNames = null;
             return DatasetPeekResult.FILE_NOT_FOUND;
         } catch (IOException e) {
-            this.columnNames = null;
+            columnNames = null;
             return DatasetPeekResult.IO_ERROR;
         }
         return DatasetPeekResult.SUCCESS;

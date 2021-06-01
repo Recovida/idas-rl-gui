@@ -5,8 +5,6 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -97,7 +95,7 @@ public class MainWindow implements Translatable {
 
     FileChangeWatcher datasetBFileChangeWatcher = null;
 
-    private ColumnPairManager manager;
+    private final ColumnPairManager manager;
 
     ConcurrentMap<String, ConcurrentMap<String, DatasetPeek>> peekFromFileNameAndEncoding = new ConcurrentHashMap<>();
 
@@ -123,7 +121,7 @@ public class MainWindow implements Translatable {
 
     private JPanel linkageColsTabPanel;
 
-    private ExecutionPanel executionTabPanel;
+    private final ExecutionPanel executionTabPanel;
 
     private MainToolBar mainToolBar;
 
@@ -356,7 +354,7 @@ public class MainWindow implements Translatable {
             doNew();
 
         // Initial validation
-        SwingUtilities.invokeLater(() -> validateAllTabs());
+        SwingUtilities.invokeLater(this::validateAllTabs);
 
         // show frame
         frame.setVisible(true);
@@ -822,7 +820,7 @@ public class MainWindow implements Translatable {
         }
         Arrays.stream(new FileChangeWatcher[] { datasetAFileChangeWatcher,
                 datasetBFileChangeWatcher, currentFileChangeWatcher })
-                .filter(w -> w != null).forEach(w -> w.disable());
+                .filter(w -> w != null).forEach(FileChangeWatcher::disable);
         frame.dispose();
     }
 
@@ -891,7 +889,7 @@ public class MainWindow implements Translatable {
                         MessageProvider
                                 .getMessage("menu.file.save.savechangesfile"),
                         currentFileName);
-        return JOptionPane.showOptionDialog(this.frame, msg,
+        return JOptionPane.showOptionDialog(frame, msg,
                 MessageProvider.getMessage("menu.file.save.savechanges"),
                 JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                 null, null, null);
@@ -911,7 +909,7 @@ public class MainWindow implements Translatable {
                 .getMessage("menu.file.save.changedexternally");
         int result;
         do {
-            result = JOptionPane.showOptionDialog(this.frame, msg, title,
+            result = JOptionPane.showOptionDialog(frame, msg, title,
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
                     null, opt, null);
         } while (result == JOptionPane.CLOSED_OPTION);
@@ -948,19 +946,13 @@ public class MainWindow implements Translatable {
             if (result != null)
                 datasetsTabPanel.getFirstDatasetField().setText(result);
         });
-        datasetsTabPanel.getSecondDatasetBtn()
-                .addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        String current = datasetsTabPanel
-                                .getSecondDatasetField().getText();
-                        String result = selectDatasetFile(
-                                current.isEmpty() ? null : current);
-                        if (result != null)
-                            datasetsTabPanel.getSecondDatasetField()
-                                    .setText(result);
-                    }
-                });
+        datasetsTabPanel.getSecondDatasetBtn().addActionListener(e -> {
+            String current = datasetsTabPanel.getSecondDatasetField().getText();
+            String result = selectDatasetFile(
+                    current.isEmpty() ? null : current);
+            if (result != null)
+                datasetsTabPanel.getSecondDatasetField().setText(result);
+        });
 
         optionsTabPanel = new OptionsTabPanel();
         tabbedPane.addTab("_Options", null, optionsTabPanel, null);
@@ -1029,8 +1021,7 @@ public class MainWindow implements Translatable {
             String f = chooser.getSelectedFile().getAbsolutePath();
             if (here != null && f.startsWith(here.toString() + File.separator))
                 return here.relativize(Paths.get(f)).toString();
-            else
-                return f;
+            return f;
         }
         return null;
     }

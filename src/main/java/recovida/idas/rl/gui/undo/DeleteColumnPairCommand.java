@@ -10,7 +10,7 @@ import recovida.idas.rl.gui.ui.table.ColumnPairTable;
  */
 public class DeleteColumnPairCommand extends AbstractCommand {
 
-    private ColumnPairManager manager;
+    private final ColumnPairManager manager;
 
     int index = 0;
 

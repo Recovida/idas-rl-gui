@@ -3,7 +3,6 @@ package recovida.idas.rl.gui.ui.field;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -36,15 +35,11 @@ public class EncodingComboBox extends JComboBoxWithPlaceholder {
                     .collect(Collectors.toList()));
         }
         List<String> sortedEncodings = new ArrayList<>(allEncodings);
-        Collections.sort(sortedEncodings, new Comparator<String>() {
-
-            @Override
-            public int compare(String o1, String o2) {
-                if (Character.isDigit(o1.charAt(0)) == Character
-                        .isDigit(o2.charAt(0)))
-                    return o1.compareToIgnoreCase(o2);
-                return Character.isDigit(o1.charAt(0)) ? 1 : -1;
-            }
+        Collections.sort(sortedEncodings, (o1, o2) -> {
+            if (Character.isDigit(o1.charAt(0)) == Character
+                    .isDigit(o2.charAt(0)))
+                return o1.compareToIgnoreCase(o2);
+            return Character.isDigit(o1.charAt(0)) ? 1 : -1;
         });
         sortedEncodings.add(0, "ANSI");
         sortedEncodings.add(0, "UTF-8"); // add again to the beginning

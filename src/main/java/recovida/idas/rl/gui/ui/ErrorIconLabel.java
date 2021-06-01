@@ -36,7 +36,6 @@ public class ErrorIconLabel extends JLabel {
      * Creates an instance of the label with the icon.
      */
     public ErrorIconLabel() {
-        super();
         setText("!");
         setForeground(Color.RED);
         Graphics2D g = BUFFERED_IMAGE.createGraphics();

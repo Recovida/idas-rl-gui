@@ -11,7 +11,7 @@ import java.util.ListIterator;
  */
 public abstract class AbstractCompositeCommand extends AbstractCommand {
 
-    private List<AbstractCommand> commands;
+    private final List<AbstractCommand> commands;
 
     /**
      * Creates an instance of a composite command.

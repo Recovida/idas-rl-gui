@@ -32,7 +32,7 @@ public class ColumnPairTableModel extends DefaultTableModel {
             Double.class, Double.class, String.class, String.class,
             String.class, String.class };
 
-    private Map<String, Integer> indexFromKey = new HashMap<>();
+    private final Map<String, Integer> indexFromKey = new HashMap<>();
 
     protected Map<Integer, Collection<Integer>> numberToColIdx = new HashMap<>();
 
@@ -140,8 +140,8 @@ public class ColumnPairTableModel extends DefaultTableModel {
     public void updateLocalisedStrings(TableColumnModel cm) {
         String[] displayNames = new String[keys.length];
         for (int i = 0; i < displayNames.length; i++)
-            cm.getColumn(i).setHeaderValue(MessageProvider.getMessage(
-                    "columns.table." + keys[i].replaceAll("_", "")));
+            cm.getColumn(i).setHeaderValue(MessageProvider
+                    .getMessage("columns.table." + keys[i].replace("_", "")));
         if (getRowCount() > 0)
             fireTableRowsUpdated(0, getRowCount() - 1);
     }
@@ -163,8 +163,8 @@ public class ColumnPairTableModel extends DefaultTableModel {
                 .contains(value);
         // validate weight
         value = getValue(rowIndex, "weight");
-        v[indexFromKey.get("weight")] = "copy".equals(type) || value != null
-                && value instanceof Double && (Double) value >= 0;
+        v[indexFromKey.get("weight")] = "copy".equals(type)
+                || value instanceof Double && (Double) value >= 0;
         // validate phon weight
         value = getValue(rowIndex, "phon_weight");
         v[indexFromKey.get("phon_weight")] = value == null

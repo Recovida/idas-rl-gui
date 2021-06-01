@@ -79,7 +79,7 @@ public class StringSettingItemWithList
             String defaultValue, JComboBox<String> guiComponent,
             SettingItemChangeListener listener) {
         this(history, currentValue, defaultValue, guiComponent);
-        this.listeners.add(listener);
+        listeners.add(listener);
     }
 
     @Override
@@ -94,15 +94,12 @@ public class StringSettingItemWithList
 
     @Override
     public void setValue(String newValue) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                supressDocumentListener = true;
-                guiComponent.setSelectedIndex(-1);
-                guiComponent.setSelectedItem(newValue);
-                guiComponent.grabFocus();
-                supressDocumentListener = false;
-            }
+        SwingUtilities.invokeLater(() -> {
+            supressDocumentListener = true;
+            guiComponent.setSelectedIndex(-1);
+            guiComponent.setSelectedItem(newValue);
+            guiComponent.grabFocus();
+            supressDocumentListener = false;
         });
     }
 

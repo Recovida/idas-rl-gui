@@ -32,43 +32,43 @@ public class MainMenuBar extends JMenuBar implements Translatable {
 
     // File
 
-    private JMenu fileMenu;
+    private final JMenu fileMenu;
 
-    private JMenuItem newFileMenuItem;
+    private final JMenuItem newFileMenuItem;
 
-    private JMenuItem openFileMenuItem;
+    private final JMenuItem openFileMenuItem;
 
-    private JMenuItem saveFileMenuItem;
+    private final JMenuItem saveFileMenuItem;
 
-    private JMenuItem saveAsFileMenuItem;
+    private final JMenuItem saveAsFileMenuItem;
 
-    private JMenuItem exitMenuItem;
+    private final JMenuItem exitMenuItem;
 
     // Edit
 
-    private JMenu editMenu;
+    private final JMenu editMenu;
 
-    private JMenuItem undoMenuItem;
+    private final JMenuItem undoMenuItem;
 
-    private JMenuItem redoMenuItem;
+    private final JMenuItem redoMenuItem;
 
     // Run
 
-    private JMenu runMenu;
+    private final JMenu runMenu;
 
-    private JMenuItem runMenuItem;
+    private final JMenuItem runMenuItem;
 
     // Help
 
-    private JMenu helpMenu;
+    private final JMenu helpMenu;
 
-    private JMenuItem aboutMenuItem;
+    private final JMenuItem aboutMenuItem;
 
     // File name
 
-    private JLabel currentFileLbl;
+    private final JLabel currentFileLbl;
 
-    private JMenuItem cancelMenuItem;
+    private final JMenuItem cancelMenuItem;
 
     /**
      * Creates an instance.

@@ -22,7 +22,7 @@ public class JComboBoxWithPlaceholder extends JComboBox<String>
      */
     public class ComboBoxEditorWithPlaceholder implements ComboBoxEditor {
 
-        private JTextFieldWithPlaceholder component;
+        private final JTextFieldWithPlaceholder component;
 
         /**
          * Creates an instance.
@@ -72,7 +72,6 @@ public class JComboBoxWithPlaceholder extends JComboBox<String>
      * Creates an instance of the combobox.
      */
     public JComboBoxWithPlaceholder() {
-        super();
         setEditor(new ComboBoxEditorWithPlaceholder());
         setEditable(true);
     }

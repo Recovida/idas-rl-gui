@@ -41,7 +41,6 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 
 import recovida.idas.rl.core.io.write.CSVDatasetWriter;
 import recovida.idas.rl.core.io.write.DatasetWriter;
@@ -148,37 +147,28 @@ public class ExecutionInnerPanel extends JPanel
         table.getColumnModel().getColumn(0).setMaxWidth(100);
         table.getColumnModel().getColumn(1).setMinWidth(125);
         table.getColumnModel().getColumn(1).setMaxWidth(200);
-        table.getColumnModel().getColumn(1)
-                .setCellRenderer(new TableCellRenderer() {
-
-                    @Override
-                    public Component getTableCellRendererComponent(JTable table,
-                            Object value, boolean isSelected, boolean hasFocus,
-                            int row, int column) {
-                        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-                        String type = (String) value;
-                        value = MessageProvider
-                                .getMessage("execution.table." + value);
-                        Icon icon = UIManager
-                                .getIcon("OptionPane." + type + "Icon");
-                        Component comp = renderer.getTableCellRendererComponent(
-                                table, value, isSelected, hasFocus, row,
-                                column);
-                        if (icon != null && comp instanceof JLabel) {
-                            BufferedImage bi = new BufferedImage(
-                                    icon.getIconWidth(), icon.getIconHeight(),
-                                    BufferedImage.TYPE_INT_ARGB);
-                            int d = table.getRowHeight() * 4 / 5;
-                            Graphics2D g = bi.createGraphics();
-                            icon.paintIcon(null, g, 0, 0);
-                            g.dispose();
-                            ((JLabel) comp).setIcon(
-                                    new ImageIcon(bi.getScaledInstance(d, d,
-                                            Image.SCALE_SMOOTH)));
-                        }
-                        return comp;
+        table.getColumnModel().getColumn(1).setCellRenderer(
+                (table, value, isSelected, hasFocus, row, column) -> {
+                    DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+                    String type = (String) value;
+                    value = MessageProvider
+                            .getMessage("execution.table." + value);
+                    Icon icon = UIManager
+                            .getIcon("OptionPane." + type + "Icon");
+                    Component comp = renderer.getTableCellRendererComponent(
+                            table, value, isSelected, hasFocus, row, column);
+                    if (icon != null && comp instanceof JLabel) {
+                        BufferedImage bi = new BufferedImage(
+                                icon.getIconWidth(), icon.getIconHeight(),
+                                BufferedImage.TYPE_INT_ARGB);
+                        int d = table.getRowHeight() * 4 / 5;
+                        Graphics2D g = bi.createGraphics();
+                        icon.paintIcon(null, g, 0, 0);
+                        g.dispose();
+                        ((JLabel) comp).setIcon(new ImageIcon(bi
+                                .getScaledInstance(d, d, Image.SCALE_SMOOTH)));
                     }
-
+                    return comp;
                 });
         table.getColumnModel().getColumn(2)
                 .setCellRenderer(new DefaultTableCellRenderer() {

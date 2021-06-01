@@ -19,9 +19,9 @@ import javax.swing.SwingUtilities;
  */
 public class JComboBoxSuggestionProvider {
 
-    private JComboBox<String> field;
+    private final JComboBox<String> field;
 
-    private JPopupMenu menu;
+    private final JPopupMenu menu;
 
     private int limit = 20;
 
@@ -34,7 +34,7 @@ public class JComboBoxSuggestionProvider {
      */
     public JComboBoxSuggestionProvider(JComboBox<String> field) {
         this.field = field;
-        this.menu = new JPopupMenu();
+        menu = new JPopupMenu();
 
         menu.setFocusable(false);
         JTextField tf = (JTextField) this.field.getEditor()

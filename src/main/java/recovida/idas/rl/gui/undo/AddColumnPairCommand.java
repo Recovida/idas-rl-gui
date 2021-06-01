@@ -10,15 +10,15 @@ import recovida.idas.rl.gui.ui.table.ColumnPairTable;
  */
 public class AddColumnPairCommand extends AbstractCommand {
 
-    private ColumnPairManager manager;
+    private final ColumnPairManager manager;
 
     int index = 0;
 
-    private String type;
+    private final String type;
 
-    private String leftColumn;
+    private final String leftColumn;
 
-    private String rightColumn;
+    private final String rightColumn;
 
     /**
      * Creates an instance of the command in the special case where the added

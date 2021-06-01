@@ -17,7 +17,7 @@ public class RenameColumnPairCellRenderer extends AbstractColumnPairCellRenderer
 
     private static final long serialVersionUID = 4089960339928197149L;
 
-    private String nameKey;
+    private final String nameKey;
 
     private String suffix = "";
 
@@ -29,7 +29,6 @@ public class RenameColumnPairCellRenderer extends AbstractColumnPairCellRenderer
      *                parameter is <code>index_a</code>)
      */
     public RenameColumnPairCellRenderer(String nameKey) {
-        super();
         this.nameKey = nameKey;
     }
 

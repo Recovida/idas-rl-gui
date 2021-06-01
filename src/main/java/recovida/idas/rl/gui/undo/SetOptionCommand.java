@@ -14,11 +14,11 @@ import recovida.idas.rl.gui.settingitem.AbstractSettingItem;
  */
 public class SetOptionCommand<T> extends AbstractCommand {
 
-    private T oldValue;
+    private final T oldValue;
 
     private T newValue;
 
-    private AbstractSettingItem<T, JComponent> settingItem;
+    private final AbstractSettingItem<T, JComponent> settingItem;
 
     private boolean skip;
 

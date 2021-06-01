@@ -115,8 +115,8 @@ public class ColumnPairManager {
         this.buttonPanel = buttonPanel;
         this.editingPanel = editingPanel;
         this.table = table;
-        this.model = (ColumnPairTableModel) table.getModel();
-        this.selectionModel = table.getSelectionModel();
+        model = (ColumnPairTableModel) table.getModel();
+        selectionModel = table.getSelectionModel();
 
         buttonPanel.getAddPairBtn().addActionListener(
                 e -> history.push(new AddColumnPairCommand(this)));

@@ -13,17 +13,17 @@ import recovida.idas.rl.gui.ui.table.ColumnPairTable;
  */
 public class EditColumnPairFieldCommand<T> extends AbstractCommand {
 
-    private ColumnPairManager manager;
+    private final ColumnPairManager manager;
 
     int index = 0;
 
-    private T oldValue;
+    private final T oldValue;
 
     private T newValue;
 
     private boolean skipField;
 
-    private String key;
+    private final String key;
 
     /**
      * Creates an instance of this command.

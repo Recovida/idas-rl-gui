@@ -30,7 +30,7 @@ public class Execution {
     public Execution(ExecutionInnerPanel panel, String configFileName) {
         this.panel = panel;
         this.configFileName = configFileName;
-        this.main = new Main(configFileName, 100);
+        main = new Main(configFileName, 100);
     }
 
     /**

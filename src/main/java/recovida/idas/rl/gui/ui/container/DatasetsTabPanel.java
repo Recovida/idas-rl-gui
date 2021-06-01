@@ -30,56 +30,56 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
     private static final long serialVersionUID = -2753754491877596410L;
 
     // fields
-    private JTextField firstDatasetField;
+    private final JTextField firstDatasetField;
 
-    private JTextField secondDatasetField;
+    private final JTextField secondDatasetField;
 
-    private JComboBoxWithPlaceholder firstEncodingField;
+    private final JComboBoxWithPlaceholder firstEncodingField;
 
-    private JComboBoxWithPlaceholder secondEncodingField;
+    private final JComboBoxWithPlaceholder secondEncodingField;
 
-    private JTextFieldWithPlaceholder firstDatasetSuffixField;
+    private final JTextFieldWithPlaceholder firstDatasetSuffixField;
 
-    private JTextFieldWithPlaceholder secondDatasetSuffixField;
+    private final JTextFieldWithPlaceholder secondDatasetSuffixField;
 
-    private JTextFieldWithPlaceholder firstDatasetRowNumColField;
+    private final JTextFieldWithPlaceholder firstDatasetRowNumColField;
 
-    private JTextFieldWithPlaceholder secondDatasetRowNumColField;
+    private final JTextFieldWithPlaceholder secondDatasetRowNumColField;
 
     // error icons
-    private ErrorIconLabel firstDatasetWarningLbl;
+    private final ErrorIconLabel firstDatasetWarningLbl;
 
-    private ErrorIconLabel secondDatasetWarningLbl;
+    private final ErrorIconLabel secondDatasetWarningLbl;
 
-    private ErrorIconLabel firstEncodingWarningLbl;
+    private final ErrorIconLabel firstEncodingWarningLbl;
 
-    private ErrorIconLabel secondEncodingWarningLbl;
+    private final ErrorIconLabel secondEncodingWarningLbl;
 
-    private ErrorIconLabel firstDatasetSuffixWarningLbl;
+    private final ErrorIconLabel firstDatasetSuffixWarningLbl;
 
-    private ErrorIconLabel secondDatasetSuffixWarningLbl;
+    private final ErrorIconLabel secondDatasetSuffixWarningLbl;
 
-    private ErrorIconLabel secondDatasetRowNumColWarningLbl;
+    private final ErrorIconLabel secondDatasetRowNumColWarningLbl;
 
-    private ErrorIconLabel firstDatasetRowNumColWarningLbl;
+    private final ErrorIconLabel firstDatasetRowNumColWarningLbl;
 
     // buttons
-    private JButton firstDatasetBtn;
+    private final JButton firstDatasetBtn;
 
-    private JButton secondDatasetBtn;
+    private final JButton secondDatasetBtn;
 
     // labels
-    private JLabel firstDatasetLabel;
+    private final JLabel firstDatasetLabel;
 
-    private JLabel secondDatasetLabel;
+    private final JLabel secondDatasetLabel;
 
-    private JLabel fileNameLbl;
+    private final JLabel fileNameLbl;
 
-    private JLabel encodingLbl;
+    private final JLabel encodingLbl;
 
-    private JLabel suffixLbl;
+    private final JLabel suffixLbl;
 
-    private JLabel rowNumColLbl;
+    private final JLabel rowNumColLbl;
 
     /**
      * Creates an instance of the panel.

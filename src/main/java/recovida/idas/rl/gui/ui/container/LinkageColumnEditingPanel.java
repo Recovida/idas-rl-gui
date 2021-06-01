@@ -21,9 +21,9 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
+import recovida.idas.rl.gui.ui.ErrorIconLabel;
 import recovida.idas.rl.gui.ui.JComboBoxSuggestionProvider;
 import recovida.idas.rl.gui.ui.Translatable;
-import recovida.idas.rl.gui.ui.ErrorIconLabel;
 import recovida.idas.rl.gui.ui.field.JSpinnerWithBlankValue;
 import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
 import recovida.idas.rl.gui.ui.table.ColumnPairTable;
@@ -39,51 +39,51 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
     private static final String[] TYPES = { "copy", "name", "date", "ibge",
             "gender", "numerical_id", "categorical" };
 
-    private JTextFieldWithPlaceholder firstRenameField;
+    private final JTextFieldWithPlaceholder firstRenameField;
 
-    private JTextFieldWithPlaceholder secondRenameField;
+    private final JTextFieldWithPlaceholder secondRenameField;
 
     private final Component rightHorizontalGlue = Box.createHorizontalGlue();
 
-    private JSpinnerWithBlankValue weightField;
+    private final JSpinnerWithBlankValue weightField;
 
-    private JSpinnerWithBlankValue phonWeightField;
+    private final JSpinnerWithBlankValue phonWeightField;
 
-    private JComboBox<String> typeField;
+    private final JComboBox<String> typeField;
 
-    private JComboBox<String> firstNameField;
+    private final JComboBox<String> firstNameField;
 
-    private JSpinner numberField;
+    private final JSpinner numberField;
 
-    private JComboBox<String> secondNameField;
+    private final JComboBox<String> secondNameField;
 
-    private ErrorIconLabel weightWarningLbl;
+    private final ErrorIconLabel weightWarningLbl;
 
-    private ErrorIconLabel typeWarningLbl;
+    private final ErrorIconLabel typeWarningLbl;
 
-    private ErrorIconLabel secondNameWarningLbl;
+    private final ErrorIconLabel secondNameWarningLbl;
 
-    private ErrorIconLabel numberWarningLbl;
+    private final ErrorIconLabel numberWarningLbl;
 
-    private ErrorIconLabel firstNameWarningLbl;
+    private final ErrorIconLabel firstNameWarningLbl;
 
-    private JLabel phonWeightLbl;
+    private final JLabel phonWeightLbl;
 
-    private JLabel weightLbl;
+    private final JLabel weightLbl;
 
-    private ErrorIconLabel phonWeightWarningLbl;
+    private final ErrorIconLabel phonWeightWarningLbl;
 
-    private JLabel typeLbl;
+    private final JLabel typeLbl;
 
-    private JLabel renameSecondLbl;
+    private final JLabel renameSecondLbl;
 
-    private JLabel nameSecondLbl;
+    private final JLabel nameSecondLbl;
 
-    private JLabel renameFirstLbl;
+    private final JLabel renameFirstLbl;
 
-    private JLabel nameFirstLbl;
+    private final JLabel nameFirstLbl;
 
-    private JLabel numberLbl;
+    private final JLabel numberLbl;
 
     public JTextFieldWithPlaceholder getFirstRenameField() {
         return firstRenameField;

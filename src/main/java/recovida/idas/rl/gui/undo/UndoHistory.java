@@ -62,16 +62,16 @@ public class UndoHistory {
         public void notifyIfChanged(HistoryPropertyState that,
                 Collection<HistoryPropertyChangeEventListener> listeners) {
             for (HistoryPropertyChangeEventListener listener : listeners) {
-                if (this.canRedo != that.canRedo)
-                    listener.canRedoChanged(this.canRedo);
-                if (this.canUndo != that.canUndo)
-                    listener.canUndoChanged(this.canUndo);
-                if (this.isClean != that.isClean)
-                    listener.cleanChanged(this.isClean);
-                if (!Objects.equals(this.undoSummary, that.undoSummary))
-                    listener.undoSummaryChanged(this.undoSummary);
-                if (!Objects.equals(this.redoSummary, that.redoSummary))
-                    listener.redoSummaryChanged(this.redoSummary);
+                if (canRedo != that.canRedo)
+                    listener.canRedoChanged(canRedo);
+                if (canUndo != that.canUndo)
+                    listener.canUndoChanged(canUndo);
+                if (isClean != that.isClean)
+                    listener.cleanChanged(isClean);
+                if (!Objects.equals(undoSummary, that.undoSummary))
+                    listener.undoSummaryChanged(undoSummary);
+                if (!Objects.equals(redoSummary, that.redoSummary))
+                    listener.redoSummaryChanged(redoSummary);
             }
         }
     }

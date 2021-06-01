@@ -26,7 +26,7 @@ public class FileChangeWatcher {
 
     boolean enabled = false;
 
-    private Runnable callback;
+    private final Runnable callback;
 
     private boolean stopAfterCallback = false;
 

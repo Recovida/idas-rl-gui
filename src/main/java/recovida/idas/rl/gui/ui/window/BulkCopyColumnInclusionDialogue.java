@@ -33,13 +33,13 @@ import recovida.idas.rl.gui.ui.table.ColumnPairTable;
 public class BulkCopyColumnInclusionDialogue extends JDialog {
     private static final long serialVersionUID = 1609116129275788504L;
 
-    private JPanel rightPanel;
+    private final JPanel rightPanel;
 
-    private JPanel leftPanel;
+    private final JPanel leftPanel;
 
-    private Map<String, JCheckBox> leftMap = new LinkedHashMap<>();
+    private final Map<String, JCheckBox> leftMap = new LinkedHashMap<>();
 
-    private Map<String, JCheckBox> rightMap = new LinkedHashMap<>();
+    private final Map<String, JCheckBox> rightMap = new LinkedHashMap<>();
 
     @SuppressWarnings("unchecked")
     LinkedList<String>[] result = new LinkedList[] { new LinkedList<>(),

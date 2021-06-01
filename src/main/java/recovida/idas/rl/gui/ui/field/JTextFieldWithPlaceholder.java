@@ -35,7 +35,7 @@ public class JTextFieldWithPlaceholder extends JTextField
     @Override
     public void setPlaceholder(String placeholder) {
         this.placeholder = placeholder;
-        SwingUtilities.invokeLater(() -> repaint());
+        SwingUtilities.invokeLater(this::repaint);
     }
 
     @Override

@@ -19,11 +19,11 @@ public class ExecutionPanel extends JPanel implements Translatable {
 
     private static final long serialVersionUID = -3897094344632347178L;
 
-    private JLabel logWontBeSavedLbl;
+    private final JLabel logWontBeSavedLbl;
 
-    private JTabbedPane tabbedPane;
+    private final JTabbedPane tabbedPane;
 
-    private AtomicInteger tabCounter = new AtomicInteger(0);
+    private final AtomicInteger tabCounter = new AtomicInteger(0);
 
     /**
      * Creates an instance of the panel.

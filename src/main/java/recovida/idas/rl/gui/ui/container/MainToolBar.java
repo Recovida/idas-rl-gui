@@ -102,13 +102,13 @@ public class MainToolBar extends JToolBar implements Translatable {
 
     private static final long serialVersionUID = 5509499175879481354L;
 
-    private Component horizontalGlue;
+    private final Component horizontalGlue;
 
-    private JSeparator separator;
+    private final JSeparator separator;
 
-    private LanguageComboBox languageCbox;
+    private final LanguageComboBox languageCbox;
 
-    private JButton cancelBtn;
+    private final JButton cancelBtn;
 
     public JButton getNewFileBtn() {
         return newFileBtn;

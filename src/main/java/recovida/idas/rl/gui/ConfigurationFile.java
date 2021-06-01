@@ -169,7 +169,7 @@ public class ConfigurationFile {
                 if ("max_rows".equals(key)
                         && Integer.valueOf(Integer.MAX_VALUE).equals(value))
                     continue; // don't save default value
-                else if ("min_score".equals(key)
+                if ("min_score".equals(key)
                         && Double.valueOf(0.0).equals(value))
                     continue; // don't save default value
                 else if ("num_threads".equals(key)

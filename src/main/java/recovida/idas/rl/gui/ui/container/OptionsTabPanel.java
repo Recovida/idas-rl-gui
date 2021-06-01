@@ -33,39 +33,39 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
     // buttons
 
-    private JButton linkageDirBtn;
+    private final JButton linkageDirBtn;
 
-    private JButton indexDirBtn;
+    private final JButton indexDirBtn;
 
     // labels
 
-    private JLabel indexDirLbl;
+    private final JLabel indexDirLbl;
 
-    private JLabel minScoreLbl;
+    private final JLabel minScoreLbl;
 
-    private JLabel maxRowsLbl;
+    private final JLabel maxRowsLbl;
 
-    private JLabel linkageDirLbl;
+    private final JLabel linkageDirLbl;
 
-    private JLabel threadsLbl;
+    private final JLabel threadsLbl;
 
-    private JLabel coresLabel;
+    private final JLabel coresLabel;
 
-    private ErrorIconLabel linkageDirWarningLbl;
+    private final ErrorIconLabel linkageDirWarningLbl;
 
-    private ErrorIconLabel indexDirWarningLbl;
+    private final ErrorIconLabel indexDirWarningLbl;
 
     // fields
 
-    private JSpinnerWithBlankValue threadsField;
+    private final JSpinnerWithBlankValue threadsField;
 
-    private JTextFieldWithPlaceholder linkageDirField;
+    private final JTextFieldWithPlaceholder linkageDirField;
 
-    private JTextFieldWithPlaceholder indexDirField;
+    private final JTextFieldWithPlaceholder indexDirField;
 
-    private JSpinnerWithBlankValue minScoreField;
+    private final JSpinnerWithBlankValue minScoreField;
 
-    private JSpinnerWithBlankValue maxRowsField;
+    private final JSpinnerWithBlankValue maxRowsField;
 
     /**
      * Creates an instance of the panel.
