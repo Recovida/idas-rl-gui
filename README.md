@@ -6,7 +6,7 @@ Recovida a partir do código
 do [Cidacs-RL](https://github.com/gcgbarbosa/cidacs-rl-v1).
 
 Uma versão de linha de comando está disponível no
-[repositório IDaS-RL Core](https://gitlab.com/recovida/idas-rl-core).
+repositório recovida/idas-rl-core>.
 
 
 ## Execução
