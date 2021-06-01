@@ -4,7 +4,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>recovida</groupId>
 	<artifactId>idas-rl-gui</artifactId>
-	<version>1.0.3</version>
+	<name>IDaS-RL GUI</name>
+	<version>1.0.4</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -15,8 +16,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
-					<source>8</source>
-					<target>8</target>
+					<release>8</release>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -50,4 +50,22 @@
 			</plugin>
 		</plugins>
 	</build>
+	<dependencies>
+		<dependency>
+			<groupId>recovida</groupId>
+			<artifactId>idas-rl-core</artifactId>
+			<version>[1.0.4,)</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun</groupId>
+			<artifactId>jlfgr</artifactId>
+			<version>1.0</version>
+		</dependency>
+	</dependencies>
+	<repositories>
+		<repository>
+			<id>jarlibs</id>
+			<url>file://${project.basedir}/src/main/resources/lib</url>
+		</repository>
+	</repositories>
 </project>

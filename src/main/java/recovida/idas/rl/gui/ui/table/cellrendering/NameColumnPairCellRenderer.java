@@ -1,36 +1,51 @@
-package recovida.idas.rl.gui.ui.cellrendering;
+package recovida.idas.rl.gui.ui.table.cellrendering;
 
 import java.awt.Component;
 import java.awt.Font;
+import java.util.Collection;
 
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
+import recovida.idas.rl.gui.ui.table.ColumnPairTable;
 
-public class NumberColumnPairCellRenderer extends ColumnPairCellRenderer
+/**
+ * Renderer for names in a {@link ColumnPairTable}.
+ */
+public class NameColumnPairCellRenderer extends AbstractColumnPairCellRenderer
         implements TableCellRenderer {
 
-    private static final long serialVersionUID = 1791050245687596559L;
+    private static final long serialVersionUID = 4089960339928197149L;
+
+    protected Collection<String> validNames = null;
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
+        if (value == null)
+            value = "";
         boolean invalid = !isValid(table, row, column);
         boolean italic = false;
-        if (value == null || (int) value < 0) {
+        if (invalid && "".equals(value)) {
+            value = getBlankText(table, row);
             italic = true;
-            value = "  " + MessageProvider.getMessage("columns.table.blank");
         }
         Component c = getDefaultRenderer(table, value, isSelected, hasFocus,
                 row, column);
         if (invalid) {
-            showErrorIcon(table, c);
             c.setForeground(getErrorColour(isSelected));
             if (italic)
                 c.setFont(c.getFont().deriveFont(Font.ITALIC));
+            showErrorIcon(table, c);
         }
         return c;
+    }
+
+    public String getBlankText(JTable table, int viewRowIndex) {
+        if ("copy".equals(getValue(table, viewRowIndex, "type")))
+            return "";
+        return "  " + MessageProvider.getMessage("columns.table.blank");
     }
 
 }

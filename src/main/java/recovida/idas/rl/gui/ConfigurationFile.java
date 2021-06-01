@@ -15,19 +15,26 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 import recovida.idas.rl.gui.pair.ColumnPairManager;
-import recovida.idas.rl.gui.settingitem.SettingItem;
+import recovida.idas.rl.gui.settingitem.AbstractSettingItem;
 
+/**
+ * Represents a configuration file and provides methods for reading and saving
+ * configuration files.
+ */
 @SuppressWarnings("rawtypes")
 public class ConfigurationFile {
 
     /**
-     *
+     * A custom {@link FilterOutputStream} that ignores the first line. It is
+     * used to avoid the timestamp that {@link Properties} generates.
      */
     private final class SkipFirstLineOutputStream extends FilterOutputStream {
         private boolean ignore = true;
 
         /**
-         * @param out
+         * Creates an instance.
+         *
+         * @param out the original stream
          */
         private SkipFirstLineOutputStream(OutputStream out) {
             super(out);
@@ -46,32 +53,59 @@ public class ConfigurationFile {
         }
     }
 
-    Map<String, SettingItem> settingItems;
+    Map<String, AbstractSettingItem> settingItems;
+
     ColumnPairManager pairManager;
 
-    public final int MAX_NUMBER = 999;
-    protected final String[] COL_KEYS = { "type", "index_a", "index_b",
+    /**
+     * The maximum number a column pair may use. The numbers are used as
+     * prefixes of the keys.
+     */
+    public static final int MAX_NUMBER = 999;
+
+    protected static final String[] COL_KEYS = { "type", "index_a", "index_b",
             "rename_a", "rename_b", "weight", "phon_weight" };
-    protected final Pattern COL_KEY_PATTERN = Pattern
+
+    protected static final Pattern COL_KEY_PATTERN = Pattern
             .compile("^[0-9]+_(" + String.join("|", COL_KEYS) + ")$");
 
+    /**
+     * Creates an instance.
+     */
     public ConfigurationFile() {
         settingItems = new LinkedHashMap<>();
     }
 
-    public void addSettingItem(String key, SettingItem settingItem) {
+    /**
+     * Adds a setting item to the configuration file.
+     *
+     * @param key         the setting key
+     * @param settingItem the setting item
+     */
+    public void addSettingItem(String key, AbstractSettingItem settingItem) {
         settingItems.put(key, settingItem);
     }
 
+    /**
+     * Sets the column pair manager.
+     *
+     * @param pairManager the pair manager
+     */
     public void setPairPanager(ColumnPairManager pairManager) {
         this.pairManager = pairManager;
     }
 
+    /**
+     * Loads the contents of a configuration file.
+     *
+     * @param fileName the file name
+     * @return whether the file was successfully read
+     */
     public boolean load(String fileName) {
         Properties props = new Properties();
         try (FileInputStream in = new FileInputStream(fileName)) {
             props.load(in);
-        } catch (Exception e1) {
+        } catch (Exception e) {
             return false;
         }
         // number --> row index in the table
@@ -111,16 +145,23 @@ public class ConfigurationFile {
         return true;
     }
 
-    public Map<String, SettingItem> getSettingItems() {
+    public Map<String, AbstractSettingItem> getSettingItems() {
         return Collections.unmodifiableMap(settingItems);
     }
 
+    /**
+     * Saves the contents of this configuration file to a .properties file.
+     *
+     * @param fileName the output file name
+     * @return whether the file was successfully saved
+     */
     public boolean save(String fileName) {
         try (OutputStream output = new FileOutputStream(fileName)) {
             SkipFirstLineOutputStream skipTimestampOutput = new SkipFirstLineOutputStream(
                     output);
             Properties p = new Properties();
-            for (Entry<String, SettingItem> entry : settingItems.entrySet()) {
+            for (Entry<String, AbstractSettingItem> entry : settingItems
+                    .entrySet()) {
                 String key = entry.getKey();
                 Object value = entry.getValue().getCurrentValue();
                 if (value == null || "".equals(value))
@@ -128,7 +169,7 @@ public class ConfigurationFile {
                 if ("max_rows".equals(key)
                         && Integer.valueOf(Integer.MAX_VALUE).equals(value))
                     continue; // don't save default value
-                else if ("min_score".equals(key)
+                if ("min_score".equals(key)
                         && Double.valueOf(0.0).equals(value))
                     continue; // don't save default value
                 else if ("num_threads".equals(key)

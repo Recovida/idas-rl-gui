@@ -8,33 +8,89 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This class provides methods to "peek" into dataset files and read their
+ * column names.
+ */
 public class DatasetPeek {
 
+    /**
+     * Represents a result of the "peek".
+     */
     public enum DatasetPeekResult {
-        BLANK_NAME, FILE_NOT_FOUND, UNSUPPORTED_FORMAT, IO_ERROR,
-        UNSUPPORTED_CONTENTS, SUCCESS
+
+        /**
+         * File name is blank.
+         */
+        BLANK_NAME,
+
+        /**
+         * File does not exist.
+         */
+        FILE_NOT_FOUND,
+
+        /**
+         * Format is not supported.
+         */
+        UNSUPPORTED_FORMAT,
+
+        /**
+         * Error when reading.
+         */
+        IO_ERROR,
+
+        /**
+         * Contents are not supported. Possibly the specified encoding is
+         * incorrect, or the file contents don't correspond to its extension.
+         */
+        UNSUPPORTED_CONTENTS,
+
+        /**
+         * Column names read successfully.
+         */
+        SUCCESS
     }
 
-    private String fileName;
-    private String encoding;
+    private final Path directory;
+
+    private final String fileName;
+
+    private final String encoding;
+
     Set<String> columnNames;
+
     DatasetPeekResult result = null;
 
-    public DatasetPeek(String fileName, String encoding) {
+    /**
+     * Creates an instance.
+     *
+     * @param directory directory where the file is saved
+     * @param fileName  name of the file (without the path)
+     * @param encoding  the encoding of the file
+     */
+    public DatasetPeek(Path directory, String fileName, String encoding) {
         this.fileName = fileName;
+        this.directory = directory;
         if (encoding != null && encoding.toUpperCase()
                 .replaceAll("[^A-Z0-9]", "").equals("ANSI"))
             encoding = "Cp1252";
         this.encoding = encoding;
-        this.columnNames = null;
+        columnNames = null;
     }
 
+    /**
+     * Tries to read column names from the dataset.
+     *
+     * @return the result of the operation
+     */
     public DatasetPeekResult peek() {
         result = peek0();
         return result;
@@ -43,7 +99,14 @@ public class DatasetPeek {
     protected synchronized DatasetPeekResult peek0() {
         if (fileName == null || fileName.isEmpty())
             return DatasetPeekResult.BLANK_NAME;
-        File f = new File(fileName);
+        File f;
+        if (directory != null) {
+            f = directory.resolve(fileName).toFile();
+        } else if (!Paths.get(fileName).isAbsolute()) {
+            // without a directory, we must have an absolute path
+            return DatasetPeekResult.FILE_NOT_FOUND;
+        } else
+            f = new File(fileName);
         if (!f.isFile())
             return DatasetPeekResult.FILE_NOT_FOUND;
         String nameLower = fileName.toLowerCase();
@@ -54,10 +117,16 @@ public class DatasetPeek {
         return DatasetPeekResult.UNSUPPORTED_FORMAT;
     }
 
+    /**
+     * Character categories in a CSV file.
+     */
     private enum CsvChar {
         QUOTE, COMMA, NEWLINE, OTHER
     }
 
+    /**
+     * Parsing state.
+     */
     private enum CsvLineParseState {
         START, UNQUOTED_FIELD, QUOTED_FIELD, POST_QUOTED_FIELD, FINAL
     }
@@ -84,9 +153,9 @@ public class DatasetPeek {
             delimiter = Collections.max(delimiterFreq.keySet(),
                     (Character c1, Character c2) -> delimiterFreq.get(c1)
                             - delimiterFreq.get(c2));
-        } catch (FileNotFoundException e1) {
+        } catch (FileNotFoundException ex) {
             return DatasetPeekResult.FILE_NOT_FOUND;
-        } catch (IOException e1) {
+        } catch (IOException ex) {
             return DatasetPeekResult.IO_ERROR;
         }
 
@@ -157,7 +226,7 @@ public class DatasetPeek {
                     break;
                 }
                 if (currentColumnName.length() > 10000) {
-                    this.columnNames = null;
+                    columnNames = null;
                     return DatasetPeekResult.UNSUPPORTED_CONTENTS;
                 }
             }
@@ -165,13 +234,13 @@ public class DatasetPeek {
                 columnNames.add(currentColumnName.toString());
             }
         } catch (FileNotFoundException e) {
-            this.columnNames = null;
+            columnNames = null;
             return DatasetPeekResult.FILE_NOT_FOUND;
         } catch (IOException e) {
-            this.columnNames = null;
+            columnNames = null;
             return DatasetPeekResult.IO_ERROR;
         } catch (UnsupportedCharsetException e) {
-            this.columnNames = null;
+            columnNames = null;
             return DatasetPeekResult.UNSUPPORTED_CONTENTS;
         }
         return DatasetPeekResult.SUCCESS;
@@ -182,7 +251,7 @@ public class DatasetPeek {
         try (FileInputStream is = new FileInputStream(fileName)) {
             int firstByte = is.read();
             if (firstByte == -1) {
-                this.columnNames = null;
+                columnNames = null;
                 return DatasetPeekResult.UNSUPPORTED_CONTENTS;
             }
             int bytesInHeaderBeforeColNames, bytesInHeaderPerColumn,
@@ -198,7 +267,7 @@ public class DatasetPeek {
             }
             byte[] bytes = new byte[bytesInHeaderBeforeColNames - 1];
             if (is.read(bytes) != bytes.length) {
-                this.columnNames = null;
+                columnNames = null;
                 return DatasetPeekResult.UNSUPPORTED_CONTENTS;
             }
             bytes = new byte[bytesInHeaderPerColumn];
@@ -210,10 +279,10 @@ public class DatasetPeek {
                 columnNames.add(colName);
             }
         } catch (FileNotFoundException e) {
-            this.columnNames = null;
+            columnNames = null;
             return DatasetPeekResult.FILE_NOT_FOUND;
         } catch (IOException e) {
-            this.columnNames = null;
+            columnNames = null;
             return DatasetPeekResult.IO_ERROR;
         }
         return DatasetPeekResult.SUCCESS;

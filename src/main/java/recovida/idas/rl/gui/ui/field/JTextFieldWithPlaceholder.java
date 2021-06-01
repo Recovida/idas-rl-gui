@@ -7,6 +7,9 @@ import java.awt.RenderingHints;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+/**
+ * A {@link JTextField} that shows a placeholder when empty.
+ */
 public class JTextFieldWithPlaceholder extends JTextField
         implements FieldWithPlaceholder {
 
@@ -32,13 +35,12 @@ public class JTextFieldWithPlaceholder extends JTextField
     @Override
     public void setPlaceholder(String placeholder) {
         this.placeholder = placeholder;
-        SwingUtilities.invokeLater(() -> repaint());
+        SwingUtilities.invokeLater(this::repaint);
     }
 
     @Override
     protected void paintComponent(final Graphics pG) {
         super.paintComponent(pG);
-
         if (placeholder != null && placeholder.length() > 0
                 && getText().length() == 0) {
             ((Graphics2D) pG).setRenderingHint(RenderingHints.KEY_ANTIALIASING,

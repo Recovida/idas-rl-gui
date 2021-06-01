@@ -4,19 +4,38 @@ import java.util.Objects;
 
 import javax.swing.JComponent;
 
-import recovida.idas.rl.gui.settingitem.SettingItem;
+import recovida.idas.rl.gui.settingitem.AbstractSettingItem;
 
-public class SetOptionCommand<T> extends Command {
+/**
+ * This class represents the command of setting the value of a field (this is
+ * not used for column-related fields).
+ *
+ * @param <T> the type of the field
+ */
+public class SetOptionCommand<T> extends AbstractCommand {
 
-    private T oldValue;
+    private final T oldValue;
+
     private T newValue;
-    private SettingItem<T, JComponent> settingItem;
+
+    private final AbstractSettingItem<T, JComponent> settingItem;
+
     private boolean skip;
 
+    /**
+     * Creates an instance of this command.
+     *
+     * @param settingItem the corresponding setting item
+     * @param oldValue    value of the field prior to the change
+     * @param newValue    value of the field after the change
+     * @param skipFirst   whether the first {@link #redo()} call should have no
+     *                    effect (this is useful to avoid an infinite loop when
+     *                    the change was already made by the user)
+     */
     @SuppressWarnings("unchecked")
-    public SetOptionCommand(SettingItem<T, ?> settingItem, T oldValue,
+    public SetOptionCommand(AbstractSettingItem<T, ?> settingItem, T oldValue,
             T newValue, boolean skipFirst) {
-        this.settingItem = (SettingItem<T, JComponent>) settingItem;
+        this.settingItem = (AbstractSettingItem<T, JComponent>) settingItem;
         this.oldValue = oldValue;
         this.newValue = newValue;
         this.skip = skipFirst;
@@ -37,7 +56,7 @@ public class SetOptionCommand<T> extends Command {
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean merge(Command that) {
+    public boolean merge(AbstractCommand that) {
         if (!(that instanceof SetOptionCommand<?>))
             return false;
         if (this.settingItem != ((SetOptionCommand<T>) that).settingItem)

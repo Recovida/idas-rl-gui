@@ -1,4 +1,4 @@
-package recovida.idas.rl.gui.ui.cellrendering;
+package recovida.idas.rl.gui.ui.table.cellrendering;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -8,10 +8,15 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
-import recovida.idas.rl.gui.ui.ColumnPairTableModel;
-import recovida.idas.rl.gui.ui.WarningIcon;
+import recovida.idas.rl.gui.ui.ErrorIconLabel;
+import recovida.idas.rl.gui.ui.table.ColumnPairTable;
+import recovida.idas.rl.gui.ui.table.ColumnPairTableModel;
 
-public abstract class ColumnPairCellRenderer extends JLabel
+/**
+ * This abstract class provides the skeleton of {@link TableCellRenderer} that
+ * renders the cells of a {@link ColumnPairTable}, highlighting errors in red.
+ */
+public abstract class AbstractColumnPairCellRenderer extends JLabel
         implements TableCellRenderer {
 
     private static final long serialVersionUID = 4429833685885120604L;
@@ -41,7 +46,7 @@ public abstract class ColumnPairCellRenderer extends JLabel
     }
 
     protected void showErrorIcon(JTable table, JLabel c) {
-        WarningIcon.applyIconToLabel(c, table.getRowHeight() * 4 / 5);
+        ErrorIconLabel.applyIconToLabel(c, table.getRowHeight() * 4 / 5);
     }
 
     protected void showErrorIcon(JTable table, Component c) {

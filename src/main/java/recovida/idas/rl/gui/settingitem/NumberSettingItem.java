@@ -1,7 +1,5 @@
 package recovida.idas.rl.gui.settingitem;
 
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.text.ParseException;
 
 import javax.swing.JSpinner;
@@ -13,26 +11,25 @@ import recovida.idas.rl.gui.listener.SettingItemChangeListener;
 import recovida.idas.rl.gui.undo.SetOptionCommand;
 import recovida.idas.rl.gui.undo.UndoHistory;
 
-public class NumberSettingItem extends SettingItem<Number, JSpinner> {
+/**
+ * Represents and deals with a numeric setting item, its field and value.
+ */
+public class NumberSettingItem extends AbstractSettingItem<Number, JSpinner> {
 
     protected boolean supressDocumentListener = false;
 
+    /**
+     * Creates an instance.
+     *
+     * @param history      the undo history
+     * @param currentValue the current value
+     * @param defaultValue the default value
+     * @param guiComponent the field
+     */
     public NumberSettingItem(UndoHistory history, Number currentValue,
             Number defaultValue, JSpinner guiComponent) {
         super(history, currentValue, defaultValue, guiComponent);
         guiComponent.setValue(currentValue);
-        guiComponent.addFocusListener(new FocusListener() {
-
-            @Override
-            public void focusGained(FocusEvent e) {
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                onLeave();
-            }
-
-        });
         guiComponent.addChangeListener(new ChangeListener() {
 
             Number oldValue = (Number) guiComponent.getValue();
@@ -49,11 +46,20 @@ public class NumberSettingItem extends SettingItem<Number, JSpinner> {
         });
     }
 
+    /**
+     * Creates an instance.
+     *
+     * @param history      the undo history
+     * @param currentValue the current value
+     * @param defaultValue the default value
+     * @param guiComponent the field
+     * @param listener     a change listener
+     */
     public NumberSettingItem(UndoHistory history, Number currentValue,
             Number defaultValue, JSpinner guiComponent,
             SettingItemChangeListener listener) {
         this(history, currentValue, defaultValue, guiComponent);
-        this.listeners.add(listener);
+        listeners.add(listener);
     }
 
     @Override
@@ -68,15 +74,11 @@ public class NumberSettingItem extends SettingItem<Number, JSpinner> {
 
     @Override
     public synchronized void setValue(Number newValue) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                supressDocumentListener = true;
-                guiComponent.setValue(newValue);
-                guiComponent.grabFocus();
-                supressDocumentListener = false;
-            }
+        SwingUtilities.invokeLater(() -> {
+            supressDocumentListener = true;
+            guiComponent.setValue(newValue);
+            guiComponent.grabFocus();
+            supressDocumentListener = false;
         });
     }
 

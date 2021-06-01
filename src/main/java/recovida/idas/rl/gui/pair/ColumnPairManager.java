@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -38,50 +37,77 @@ import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.listener.ColumnPairInclusionExclusionListener;
 import recovida.idas.rl.gui.listener.ColumnPairSelectionListener;
 import recovida.idas.rl.gui.listener.ColumnPairValueChangeListener;
-import recovida.idas.rl.gui.ui.ColumnPairTableModel;
-import recovida.idas.rl.gui.ui.cellrendering.RenameColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.container.LinkageColumnButtonPanel;
 import recovida.idas.rl.gui.ui.container.LinkageColumnEditingPanel;
+import recovida.idas.rl.gui.ui.table.ColumnPairTable;
+import recovida.idas.rl.gui.ui.table.ColumnPairTableModel;
+import recovida.idas.rl.gui.ui.table.cellrendering.RenameColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.window.BulkCopyColumnInclusionDialogue;
+import recovida.idas.rl.gui.undo.AbstractCommand;
+import recovida.idas.rl.gui.undo.AbstractCompositeCommand;
 import recovida.idas.rl.gui.undo.AddColumnPairCommand;
-import recovida.idas.rl.gui.undo.Command;
-import recovida.idas.rl.gui.undo.CompositeCommand;
 import recovida.idas.rl.gui.undo.DeleteColumnPairCommand;
 import recovida.idas.rl.gui.undo.EditColumnPairFieldCommand;
 import recovida.idas.rl.gui.undo.UndoHistory;
 
+/**
+ * This class manages the column pairs (represented by rows) in a
+ * {@link ColumnPairTable}.
+ */
 public class ColumnPairManager {
 
     protected UndoHistory history;
+
     protected LinkageColumnButtonPanel buttonPanel;
+
     protected LinkageColumnEditingPanel editingPanel;
+
     protected JTable table;
+
     protected ColumnPairTableModel model;
+
     protected ListSelectionModel selectionModel;
 
     protected String firstRenameSuffix = "";
+
     protected String secondRenameSuffix = "";
 
-    public final int FIRST_NUMBER = 1;
-    public final int FIRST_COPY_NUMBER = 201;
+    protected static final int FIRST_NUMBER = 1;
+
+    protected static final int FIRST_COPY_NUMBER = 201;
 
     protected final AtomicInteger nextNumber = new AtomicInteger(FIRST_NUMBER);
+
     protected final AtomicInteger nextCopyNumber = new AtomicInteger(
             FIRST_COPY_NUMBER);
 
     protected boolean ignoreSelectionEvent = false;
+
     protected boolean ignoreChangeEvent = false;
+
     protected boolean completelyIgnoreChangeEvent = false; // don't even call
                                                            // onChange()
+
     protected Map<String, JComponent> fieldFromKey = new HashMap<>();
 
     protected Collection<String> firstDatasetColumnNames = null;
+
     protected Collection<String> secondDatasetColumnNames = null;
 
     protected List<ColumnPairSelectionListener> selectionListeners = new LinkedList<>();
+
     protected List<ColumnPairInclusionExclusionListener> rowInclusionExclusionListeners = new LinkedList<>();
+
     protected List<ColumnPairValueChangeListener> valueChangeListeners = new LinkedList<>();
 
+    /**
+     * Creates an instance of the manager.
+     *
+     * @param history      the command history
+     * @param buttonPanel  the panel that contains buttons (above the table)
+     * @param editingPanel the panel where the user can edit the values
+     * @param table        the table to be managed
+     */
     public ColumnPairManager(UndoHistory history,
             LinkageColumnButtonPanel buttonPanel,
             LinkageColumnEditingPanel editingPanel, JTable table) {
@@ -89,8 +115,8 @@ public class ColumnPairManager {
         this.buttonPanel = buttonPanel;
         this.editingPanel = editingPanel;
         this.table = table;
-        this.model = (ColumnPairTableModel) table.getModel();
-        this.selectionModel = table.getSelectionModel();
+        model = (ColumnPairTableModel) table.getModel();
+        selectionModel = table.getSelectionModel();
 
         buttonPanel.getAddPairBtn().addActionListener(
                 e -> history.push(new AddColumnPairCommand(this)));
@@ -121,7 +147,7 @@ public class ColumnPairManager {
                         dialogue.addItemToRightPanel(col,
                                 alreadyIncludedRight.contains(col));
                 List<String>[] result = dialogue.run();
-                List<Command> cmd = new LinkedList<>();
+                List<AbstractCommand> cmd = new LinkedList<>();
                 for (String c : result[0])
                     cmd.add(new AddColumnPairCommand(ColumnPairManager.this,
                             "copy", c, null));
@@ -129,7 +155,7 @@ public class ColumnPairManager {
                     cmd.add(new AddColumnPairCommand(ColumnPairManager.this,
                             "copy", null, c));
                 if (!cmd.isEmpty())
-                    history.push(new CompositeCommand(cmd) {
+                    history.push(new AbstractCompositeCommand(cmd) {
 
                         @Override
                         public String getSummary() {
@@ -238,6 +264,13 @@ public class ColumnPairManager {
         return selectionModel;
     }
 
+    /**
+     * Adds a column pair (represented by a row) to the table.
+     *
+     * @param index    the index (as in the model) of the new row
+     * @param contents an array with the contents of the new row
+     * @return the index given as an argument
+     */
     public synchronized int addColumnPair(int index, Object[] contents) {
         model.insertRow(index, contents);
         int viewIndex = table.convertRowIndexToView(index);
@@ -248,13 +281,14 @@ public class ColumnPairManager {
         return index;
     }
 
-    public void updateCellsWithNumber(int number) {
-        for (int i = 0; i < model.getRowCount(); i++)
-            if (Objects.equals(Integer.valueOf(number),
-                    model.getValue(i, "number")))
-                model.fireTableRowsUpdated(i, i);
-    }
-
+    /**
+     * Adds a column pair (represented by a row) to the table.
+     *
+     * @param type                value of the field "type"
+     * @param firstDatasetColumn  value of the field "index_a"
+     * @param secondDatasetColumn value of the field "inde_b"
+     * @return the index (as in the model) of the new row
+     */
     public int addColumnPair(String type, String firstDatasetColumn,
             String secondDatasetColumn) {
         Object[] contents = new Object[model.getColumnCount()];
@@ -270,6 +304,11 @@ public class ColumnPairManager {
         return addColumnPair(model.getRowCount(), contents);
     }
 
+    /**
+     * Adds a column pair (represented by a row) to the table.
+     *
+     * @return the index (as in the model) of the new row
+     */
     public int addColumnPair() {
         return addColumnPair(null, null, null);
     }
@@ -293,6 +332,12 @@ public class ColumnPairManager {
         return n;
     }
 
+    /**
+     * Deletes a column pair (represented by a row) from the table.
+     *
+     * @param index the index of the row to be deleted (as in the model)
+     * @return an array with the contents of the deleted row
+     */
     public synchronized Object[] deleteColumnPair(int index) {
         Object[] r = model.getRowAsArray(index);
         int viewIndex = table.convertRowIndexToView(index);
@@ -308,6 +353,13 @@ public class ColumnPairManager {
         return r;
     }
 
+    /**
+     * Effectively changes a cell value in the model.
+     *
+     * @param rowIndex the row index (as in the model)
+     * @param key      the field key
+     * @param newValue the value after the change
+     */
     public synchronized void onChange(int rowIndex, String key,
             Object newValue) {
         System.out.format("%d_%s = “%s”%n", rowIndex, key, newValue);
@@ -398,7 +450,7 @@ public class ColumnPairManager {
                             e.getDocument().getLength());
                     newValue = (Number) ((DefaultFormatter) tf.getFormatter())
                             .stringToValue(txt);
-                } catch (ParseException | BadLocationException e1) {
+                } catch (ParseException | BadLocationException ex) {
                     return;
                 }
                 if (!completelyIgnoreChangeEvent) {
@@ -463,7 +515,7 @@ public class ColumnPairManager {
                         }
                         onChange(rowIndex, key, newValue);
                     }
-                } catch (BadLocationException e1) {
+                } catch (BadLocationException ex) {
                 }
 
             }
@@ -475,8 +527,9 @@ public class ColumnPairManager {
         SwingUtilities.invokeLater(() -> {
             if (!skipField) {
                 ignoreChangeEvent = true;
-                if (table.getSelectedRow() != rowIndex)
-                    table.setRowSelectionInterval(rowIndex, rowIndex);
+                int viewIndex = table.convertRowIndexToView(rowIndex);
+                if (table.getSelectedRow() != viewIndex)
+                    table.setRowSelectionInterval(viewIndex, viewIndex);
                 JComponent field = fieldFromKey.get(key);
                 if (field instanceof JTextField) {
                     ((JTextField) field).setText((String) newValue);
@@ -540,8 +593,6 @@ public class ColumnPairManager {
                 .setEnabled(firstDatasetColumnNames != null
                         || secondDatasetColumnNames != null);
         model.setSecondDatasetColumnNames(secondDatasetColumnNames);
-        if (model.getRowCount() > 0)
-            model.fireTableRowsUpdated(0, model.getRowCount() - 1);
     }
 
     public void setComboBoxItems(JComboBox<String> field,
@@ -552,15 +603,30 @@ public class ColumnPairManager {
                 field.addItem(item);
     }
 
+    /**
+     * Adds a listener to be notified whenever a row is selected.
+     *
+     * @param listener the listener to add
+     */
     public void addSelectionListener(ColumnPairSelectionListener listener) {
         selectionListeners.add(listener);
     }
 
+    /**
+     * Adds a listener to be notified whenever a row is added or deleted.
+     *
+     * @param listener the listener to add
+     */
     public void addInclusionExclusionListener(
             ColumnPairInclusionExclusionListener listener) {
         rowInclusionExclusionListeners.add(listener);
     }
 
+    /**
+     * Adds a listener to be notified whenever a cell is changed.
+     *
+     * @param listener the listener to add
+     */
     public void addValueChangeSelectionListener(
             ColumnPairValueChangeListener listener) {
         valueChangeListeners.add(listener);
@@ -586,6 +652,9 @@ public class ColumnPairManager {
         updateRenameCellsPlaceholder();
     }
 
+    /**
+     * Resets the numbers automatically filled when a column is created.
+     */
     public void reset() {
         nextNumber.set(FIRST_NUMBER);
         nextCopyNumber.set(FIRST_COPY_NUMBER);

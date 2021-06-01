@@ -11,10 +11,21 @@ import recovida.idas.rl.gui.ui.field.FieldWithPlaceholder;
 import recovida.idas.rl.gui.undo.SetOptionCommand;
 import recovida.idas.rl.gui.undo.UndoHistory;
 
-public class StringSettingItem extends SettingItem<String, JTextField> {
+/**
+ * Represents and deals with a string setting item, its field and value.
+ */
+public class StringSettingItem extends AbstractSettingItem<String, JTextField> {
 
     protected boolean supressDocumentListener = false;
 
+    /**
+     * Creates an instance.
+     *
+     * @param history      the undo history
+     * @param currentValue the current value
+     * @param defaultValue the default value
+     * @param guiComponent the field
+     */
     public StringSettingItem(UndoHistory history, String currentValue,
             String defaultValue, JTextField guiComponent) {
         super(history, currentValue, defaultValue, guiComponent);
@@ -45,18 +56,27 @@ public class StringSettingItem extends SettingItem<String, JTextField> {
                                 new SetOptionCommand<>(StringSettingItem.this,
                                         getCurrentValue(), value, true));
                     onChange(value);
-                } catch (BadLocationException e1) {
+                } catch (BadLocationException ex) {
                 }
 
             }
         });
     }
 
+    /**
+     * Creates an instance.
+     *
+     * @param history      the undo history
+     * @param currentValue the current value
+     * @param defaultValue the default value
+     * @param guiComponent the field
+     * @param listener     a change listener
+     */
     public StringSettingItem(UndoHistory history, String currentValue,
             String defaultValue, JTextField guiComponent,
             SettingItemChangeListener listener) {
         this(history, currentValue, defaultValue, guiComponent);
-        this.listeners.add(listener);
+        listeners.add(listener);
     }
 
     @Override
@@ -65,21 +85,18 @@ public class StringSettingItem extends SettingItem<String, JTextField> {
             return;
         currentValue = newValue;
         for (SettingItemChangeListener listener : listeners)
-            if (listener != null)
+            if (listener != null) {
                 listener.changed(newValue);
+            }
     }
 
     @Override
     public synchronized void setValue(String newValue) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                supressDocumentListener = true;
-                guiComponent.setText(newValue);
-                guiComponent.grabFocus();
-                supressDocumentListener = false;
-            }
+        SwingUtilities.invokeLater(() -> {
+            supressDocumentListener = true;
+            guiComponent.setText(newValue);
+            guiComponent.grabFocus();
+            supressDocumentListener = false;
         });
     }
 

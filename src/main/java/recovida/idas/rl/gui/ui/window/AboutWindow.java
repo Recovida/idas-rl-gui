@@ -12,8 +12,18 @@ import javax.swing.JPanel;
 import recovida.idas.rl.gui.MainWindow;
 import recovida.idas.rl.gui.lang.MessageProvider;
 
+/**
+ * Windows that shows basic information about the program.
+ */
 public class AboutWindow extends JDialog {
 
+    private static final long serialVersionUID = -9167482401993772672L;
+
+    /**
+     * Creates the dialogue.
+     *
+     * @param parent the parent frame
+     */
     public AboutWindow(Frame parent) {
         super(parent);
         setLocationByPlatform(true);
@@ -34,7 +44,5 @@ public class AboutWindow extends JDialog {
         panel.add(closeBtn);
         pack();
     }
-
-    private static final long serialVersionUID = -1282322316955860957L;
 
 }

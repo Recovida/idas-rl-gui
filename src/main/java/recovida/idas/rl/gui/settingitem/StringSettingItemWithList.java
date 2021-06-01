@@ -12,11 +12,23 @@ import recovida.idas.rl.gui.ui.field.FieldWithPlaceholder;
 import recovida.idas.rl.gui.undo.SetOptionCommand;
 import recovida.idas.rl.gui.undo.UndoHistory;
 
+/**
+ * Represents and deals with a string setting item (with suggestions), its field
+ * and value.
+ */
 public class StringSettingItemWithList
-        extends SettingItem<String, JComboBox<String>> {
+        extends AbstractSettingItem<String, JComboBox<String>> {
 
     protected boolean supressDocumentListener = false;
 
+    /**
+     * Creates an instance.
+     *
+     * @param history      the undo history
+     * @param currentValue the current value
+     * @param defaultValue the default value
+     * @param guiComponent the field
+     */
     public StringSettingItemWithList(UndoHistory history, String currentValue,
             String defaultValue, JComboBox<String> guiComponent) {
         super(history, currentValue, defaultValue, guiComponent);
@@ -48,17 +60,26 @@ public class StringSettingItemWithList
                                         StringSettingItemWithList.this,
                                         getCurrentValue(), value, true));
                             onChange(value);
-                        } catch (BadLocationException e1) {
+                        } catch (BadLocationException ex) {
                         }
                     }
                 });
     }
 
+    /**
+     * Creates an instance.
+     *
+     * @param history      the undo history
+     * @param currentValue the current value
+     * @param defaultValue the default value
+     * @param guiComponent the field
+     * @param listener     a change listener
+     */
     public StringSettingItemWithList(UndoHistory history, String currentValue,
             String defaultValue, JComboBox<String> guiComponent,
             SettingItemChangeListener listener) {
         this(history, currentValue, defaultValue, guiComponent);
-        this.listeners.add(listener);
+        listeners.add(listener);
     }
 
     @Override
@@ -73,15 +94,12 @@ public class StringSettingItemWithList
 
     @Override
     public void setValue(String newValue) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                supressDocumentListener = true;
-                guiComponent.setSelectedIndex(-1);
-                guiComponent.setSelectedItem(newValue);
-                guiComponent.grabFocus();
-                supressDocumentListener = false;
-            }
+        SwingUtilities.invokeLater(() -> {
+            supressDocumentListener = true;
+            guiComponent.setSelectedIndex(-1);
+            guiComponent.setSelectedItem(newValue);
+            guiComponent.grabFocus();
+            supressDocumentListener = false;
         });
     }
 

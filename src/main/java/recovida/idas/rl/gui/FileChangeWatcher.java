@@ -9,17 +9,36 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 
+/**
+ * This class provides methods to watch a file for changes on disk.
+ */
 public class FileChangeWatcher {
 
     WatchService watchService;
+
     Path dir;
+
     Path file;
+
     WatchKey registeredKey;
+
     Thread t;
+
     boolean enabled = false;
-    private Runnable callback;
+
+    private final Runnable callback;
+
     private boolean stopAfterCallback = false;
 
+    /**
+     * Creates an instance.
+     *
+     * @param p                 the path to the file
+     * @param callback          a callback to invoke whenever the file changes
+     *                          on disk
+     * @param stopAfterCallback whether to stop automatically after the first
+     *                          change
+     */
     public FileChangeWatcher(Path p, Runnable callback,
             boolean stopAfterCallback) {
         file = p.toAbsolutePath();
@@ -28,6 +47,13 @@ public class FileChangeWatcher {
         this.stopAfterCallback = stopAfterCallback;
     }
 
+    /**
+     * Creates an instance.
+     *
+     * @param p        the path to the file
+     * @param callback a callback to invoke whenever the file changes on disk
+     *                 change
+     */
     public FileChangeWatcher(Path p, Runnable callback) {
         this(p, callback, false);
     }
@@ -60,6 +86,9 @@ public class FileChangeWatcher {
         });
     }
 
+    /**
+     * Starts watching.
+     */
     public synchronized void enable() {
         if (!enabled) {
             enabled = true;
@@ -67,6 +96,9 @@ public class FileChangeWatcher {
         }
     }
 
+    /**
+     * Stops watching.
+     */
     public synchronized void disable() {
         if (enabled) {
             enabled = false;
