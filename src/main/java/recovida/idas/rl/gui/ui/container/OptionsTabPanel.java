@@ -63,9 +63,9 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
     private JTextFieldWithPlaceholder indexDirField;
 
-    private JSpinner minScoreField;
+    private JSpinnerWithBlankValue minScoreField;
 
-    private JSpinner maxRowsField;
+    private JSpinnerWithBlankValue maxRowsField;
 
     /**
      * Creates an instance of the panel.
@@ -170,8 +170,7 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         add(minScoreLbl, minScoreLblGBC);
         minScoreField = new JSpinnerWithBlankValue(minScoreModel, "0.000");
 
-        ((JSpinnerWithBlankValue) minScoreField)
-                .setBlankValue(Double.valueOf(0.0));
+        minScoreField.setBlankValue(Double.valueOf(0.0));
         GridBagConstraints minScoreFieldGBC = new GridBagConstraints();
         minScoreFieldGBC.anchor = GridBagConstraints.WEST;
         minScoreFieldGBC.insets = new Insets(0, 0, 5, 0);
@@ -199,8 +198,7 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         maxRowsLblGBC.gridy = 5;
         add(maxRowsLbl, maxRowsLblGBC);
         maxRowsField = new JSpinnerWithBlankValue(maxRowsModel, "0");
-        ((JSpinnerWithBlankValue) maxRowsField)
-                .setBlankValue(Integer.MAX_VALUE);
+        maxRowsField.setBlankValue(Integer.MAX_VALUE);
         GridBagConstraints maxRowsFieldGBC = new GridBagConstraints();
         maxRowsFieldGBC.anchor = GridBagConstraints.WEST;
         maxRowsFieldGBC.gridx = 1;
@@ -265,6 +263,9 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         coresLabel.setText(MessageFormat.format(
                 MessageProvider.getMessage("options.threads.cores"),
                 Runtime.getRuntime().availableProcessors()));
+        minScoreField.updateLocalisedStrings();
+        maxRowsField.updateLocalisedStrings();
+        threadsField.updateLocalisedStrings();
     }
 
     public JButton getLinkageDirBtn() {
