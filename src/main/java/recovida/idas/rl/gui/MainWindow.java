@@ -757,7 +757,9 @@ public class MainWindow implements Translatable {
     protected void doOpen(String newConfigFileName) {
         skipValidation = true;
         clearAllFields();
+        history.clearAll();
         manager.reset();
+        updateConfigFileName(null);
         executionTabPanel.clear();
         if (cf.load(newConfigFileName)) {
             updateConfigFileName(newConfigFileName);
