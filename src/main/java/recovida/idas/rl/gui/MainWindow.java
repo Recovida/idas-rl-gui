@@ -1059,8 +1059,13 @@ public class MainWindow implements Translatable {
         chooser.setAcceptAllFileFilterUsed(false);
         int result = save ? chooser.showSaveDialog(frame)
                 : chooser.showOpenDialog(frame);
-        if (result == JFileChooser.APPROVE_OPTION)
-            return chooser.getSelectedFile().getAbsolutePath();
+        if (result == JFileChooser.APPROVE_OPTION) {
+            String p = chooser.getSelectedFile().getAbsolutePath();
+            if (p != null
+                    && !p.toLowerCase().matches("^.+\\.(properties|ini)$"))
+                p += ".properties";
+            return p;
+        }
         return null;
     }
 
