@@ -300,7 +300,8 @@ public class ColumnPairManager {
             contents[model.getColumnIndex("index_b")] = secondDatasetColumn;
         if (type != null)
             contents[model.getColumnIndex("type")] = type;
-        contents[model.getColumnIndex("weight")] = 0.0;
+        contents[model.getColumnIndex("weight")] = "copy".equals(type) ? 0.0
+                : 1.0;
         return addColumnPair(model.getRowCount(), contents);
     }
 
