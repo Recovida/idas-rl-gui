@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.Toolkit;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,6 +55,9 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
         super(parent);
         setFont(parent.getFont());
         setMinimumSize(new Dimension(600, 300));
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        setMaximumSize(new Dimension(screenSize.width * 9 / 10,
+                screenSize.height * 8 / 10));
         setLocationByPlatform(true);
         setModalityType(ModalityType.APPLICATION_MODAL);
         setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
@@ -136,6 +140,14 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
             dispose();
         });
 
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        Dimension d = super.getPreferredSize();
+        Dimension max = getMaximumSize();
+        return new Dimension(Math.min(d.width, max.width),
+                Math.min(d.height, max.height));
     }
 
     private final JPanel mainPanel = new JPanel();
