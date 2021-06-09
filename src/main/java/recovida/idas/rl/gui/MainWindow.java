@@ -1021,7 +1021,8 @@ public class MainWindow implements Translatable {
 
     private String selectDatasetFile(String currentName) {
         JFileChooser chooser = new JFileChooser();
-        Path dir = currentFileName == null ? Paths.get(".").toAbsolutePath()
+        Path dir = currentFileName == null
+                ? Paths.get(System.getProperty("user.home")).toAbsolutePath()
                 : Paths.get(currentFileName).toAbsolutePath().getParent();
         chooser.setCurrentDirectory(currentName != null
                 ? dir.resolve(currentName).getParent().toFile()
@@ -1046,9 +1047,9 @@ public class MainWindow implements Translatable {
 
     private String selectConfigFile(String fileName, boolean save) {
         JFileChooser chooser = new JFileChooser();
-        chooser.setCurrentDirectory(
-                fileName != null ? new File(fileName).getParentFile()
-                        : new File(".").getAbsoluteFile());
+        chooser.setCurrentDirectory(fileName != null
+                ? new File(fileName).getParentFile()
+                : new File(System.getProperty("user.home")).getAbsoluteFile());
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 MessageProvider
                         .getMessage(save ? "menu.file.save.propertiesfile"
@@ -1065,7 +1066,8 @@ public class MainWindow implements Translatable {
 
     private String selectDir(String fileName) {
         JFileChooser chooser = new JFileChooser();
-        Path dir = currentFileName == null ? Paths.get(".").toAbsolutePath()
+        Path dir = currentFileName == null
+                ? Paths.get(System.getProperty("user.home")).toAbsolutePath()
                 : Paths.get(currentFileName).toAbsolutePath().getParent();
         chooser.setCurrentDirectory(
                 fileName != null ? dir.resolve(fileName).getParent().toFile()
