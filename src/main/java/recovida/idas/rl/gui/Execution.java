@@ -4,6 +4,8 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.swing.SwingUtilities;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import recovida.idas.rl.core.Main;
 import recovida.idas.rl.core.util.StatusReporter;
 import recovida.idas.rl.gui.ui.container.ExecutionInnerPanel;
@@ -68,7 +70,14 @@ public class Execution {
         StatusReporter.set(reporter);
 
         CompletableFuture<Boolean> f = CompletableFuture.supplyAsync(() -> {
-            boolean result = main.execute();
+            boolean result;
+            try {
+                result = main.execute();
+            } catch (Exception e) {
+                StatusReporter.get()
+                        .errorUnexpectedError(ExceptionUtils.getStackTrace(e));
+                result = false;
+            }
             if (!result)
                 SwingUtilities.invokeLater(() -> panel.showProgress(false));
             return result;
