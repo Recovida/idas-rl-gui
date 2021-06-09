@@ -117,6 +117,10 @@ public class DatasetPeek {
         return DatasetPeekResult.UNSUPPORTED_FORMAT;
     }
 
+    public static String[] getSupportedExtensions() {
+        return new String[] { "csv", "dbf" };
+    }
+
     /**
      * Character categories in a CSV file.
      */

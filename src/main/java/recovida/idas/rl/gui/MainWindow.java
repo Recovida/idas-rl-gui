@@ -1026,9 +1026,11 @@ public class MainWindow implements Translatable {
         chooser.setCurrentDirectory(currentName != null
                 ? dir.resolve(currentName).getParent().toFile()
                 : dir.toFile());
+        String[] extensions = DatasetPeek.getSupportedExtensions();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                MessageProvider.getMessage("datasets.supportedformats"), "csv",
-                "dbf");
+                MessageProvider.getMessage("datasets.supportedformats") + " (*."
+                        + String.join("; *.", extensions) + ")",
+                extensions);
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
