@@ -43,6 +43,7 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import recovida.idas.rl.core.io.Separator;
 import recovida.idas.rl.gui.DatasetPeek.DatasetPeekResult;
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.listener.ColumnPairInclusionExclusionListener;
@@ -52,8 +53,9 @@ import recovida.idas.rl.gui.listener.SettingItemChangeListener;
 import recovida.idas.rl.gui.pair.ColumnPairManager;
 import recovida.idas.rl.gui.settingitem.AbstractSettingItem;
 import recovida.idas.rl.gui.settingitem.NumberSettingItem;
+import recovida.idas.rl.gui.settingitem.ObjectFromListSettingItem;
+import recovida.idas.rl.gui.settingitem.StringFromListSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItem;
-import recovida.idas.rl.gui.settingitem.StringSettingItemWithList;
 import recovida.idas.rl.gui.ui.ErrorIconLabel;
 import recovida.idas.rl.gui.ui.Translatable;
 import recovida.idas.rl.gui.ui.container.DatasetsTabPanel;
@@ -194,7 +196,7 @@ public class MainWindow implements Translatable {
                         datasetsTabPanel.getFirstDatasetField(),
                         datasetsTabEventListenerTop));
         cf.addSettingItem("encoding_a",
-                new StringSettingItemWithList(history, "", "UTF-8",
+                new StringFromListSettingItem(history, "", "UTF-8",
                         datasetsTabPanel.getFirstEncodingField(),
                         datasetsTabEventListenerTop));
         cf.addSettingItem("suffix_a",
@@ -211,7 +213,7 @@ public class MainWindow implements Translatable {
                         datasetsTabPanel.getSecondDatasetField(),
                         datasetsTabEventListenerTop));
         cf.addSettingItem("encoding_b",
-                new StringSettingItemWithList(history, "", "UTF-8",
+                new StringFromListSettingItem(history, "", "UTF-8",
                         datasetsTabPanel.getSecondEncodingField(),
                         datasetsTabEventListenerTop));
         cf.addSettingItem("suffix_b",
@@ -247,6 +249,14 @@ public class MainWindow implements Translatable {
                 new NumberSettingItem(history, Integer.MAX_VALUE,
                         Integer.MAX_VALUE, optionsTabPanel.getMaxRowsField(),
                         optionsTabEventListener));
+        cf.addSettingItem("output_dec_sep", new ObjectFromListSettingItem<>(
+                history, Separator.DEFAULT_DEC_SEP, Separator.DEFAULT_DEC_SEP,
+                optionsTabPanel.getScoreDecSepField(), optionsTabEventListener,
+                Separator.getDecimalSeparators()));
+        cf.addSettingItem("output_col_sep", new ObjectFromListSettingItem<>(
+                history, Separator.DEFAULT_COL_SEP, Separator.DEFAULT_COL_SEP,
+                optionsTabPanel.getColSepField(), optionsTabEventListener,
+                Separator.getColumnSeparators()));
 
         // Tab: COLUMNS
         ColumnPairValueChangeListener linkageColsTabAddDelEventListener = (
@@ -685,6 +695,10 @@ public class MainWindow implements Translatable {
                     && ((JComboBox<String>) component).isEditable())
                 ((JComboBox<String>) item.getGuiComponent())
                         .setSelectedItem("");
+            else if (component instanceof JComboBox<?>
+                    && !((JComboBox<?>) component).isEditable()
+                    && ((JComboBox<?>) component).getItemCount() > 0)
+                ((JComboBox<?>) item.getGuiComponent()).setSelectedIndex(0);
             else if (component instanceof JSpinnerWithBlankValue)
                 ((JSpinnerWithBlankValue) component).setValue(
                         ((JSpinnerWithBlankValue) component).getBlankValue());

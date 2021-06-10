@@ -16,7 +16,7 @@ import recovida.idas.rl.gui.undo.UndoHistory;
  * Represents and deals with a string setting item (with suggestions), its field
  * and value.
  */
-public class StringSettingItemWithList
+public class StringFromListSettingItem
         extends AbstractSettingItem<String, JComboBox<String>> {
 
     protected boolean supressDocumentListener = false;
@@ -29,7 +29,7 @@ public class StringSettingItemWithList
      * @param defaultValue the default value
      * @param guiComponent the field
      */
-    public StringSettingItemWithList(UndoHistory history, String currentValue,
+    public StringFromListSettingItem(UndoHistory history, String currentValue,
             String defaultValue, JComboBox<String> guiComponent) {
         super(history, currentValue, defaultValue, guiComponent);
         guiComponent.setSelectedItem(currentValue);
@@ -57,7 +57,7 @@ public class StringSettingItemWithList
                                     e.getDocument().getLength());
                             if (!supressDocumentListener)
                                 history.push(new SetOptionCommand<>(
-                                        StringSettingItemWithList.this,
+                                        StringFromListSettingItem.this,
                                         getCurrentValue(), value, true));
                             onChange(value);
                         } catch (BadLocationException ex) {
@@ -75,7 +75,7 @@ public class StringSettingItemWithList
      * @param guiComponent the field
      * @param listener     a change listener
      */
-    public StringSettingItemWithList(UndoHistory history, String currentValue,
+    public StringFromListSettingItem(UndoHistory history, String currentValue,
             String defaultValue, JComboBox<String> guiComponent,
             SettingItemChangeListener listener) {
         this(history, currentValue, defaultValue, guiComponent);
