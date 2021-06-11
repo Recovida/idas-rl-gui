@@ -595,20 +595,28 @@ public class MainWindow implements Translatable {
         String linkageDir = (String) cf.getSettingItems().get("linkage_folder")
                 .getCurrentValue();
         if (linkageDir == null || linkageDir.isEmpty()) {
+            err.setToolTipText(MessageProvider
+                    .getMessage("options.linkagelocation.blank"));
             err.setVisible(true);
             errorCount++;
-        } else
+        } else {
+            err.setToolTipText("");
             err.setVisible(false);
+        }
 
         // index directory
         String indexDir = (String) cf.getSettingItems().get("db_index")
                 .getCurrentValue();
         err = optionsTabPanel.getIndexDirWarningLbl();
         if (indexDir == null || indexDir.isEmpty()) {
+            err.setToolTipText(
+                    MessageProvider.getMessage("options.indexlocation.blank"));
             err.setVisible(true);
             errorCount++;
-        } else
+        } else {
+            err.setToolTipText("");
             err.setVisible(false);
+        }
 
         // cleaning regex
         err = optionsTabPanel.getCleaningRegexWarningLbl();
@@ -616,10 +624,13 @@ public class MainWindow implements Translatable {
             String r = (String) Optional.ofNullable(cf.getSettingItems()
                     .get("cleaning_regex").getCurrentValue()).orElse("");
             Pattern.compile(r);
+            err.setToolTipText("");
             err.setVisible(false);
         } catch (PatternSyntaxException e) {
             errorCount++;
             err.setVisible(true);
+            err.setToolTipText(MessageProvider
+                    .getMessage("options.cleaningregex.invalid"));
         }
 
         // separators
