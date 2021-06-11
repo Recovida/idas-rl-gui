@@ -183,7 +183,11 @@ public class ConfigurationFile {
                 else if ("output_col_sep".equals(key)
                         && Objects.equals(value, Separator.DEFAULT_COL_SEP))
                     continue; // don't save default value
-                String valueStr = value == null ? null : value.toString();
+                String valueStr;
+                if (value instanceof Separator)
+                    valueStr = ((Separator) value).name().toLowerCase();
+                else
+                    valueStr = value == null ? null : value.toString();
                 p.put(key, valueStr);
                 p.store(skipTimestampOutput, null);
                 p.clear();

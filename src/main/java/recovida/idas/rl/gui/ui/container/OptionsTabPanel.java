@@ -58,13 +58,15 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
     private JLabel colSepLbl;
 
-    private JLabel scoreDecSepLbl;
+    private JLabel decSepLbl;
 
     private final ErrorIconLabel linkageDirWarningLbl;
 
     private final ErrorIconLabel indexDirWarningLbl;
 
     private ErrorIconLabel cleaningRegexWarningLbl;
+
+    private ErrorIconLabel decSepWarningLbl;
 
     // fields
 
@@ -82,7 +84,7 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
     private JComboBox<Separator> colSepField;
 
-    private JComboBox<Separator> scoreDecSepField;
+    private JComboBox<Separator> decSepField;
 
     /**
      * Creates an instance of the panel.
@@ -92,9 +94,9 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         // layout
 
         GridBagLayout gbl = new GridBagLayout();
-        gbl.columnWidths = new int[] { 600, 900 };
+        gbl.columnWidths = new int[] { 300, 100 };
         gbl.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        gbl.columnWeights = new double[] { 0.0, 0.0 };
+        gbl.columnWeights = new double[] { 0.0, 1.0 };
         gbl.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 1.0 };
         setLayout(gbl);
@@ -304,7 +306,7 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
         // column separator
 
-        colSepLbl = new JLabel("_Column separator in output file");
+        colSepLbl = new JLabel("_Column separator (output)");
         colSepLbl.setPreferredSize(new Dimension(150, 17));
         colSepLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         GridBagConstraints colSepLblGBC = new GridBagConstraints();
@@ -324,8 +326,8 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         colSepPanel.setLayout(new BoxLayout(colSepPanel, BoxLayout.X_AXIS));
 
         colSepField = new JComboBox<>();
-        colSepField.setMinimumSize(new Dimension(700, 27));
-        colSepField.setMaximumSize(new Dimension(5500, 32767));
+        colSepField.setMinimumSize(new Dimension(1000, 27));
+        colSepField.setMaximumSize(new Dimension(20000, 32767));
         colSepPanel.add(colSepField);
 
         Component colSepHorGlue = Box.createHorizontalGlue();
@@ -333,33 +335,35 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
         // decimal separator
 
-        scoreDecSepLbl = new JLabel("_Score decimal separator in output file");
-        scoreDecSepLbl.setPreferredSize(new Dimension(150, 17));
-        scoreDecSepLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-        GridBagConstraints scoreDecSepLblGBC = new GridBagConstraints();
-        scoreDecSepLblGBC.fill = GridBagConstraints.HORIZONTAL;
-        scoreDecSepLblGBC.insets = new Insets(0, 0, 5, 5);
-        scoreDecSepLblGBC.gridx = 0;
-        scoreDecSepLblGBC.gridy = 8;
-        add(scoreDecSepLbl, scoreDecSepLblGBC);
+        decSepLbl = new JLabel("_Decimal separator (output)");
+        decSepLbl.setPreferredSize(new Dimension(150, 17));
+        decSepLbl.setHorizontalAlignment(SwingConstants.TRAILING);
+        GridBagConstraints decSepLblGBC = new GridBagConstraints();
+        decSepLblGBC.fill = GridBagConstraints.HORIZONTAL;
+        decSepLblGBC.insets = new Insets(0, 0, 5, 5);
+        decSepLblGBC.gridx = 0;
+        decSepLblGBC.gridy = 8;
+        add(decSepLbl, decSepLblGBC);
 
-        JPanel scoreDecSepPanel = new JPanel();
-        GridBagConstraints scoreDecSepPanelGBC = new GridBagConstraints();
-        scoreDecSepPanelGBC.insets = new Insets(0, 0, 5, 0);
-        scoreDecSepPanelGBC.fill = GridBagConstraints.BOTH;
-        scoreDecSepPanelGBC.gridx = 1;
-        scoreDecSepPanelGBC.gridy = 8;
-        add(scoreDecSepPanel, scoreDecSepPanelGBC);
-        scoreDecSepPanel
-                .setLayout(new BoxLayout(scoreDecSepPanel, BoxLayout.X_AXIS));
+        JPanel decSepPanel = new JPanel();
+        GridBagConstraints decSepPanelGBC = new GridBagConstraints();
+        decSepPanelGBC.insets = new Insets(0, 0, 5, 0);
+        decSepPanelGBC.fill = GridBagConstraints.BOTH;
+        decSepPanelGBC.gridx = 1;
+        decSepPanelGBC.gridy = 8;
+        add(decSepPanel, decSepPanelGBC);
+        decSepPanel.setLayout(new BoxLayout(decSepPanel, BoxLayout.X_AXIS));
 
-        scoreDecSepField = new JComboBox<>();
-        scoreDecSepField.setMinimumSize(new Dimension(700, 27));
-        scoreDecSepField.setMaximumSize(new Dimension(5500, 32767));
-        scoreDecSepPanel.add(scoreDecSepField);
+        decSepWarningLbl = new ErrorIconLabel();
+        decSepPanel.add(getDecSepWarningLbl());
 
-        Component scoreDecSepHorGlue = Box.createHorizontalGlue();
-        scoreDecSepPanel.add(scoreDecSepHorGlue);
+        decSepField = new JComboBox<>();
+        decSepField.setMinimumSize(new Dimension(700, 27));
+        decSepField.setMaximumSize(new Dimension(23000, 32767));
+        decSepPanel.add(decSepField);
+
+        Component decSepHorGlue = Box.createHorizontalGlue();
+        decSepPanel.add(decSepHorGlue);
 
     }
 
@@ -381,8 +385,7 @@ public class OptionsTabPanel extends JPanel implements Translatable {
                 Runtime.getRuntime().availableProcessors()));
         cleaningRegexLbl
                 .setText(MessageProvider.getMessage("options.cleaningregex"));
-        scoreDecSepLbl
-                .setText(MessageProvider.getMessage("options.scoredecsep"));
+        decSepLbl.setText(MessageProvider.getMessage("options.decsep"));
         colSepLbl.setText(MessageProvider.getMessage("options.colsep"));
         minScoreField.updateLocalisedStrings();
         maxRowsField.updateLocalisedStrings();
@@ -461,8 +464,12 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         return colSepField;
     }
 
-    public JComboBox<Separator> getScoreDecSepField() {
-        return scoreDecSepField;
+    public JComboBox<Separator> getDecSepField() {
+        return decSepField;
+    }
+
+    public ErrorIconLabel getDecSepWarningLbl() {
+        return decSepWarningLbl;
     }
 
 }

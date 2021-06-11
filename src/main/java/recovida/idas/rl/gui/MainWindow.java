@@ -51,9 +51,9 @@ import recovida.idas.rl.gui.listener.ColumnPairSelectionListener;
 import recovida.idas.rl.gui.listener.ColumnPairValueChangeListener;
 import recovida.idas.rl.gui.listener.SettingItemChangeListener;
 import recovida.idas.rl.gui.pair.ColumnPairManager;
+import recovida.idas.rl.gui.settingitem.AbstractObjectFromListSettingItem;
 import recovida.idas.rl.gui.settingitem.AbstractSettingItem;
 import recovida.idas.rl.gui.settingitem.NumberSettingItem;
-import recovida.idas.rl.gui.settingitem.ObjectFromListSettingItem;
 import recovida.idas.rl.gui.settingitem.StringFromListSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItem;
 import recovida.idas.rl.gui.ui.ErrorIconLabel;
@@ -249,14 +249,34 @@ public class MainWindow implements Translatable {
                 new NumberSettingItem(history, Integer.MAX_VALUE,
                         Integer.MAX_VALUE, optionsTabPanel.getMaxRowsField(),
                         optionsTabEventListener));
-        cf.addSettingItem("output_dec_sep", new ObjectFromListSettingItem<>(
-                history, Separator.DEFAULT_DEC_SEP, Separator.DEFAULT_DEC_SEP,
-                optionsTabPanel.getScoreDecSepField(), optionsTabEventListener,
-                Separator.getDecimalSeparators()));
-        cf.addSettingItem("output_col_sep", new ObjectFromListSettingItem<>(
-                history, Separator.DEFAULT_COL_SEP, Separator.DEFAULT_COL_SEP,
-                optionsTabPanel.getColSepField(), optionsTabEventListener,
-                Separator.getColumnSeparators()));
+        cf.addSettingItem("output_dec_sep",
+                new AbstractObjectFromListSettingItem<Separator>(history,
+                        Separator.DEFAULT_DEC_SEP, Separator.DEFAULT_DEC_SEP,
+                        optionsTabPanel.getDecSepField(),
+                        optionsTabEventListener,
+                        Separator.getDecimalSeparators()) {
+
+                    @Override
+                    public void setValueFromString(String newValue) {
+                        Separator s = Separator.fromName(newValue);
+                        setValue(s == null ? Separator.DEFAULT_DEC_SEP : s);
+                    }
+
+                });
+        cf.addSettingItem("output_col_sep",
+                new AbstractObjectFromListSettingItem<Separator>(history,
+                        Separator.DEFAULT_COL_SEP, Separator.DEFAULT_COL_SEP,
+                        optionsTabPanel.getColSepField(),
+                        optionsTabEventListener,
+                        Separator.getColumnSeparators()) {
+
+                    @Override
+                    public void setValueFromString(String newValue) {
+                        Separator s = Separator.fromName(newValue);
+                        setValue(s == null ? Separator.DEFAULT_COL_SEP : s);
+                    }
+
+                });
 
         // Tab: COLUMNS
         ColumnPairValueChangeListener linkageColsTabAddDelEventListener = (
@@ -568,28 +588,55 @@ public class MainWindow implements Translatable {
         if (skipValidation)
             return -1;
         int errorCount = 0;
+        JLabel err;
+
+        // linkage directory
+        err = optionsTabPanel.getLinkageDirWarningLbl();
         String linkageDir = (String) cf.getSettingItems().get("linkage_folder")
                 .getCurrentValue();
         if (linkageDir == null || linkageDir.isEmpty()) {
-            optionsTabPanel.getLinkageDirWarningLbl().setVisible(true);
+            err.setVisible(true);
             errorCount++;
         } else
-            optionsTabPanel.getLinkageDirWarningLbl().setVisible(false);
+            err.setVisible(false);
+
+        // index directory
         String indexDir = (String) cf.getSettingItems().get("db_index")
                 .getCurrentValue();
+        err = optionsTabPanel.getIndexDirWarningLbl();
         if (indexDir == null || indexDir.isEmpty()) {
-            optionsTabPanel.getIndexDirWarningLbl().setVisible(true);
+            err.setVisible(true);
             errorCount++;
         } else
-            optionsTabPanel.getIndexDirWarningLbl().setVisible(false);
+            err.setVisible(false);
+
+        // cleaning regex
+        err = optionsTabPanel.getCleaningRegexWarningLbl();
         try {
             String r = (String) Optional.ofNullable(cf.getSettingItems()
                     .get("cleaning_regex").getCurrentValue()).orElse("");
             Pattern.compile(r);
-            optionsTabPanel.getCleaningRegexWarningLbl().setVisible(false);
+            err.setVisible(false);
         } catch (PatternSyntaxException e) {
             errorCount++;
-            optionsTabPanel.getCleaningRegexWarningLbl().setVisible(true);
+            err.setVisible(true);
+        }
+
+        // separators
+        Separator sep1 = (Separator) cf.getSettingItems().get("output_dec_sep")
+                .getCurrentValue();
+        Separator sep2 = (Separator) cf.getSettingItems().get("output_col_sep")
+                .getCurrentValue();
+        err = optionsTabPanel.getDecSepWarningLbl();
+        if (sep2 != null && sep1 != null
+                && sep1.getCharacter() == sep2.getCharacter()) {
+            errorCount++;
+            err.setVisible(true);
+            err.setToolTipText(
+                    MessageProvider.getMessage("options.decsep.equalscolsep"));
+        } else {
+            err.setToolTipText("");
+            err.setVisible(false);
         }
         tabbedPane.setIconAt(tabbedPane.indexOfComponent(optionsTabPanel),
                 errorCount == 0 ? null : getTabErrorIcon());

@@ -1,5 +1,7 @@
 package recovida.idas.rl.gui.settingitem;
 
+import java.awt.event.ItemEvent;
+
 import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
 
@@ -13,7 +15,7 @@ import recovida.idas.rl.gui.undo.UndoHistory;
  *
  * @param <T> the type of the options
  */
-public class ObjectFromListSettingItem<T>
+public abstract class AbstractObjectFromListSettingItem<T>
         extends AbstractSettingItem<T, JComboBox<T>> {
 
     protected boolean supressDocumentListener = false;
@@ -26,18 +28,20 @@ public class ObjectFromListSettingItem<T>
      * @param defaultValue the default value
      * @param guiComponent the field
      */
-    public ObjectFromListSettingItem(UndoHistory history, T currentValue,
+    public AbstractObjectFromListSettingItem(UndoHistory history, T currentValue,
             T defaultValue, JComboBox<T> guiComponent) {
         super(history, currentValue, defaultValue, guiComponent);
         guiComponent.setSelectedItem(currentValue);
-        guiComponent.addActionListener(e -> {
+        guiComponent.addItemListener(e -> {
+            if (e.getStateChange() != ItemEvent.SELECTED)
+                return;
             @SuppressWarnings("unchecked")
             T value = (T) guiComponent.getSelectedItem();
-            if (value == null)
+            if (value == null || value.equals(getCurrentValue()))
                 return;
             if (!supressDocumentListener)
                 history.push(
-                        new SetOptionCommand<>(ObjectFromListSettingItem.this,
+                        new SetOptionCommand<>(AbstractObjectFromListSettingItem.this,
                                 getCurrentValue(), value, true));
             onChange(value);
         });
@@ -52,7 +56,7 @@ public class ObjectFromListSettingItem<T>
      * @param guiComponent the field
      * @param values       the allowed values to be added to the field
      */
-    public ObjectFromListSettingItem(UndoHistory history, T currentValue,
+    public AbstractObjectFromListSettingItem(UndoHistory history, T currentValue,
             T defaultValue, JComboBox<T> guiComponent, Iterable<T> values) {
         this(history, currentValue, defaultValue, guiComponent);
         fillComboBox(values);
@@ -79,7 +83,7 @@ public class ObjectFromListSettingItem<T>
      * @param guiComponent the field
      * @param listener     a change listener
      */
-    public ObjectFromListSettingItem(UndoHistory history, T currentValue,
+    public AbstractObjectFromListSettingItem(UndoHistory history, T currentValue,
             T defaultValue, JComboBox<T> guiComponent,
             SettingItemChangeListener listener) {
         this(history, currentValue, defaultValue, guiComponent);
@@ -96,7 +100,7 @@ public class ObjectFromListSettingItem<T>
      * @param listener     a change listener
      * @param values       the allowed values to be added to the field
      */
-    public ObjectFromListSettingItem(UndoHistory history, T currentValue,
+    public AbstractObjectFromListSettingItem(UndoHistory history, T currentValue,
             T defaultValue, JComboBox<T> guiComponent,
             SettingItemChangeListener listener, Iterable<T> values) {
         this(history, currentValue, defaultValue, guiComponent, values);
@@ -105,7 +109,7 @@ public class ObjectFromListSettingItem<T>
 
     @Override
     public void onChange(T newValue) {
-        if (newValue.equals(currentValue))
+        if (newValue == null || newValue.equals(currentValue))
             return;
         currentValue = newValue;
         for (SettingItemChangeListener listener : listeners)
@@ -125,9 +129,6 @@ public class ObjectFromListSettingItem<T>
     }
 
     @Override
-    public void setValueFromString(String newValue) {
-        // TODO:
-        // setValue(newValue);
-    }
+    public abstract void setValueFromString(String newValue);
 
 }
