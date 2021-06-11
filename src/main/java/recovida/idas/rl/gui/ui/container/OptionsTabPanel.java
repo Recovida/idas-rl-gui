@@ -11,6 +11,7 @@ import java.text.MessageFormat;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -19,6 +20,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
+import recovida.idas.rl.core.io.Separator;
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.ErrorIconLabel;
 import recovida.idas.rl.gui.ui.Translatable;
@@ -54,11 +56,17 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
     private JLabel cleaningRegexLbl;
 
+    private JLabel colSepLbl;
+
+    private JLabel decSepLbl;
+
     private final ErrorIconLabel linkageDirWarningLbl;
 
     private final ErrorIconLabel indexDirWarningLbl;
 
     private ErrorIconLabel cleaningRegexWarningLbl;
+
+    private ErrorIconLabel decSepWarningLbl;
 
     // fields
 
@@ -74,6 +82,10 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
     private JTextField cleaningRegexField;
 
+    private JComboBox<Separator> colSepField;
+
+    private JComboBox<Separator> decSepField;
+
     /**
      * Creates an instance of the panel.
      */
@@ -82,11 +94,11 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         // layout
 
         GridBagLayout gbl = new GridBagLayout();
-        gbl.columnWidths = new int[] { 250, 500 };
-        gbl.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+        gbl.columnWidths = new int[] { 300, 100 };
+        gbl.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         gbl.columnWeights = new double[] { 0.0, 1.0 };
-        gbl.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                Double.MIN_VALUE };
+        gbl.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 1.0 };
         setLayout(gbl);
 
         // margin
@@ -104,8 +116,8 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         linkageDirLbl = new JLabel("_Linkage location");
         linkageDirLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         GridBagConstraints linkageDirLblGBC = new GridBagConstraints();
+        linkageDirLblGBC.fill = GridBagConstraints.HORIZONTAL;
         linkageDirLblGBC.insets = new Insets(0, 0, 5, 5);
-        linkageDirLblGBC.anchor = GridBagConstraints.EAST;
         linkageDirLblGBC.gridx = 0;
         linkageDirLblGBC.gridy = 1;
         add(linkageDirLbl, linkageDirLblGBC);
@@ -136,7 +148,7 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         indexDirLbl = new JLabel("_Index location");
         indexDirLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         GridBagConstraints indexDirLblGBC = new GridBagConstraints();
-        indexDirLblGBC.anchor = GridBagConstraints.EAST;
+        indexDirLblGBC.fill = GridBagConstraints.HORIZONTAL;
         indexDirLblGBC.insets = new Insets(0, 0, 5, 5);
         indexDirLblGBC.gridx = 0;
         indexDirLblGBC.gridy = 2;
@@ -204,14 +216,22 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         maxRowsLblGBC.gridx = 0;
         maxRowsLblGBC.gridy = 5;
         add(maxRowsLbl, maxRowsLblGBC);
+
+        JPanel maxRowsPanel = new JPanel();
+        GridBagConstraints maxRowsPanelGBC = new GridBagConstraints();
+        maxRowsPanelGBC.fill = GridBagConstraints.BOTH;
+        maxRowsPanelGBC.insets = new Insets(0, 0, 5, 0);
+        maxRowsPanelGBC.gridx = 1;
+        maxRowsPanelGBC.gridy = 5;
+        add(maxRowsPanel, maxRowsPanelGBC);
+        maxRowsPanel.setLayout(new BoxLayout(maxRowsPanel, BoxLayout.X_AXIS));
         maxRowsField = new JSpinnerWithBlankValue(maxRowsModel, "0");
+        maxRowsPanel.add(maxRowsField);
         maxRowsField.setBlankValue(Integer.MAX_VALUE);
-        GridBagConstraints maxRowsFieldGBC = new GridBagConstraints();
-        maxRowsFieldGBC.insets = new Insets(0, 0, 5, 0);
-        maxRowsFieldGBC.anchor = GridBagConstraints.WEST;
-        maxRowsFieldGBC.gridx = 1;
-        maxRowsFieldGBC.gridy = 5;
-        add(maxRowsField, maxRowsFieldGBC);
+
+        Component maxRowsHorGlue = Box.createHorizontalGlue();
+        maxRowsHorGlue.setPreferredSize(new Dimension(950, 0));
+        maxRowsPanel.add(maxRowsHorGlue);
 
         // num threads
 
@@ -220,7 +240,7 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         threadsLbl = new JLabel("_Number of threads");
         threadsLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         GridBagConstraints threadsLblGBC = new GridBagConstraints();
-        threadsLblGBC.anchor = GridBagConstraints.EAST;
+        threadsLblGBC.fill = GridBagConstraints.HORIZONTAL;
         threadsLblGBC.insets = new Insets(0, 0, 5, 5);
         threadsLblGBC.gridx = 0;
         threadsLblGBC.gridy = 4;
@@ -259,8 +279,8 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         cleaningRegexLbl.setPreferredSize(new Dimension(150, 17));
         cleaningRegexLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         GridBagConstraints cleaningRegexLblGBC = new GridBagConstraints();
-        cleaningRegexLblGBC.anchor = GridBagConstraints.EAST;
-        cleaningRegexLblGBC.insets = new Insets(0, 0, 0, 5);
+        cleaningRegexLblGBC.fill = GridBagConstraints.HORIZONTAL;
+        cleaningRegexLblGBC.insets = new Insets(0, 0, 5, 5);
         cleaningRegexLblGBC.gridx = 0;
         cleaningRegexLblGBC.gridy = 6;
         add(cleaningRegexLbl, cleaningRegexLblGBC);
@@ -268,6 +288,7 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         JPanel cleaningRegexContainer;
         cleaningRegexContainer = new JPanel();
         GridBagConstraints cleaningRegexContainerGBC = new GridBagConstraints();
+        cleaningRegexContainerGBC.insets = new Insets(0, 0, 5, 0);
         cleaningRegexContainerGBC.fill = GridBagConstraints.BOTH;
         cleaningRegexContainerGBC.gridx = 1;
         cleaningRegexContainerGBC.gridy = 6;
@@ -282,6 +303,67 @@ public class OptionsTabPanel extends JPanel implements Translatable {
         cleaningRegexField = new JTextField();
         cleaningRegexContainer.add(cleaningRegexField);
         cleaningRegexField.setColumns(10);
+
+        // column separator
+
+        colSepLbl = new JLabel("_Column separator (output)");
+        colSepLbl.setPreferredSize(new Dimension(150, 17));
+        colSepLbl.setHorizontalAlignment(SwingConstants.TRAILING);
+        GridBagConstraints colSepLblGBC = new GridBagConstraints();
+        colSepLblGBC.fill = GridBagConstraints.HORIZONTAL;
+        colSepLblGBC.insets = new Insets(0, 0, 5, 5);
+        colSepLblGBC.gridx = 0;
+        colSepLblGBC.gridy = 7;
+        add(colSepLbl, colSepLblGBC);
+
+        JPanel colSepPanel = new JPanel();
+        GridBagConstraints colSepPanelGBC = new GridBagConstraints();
+        colSepPanelGBC.insets = new Insets(0, 0, 5, 0);
+        colSepPanelGBC.fill = GridBagConstraints.BOTH;
+        colSepPanelGBC.gridx = 1;
+        colSepPanelGBC.gridy = 7;
+        add(colSepPanel, colSepPanelGBC);
+        colSepPanel.setLayout(new BoxLayout(colSepPanel, BoxLayout.X_AXIS));
+
+        colSepField = new JComboBox<>();
+        colSepField.setMinimumSize(new Dimension(1000, 27));
+        colSepField.setMaximumSize(new Dimension(20000, 32767));
+        colSepPanel.add(colSepField);
+
+        Component colSepHorGlue = Box.createHorizontalGlue();
+        colSepPanel.add(colSepHorGlue);
+
+        // decimal separator
+
+        decSepLbl = new JLabel("_Decimal separator (output)");
+        decSepLbl.setPreferredSize(new Dimension(150, 17));
+        decSepLbl.setHorizontalAlignment(SwingConstants.TRAILING);
+        GridBagConstraints decSepLblGBC = new GridBagConstraints();
+        decSepLblGBC.fill = GridBagConstraints.HORIZONTAL;
+        decSepLblGBC.insets = new Insets(0, 0, 5, 5);
+        decSepLblGBC.gridx = 0;
+        decSepLblGBC.gridy = 8;
+        add(decSepLbl, decSepLblGBC);
+
+        JPanel decSepPanel = new JPanel();
+        GridBagConstraints decSepPanelGBC = new GridBagConstraints();
+        decSepPanelGBC.insets = new Insets(0, 0, 5, 0);
+        decSepPanelGBC.fill = GridBagConstraints.BOTH;
+        decSepPanelGBC.gridx = 1;
+        decSepPanelGBC.gridy = 8;
+        add(decSepPanel, decSepPanelGBC);
+        decSepPanel.setLayout(new BoxLayout(decSepPanel, BoxLayout.X_AXIS));
+
+        decSepWarningLbl = new ErrorIconLabel();
+        decSepPanel.add(getDecSepWarningLbl());
+
+        decSepField = new JComboBox<>();
+        decSepField.setMinimumSize(new Dimension(700, 27));
+        decSepField.setMaximumSize(new Dimension(23000, 32767));
+        decSepPanel.add(decSepField);
+
+        Component decSepHorGlue = Box.createHorizontalGlue();
+        decSepPanel.add(decSepHorGlue);
 
     }
 
@@ -303,6 +385,8 @@ public class OptionsTabPanel extends JPanel implements Translatable {
                 Runtime.getRuntime().availableProcessors()));
         cleaningRegexLbl
                 .setText(MessageProvider.getMessage("options.cleaningregex"));
+        decSepLbl.setText(MessageProvider.getMessage("options.decsep"));
+        colSepLbl.setText(MessageProvider.getMessage("options.colsep"));
         minScoreField.updateLocalisedStrings();
         maxRowsField.updateLocalisedStrings();
         threadsField.updateLocalisedStrings();
@@ -374,6 +458,18 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
     public ErrorIconLabel getCleaningRegexWarningLbl() {
         return cleaningRegexWarningLbl;
+    }
+
+    public JComboBox<Separator> getColSepField() {
+        return colSepField;
+    }
+
+    public JComboBox<Separator> getDecSepField() {
+        return decSepField;
+    }
+
+    public ErrorIconLabel getDecSepWarningLbl() {
+        return decSepWarningLbl;
     }
 
 }

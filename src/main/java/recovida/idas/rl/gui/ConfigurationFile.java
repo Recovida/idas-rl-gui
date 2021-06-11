@@ -11,9 +11,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import recovida.idas.rl.core.io.Separator;
 import recovida.idas.rl.gui.pair.ColumnPairManager;
 import recovida.idas.rl.gui.settingitem.AbstractSettingItem;
 
@@ -175,7 +177,17 @@ public class ConfigurationFile {
                 else if ("num_threads".equals(key)
                         && Integer.valueOf(0).equals(value))
                     continue; // don't save default value
-                String valueStr = value == null ? null : value.toString();
+                else if ("output_dec_sep".equals(key)
+                        && Objects.equals(value, Separator.DEFAULT_DEC_SEP))
+                    continue; // don't save default value
+                else if ("output_col_sep".equals(key)
+                        && Objects.equals(value, Separator.DEFAULT_COL_SEP))
+                    continue; // don't save default value
+                String valueStr;
+                if (value instanceof Separator)
+                    valueStr = ((Separator) value).name().toLowerCase();
+                else
+                    valueStr = value == null ? null : value.toString();
                 p.put(key, valueStr);
                 p.store(skipTimestampOutput, null);
                 p.clear();
