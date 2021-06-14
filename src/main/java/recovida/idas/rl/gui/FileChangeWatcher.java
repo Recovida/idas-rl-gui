@@ -117,7 +117,8 @@ public class FileChangeWatcher {
 
     protected void stop() {
         try {
-            watchService.close();
+            if (watchService != null)
+                watchService.close();
             if (t != null && t.isAlive()) {
                 t.interrupt();
                 t.join();

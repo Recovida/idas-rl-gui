@@ -460,7 +460,7 @@ public class MainWindow implements Translatable {
         } else {
             p = new DatasetPeek(dir, fn1, enc1);
             p.peek();
-            if (fn1 != null && !fn1.isEmpty()) {
+            if (f1 != null && !f1.isEmpty()) {
                 m.put(enc1, p);
                 if (datasetAFileChangeWatcher != null)
                     datasetAFileChangeWatcher.disable();
@@ -490,7 +490,7 @@ public class MainWindow implements Translatable {
         } else {
             p = new DatasetPeek(dir, fn2, enc2);
             p.peek();
-            if (fn2 != null && !fn2.isEmpty()) {
+            if (f2 != null && !f2.isEmpty()) {
                 m.put(enc2, p);
                 if (datasetBFileChangeWatcher != null)
                     datasetBFileChangeWatcher.disable();
@@ -827,6 +827,14 @@ public class MainWindow implements Translatable {
     }
 
     protected void doOpen(String newConfigFileName) {
+        if (datasetAFileChangeWatcher != null) {
+            datasetAFileChangeWatcher.disable();
+            datasetAFileChangeWatcher = null;
+        }
+        if (datasetBFileChangeWatcher != null) {
+            datasetBFileChangeWatcher.disable();
+            datasetBFileChangeWatcher = null;
+        }
         skipValidation = true;
         clearAllFields();
         history.clearAll();
