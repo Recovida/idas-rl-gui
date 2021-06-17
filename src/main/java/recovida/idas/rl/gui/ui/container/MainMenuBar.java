@@ -19,6 +19,7 @@ import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
+import recovida.idas.rl.gui.ExecutionStatus;
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.JMenuWithBorder;
 import recovida.idas.rl.gui.ui.Translatable;
@@ -29,6 +30,8 @@ import recovida.idas.rl.gui.ui.Translatable;
 public class MainMenuBar extends JMenuBar implements Translatable {
 
     private static final long serialVersionUID = -8153106866054489899L;
+
+    private ExecutionStatus execStatus = ExecutionStatus.UNSAVED;
 
     // File
 
@@ -201,8 +204,9 @@ public class MainMenuBar extends JMenuBar implements Translatable {
         // run
         runMenu.setText(MessageProvider.getMessage("menu.run"));
         runMenuItem.setText(MessageProvider.getMessage("menu.run.run"));
-        getCancelMenuItem()
-                .setText(MessageProvider.getMessage("menu.run.cancel"));
+        runMenuItem.setToolTipText(
+                MessageProvider.getMessage("menu.run.run" + execStatus.sfx()));
+        cancelMenuItem.setText(MessageProvider.getMessage("menu.run.cancel"));
 
         // help
         helpMenu.setText(MessageProvider.getMessage("menu.help"));
@@ -287,6 +291,19 @@ public class MainMenuBar extends JMenuBar implements Translatable {
 
     public JMenuItem getCancelMenuItem() {
         return cancelMenuItem;
+    }
+
+    public ExecutionStatus getExecStatus() {
+        return execStatus;
+    }
+
+    public void setExecStatus(ExecutionStatus execStatus) {
+        if (execStatus != null) {
+            this.execStatus = execStatus;
+            updateLocalisedStrings();
+            runMenuItem.setEnabled(execStatus == ExecutionStatus.READY);
+            cancelMenuItem.setEnabled(execStatus == ExecutionStatus.RUNNING);
+        }
     }
 
 }

@@ -9,6 +9,7 @@ import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
+import recovida.idas.rl.gui.ExecutionStatus;
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.LanguageComboBox;
 import recovida.idas.rl.gui.ui.Translatable;
@@ -18,21 +19,23 @@ import recovida.idas.rl.gui.ui.Translatable;
  */
 public class MainToolBar extends JToolBar implements Translatable {
 
-    protected JButton newFileBtn;
+    private ExecutionStatus execStatus = ExecutionStatus.UNSAVED;
 
-    protected JButton openFileBtn;
+    private JButton newFileBtn;
 
-    protected JButton saveFileBtn;
+    private JButton openFileBtn;
 
-    protected JSeparator sep1;
+    private JButton saveFileBtn;
 
-    protected JButton undoBtn;
+    private JSeparator sep1;
 
-    protected JButton redoBtn;
+    private JButton undoBtn;
 
-    protected JSeparator sep2;
+    private JButton redoBtn;
 
-    protected JButton runBtn;
+    private JSeparator sep2;
+
+    private JButton runBtn;
 
     /**
      * Creates an instance.
@@ -149,7 +152,22 @@ public class MainToolBar extends JToolBar implements Translatable {
                 .setToolTipText(MessageProvider.getMessage("menu.file.open"));
         saveFileBtn
                 .setToolTipText(MessageProvider.getMessage("menu.file.save"));
-        runBtn.setToolTipText(MessageProvider.getMessage("menu.run.run"));
+        runBtn.setToolTipText(
+                MessageProvider.getMessage("menu.run.run" + execStatus.sfx()));
         cancelBtn.setToolTipText(MessageProvider.getMessage("menu.run.cancel"));
+    }
+
+    public ExecutionStatus getExecStatus() {
+        return execStatus;
+    }
+
+    public void setExecStatus(ExecutionStatus execStatus) {
+        if (execStatus != null) {
+            this.execStatus = execStatus;
+            updateLocalisedStrings();
+            runBtn.setEnabled(execStatus == ExecutionStatus.READY);
+            cancelBtn.setEnabled(execStatus == ExecutionStatus.RUNNING);
+            languageCbox.setEnabled(execStatus != ExecutionStatus.RUNNING);
+        }
     }
 }

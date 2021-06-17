@@ -96,7 +96,6 @@ public class ExecutionInnerPanel extends JPanel
         copyLogBtn = new JButton("_Copy log");
         copyLogBtn.setIcon(new ImageIcon(ExecutionInnerPanel.class
                 .getResource("/toolbarButtonGraphics/general/Copy24.gif")));
-        copyLogBtn.setPreferredSize(new Dimension(270, 30));
         copyLogBtn.setMaximumSize(new Dimension(500, 50));
         copyLogBtn.setMinimumSize(new Dimension(250, 30));
         topPanel.add(copyLogBtn);
@@ -104,7 +103,6 @@ public class ExecutionInnerPanel extends JPanel
         saveLogBtn = new JButton("_Save log");
         saveLogBtn.setIcon(new ImageIcon(ExecutionInnerPanel.class
                 .getResource("/toolbarButtonGraphics/general/Export24.gif")));
-        saveLogBtn.setPreferredSize(new Dimension(270, 30));
         saveLogBtn.setMaximumSize(new Dimension(500, 50));
         saveLogBtn.setMinimumSize(new Dimension(250, 30));
         topPanel.add(saveLogBtn);
@@ -112,7 +110,6 @@ public class ExecutionInnerPanel extends JPanel
         openDirBtn = new JButton("_Show result");
         openDirBtn.setIcon(new ImageIcon(ExecutionInnerPanel.class
                 .getResource("/toolbarButtonGraphics/general/History24.gif")));
-        openDirBtn.setPreferredSize(new Dimension(270, 30));
         openDirBtn.setMaximumSize(new Dimension(500, 50));
         openDirBtn.setMinimumSize(new Dimension(250, 30));
         openDirBtn.setEnabled(false);

@@ -924,10 +924,8 @@ public class MainWindow implements Translatable {
     }
 
     protected void doRun() {
-        mainToolBar.getRunBtn().setEnabled(false);
-        menuBar.getRunMenuItem().setEnabled(false);
-        mainToolBar.getCancelBtn().setEnabled(true);
-        menuBar.getCancelMenuItem().setEnabled(true);
+        mainToolBar.setExecStatus(ExecutionStatus.RUNNING);
+        menuBar.setExecStatus(ExecutionStatus.RUNNING);
         if (dirty)
             doSave();
         execution = new Execution(executionTabPanel.addExecutionPanel(),
@@ -936,10 +934,8 @@ public class MainWindow implements Translatable {
         CompletableFuture<Boolean> f = execution.start();
         f.thenAccept((Boolean success) -> {
             SwingUtilities.invokeLater(() -> {
-                mainToolBar.getRunBtn().setEnabled(true);
-                menuBar.getRunMenuItem().setEnabled(true);
-                mainToolBar.getCancelBtn().setEnabled(false);
-                menuBar.getCancelMenuItem().setEnabled(false);
+                mainToolBar.setExecStatus(ExecutionStatus.READY);
+                menuBar.setExecStatus(ExecutionStatus.READY);
                 f.join();
             });
         });
@@ -976,8 +972,10 @@ public class MainWindow implements Translatable {
             currentFileChangeWatcher = null;
         currentFileName = fn;
         dirty = false;
-        menuBar.getRunMenuItem().setEnabled(fn != null);
-        mainToolBar.getRunBtn().setEnabled(fn != null);
+        ExecutionStatus es = fn == null ? ExecutionStatus.UNSAVED
+                : ExecutionStatus.READY;
+        menuBar.setExecStatus(es);
+        mainToolBar.setExecStatus(es);
         updateConfigFileLabel();
     }
 
