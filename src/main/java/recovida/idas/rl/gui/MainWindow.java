@@ -157,6 +157,7 @@ public class MainWindow implements Translatable {
      * files.
      *
      * @wbp.parser.entryPoint
+     *
      */
     public MainWindow() {
         this(null);

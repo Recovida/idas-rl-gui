@@ -369,12 +369,12 @@ public class OptionsTabPanel extends JPanel implements Translatable {
 
     @Override
     public void updateLocalisedStrings() {
-        indexDirLbl
-                .setText(MessageProvider.getMessage("options.indexlocation"));
+        indexDirLbl.setText(
+                "* " + MessageProvider.getMessage("options.indexlocation"));
         indexDirBtn.setText(
                 MessageProvider.getMessage("options.indexlocation.select"));
-        linkageDirLbl
-                .setText(MessageProvider.getMessage("options.linkagelocation"));
+        linkageDirLbl.setText(
+                "* " + MessageProvider.getMessage("options.linkagelocation"));
         linkageDirBtn.setText(
                 MessageProvider.getMessage("options.linkagelocation.select"));
         maxRowsLbl.setText(MessageProvider.getMessage("options.maxrows"));

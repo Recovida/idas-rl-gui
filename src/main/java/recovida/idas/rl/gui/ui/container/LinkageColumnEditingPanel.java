@@ -484,7 +484,8 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
 
     @Override
     public void updateLocalisedStrings() {
-        numberLbl.setText(MessageProvider.getMessage("columns.editing.number"));
+        numberLbl.setText(
+                "* " + MessageProvider.getMessage("columns.editing.number"));
         nameFirstLbl
                 .setText(MessageProvider.getMessage("columns.editing.indexa"));
         renameFirstLbl
@@ -493,8 +494,10 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
                 .setText(MessageProvider.getMessage("columns.editing.indexb"));
         renameSecondLbl
                 .setText(MessageProvider.getMessage("columns.editing.renameb"));
-        typeLbl.setText(MessageProvider.getMessage("columns.editing.type"));
-        weightLbl.setText(MessageProvider.getMessage("columns.editing.weight"));
+        typeLbl.setText(
+                "* " + MessageProvider.getMessage("columns.editing.type"));
+        weightLbl.setText(
+                "* " + MessageProvider.getMessage("columns.editing.weight"));
         phonWeightLbl.setText(
                 MessageProvider.getMessage("columns.editing.phonweight"));
         weightField.updateLocalisedStrings();

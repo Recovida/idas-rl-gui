@@ -388,7 +388,8 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
                 .setText(MessageProvider.getMessage("datasets.datasetb"));
         firstDatasetBtn.setText(MessageProvider.getMessage("datasets.select"));
         secondDatasetBtn.setText(MessageProvider.getMessage("datasets.select"));
-        fileNameLbl.setText(MessageProvider.getMessage("datasets.filename"));
+        fileNameLbl.setText(
+                "* " + MessageProvider.getMessage("datasets.filename"));
         encodingLbl.setText(MessageProvider.getMessage("datasets.encoding"));
         suffixLbl.setText(MessageProvider.getMessage("datasets.suffix"));
         rowNumColLbl
