@@ -94,6 +94,11 @@ sob responsabilidade do
 [Prof. Dr. Paulo Andrade Lotufo](https://uspdigital.usp.br/especialistas/especialistaObter?codpub=F7A214F0B89F),
 e com a atuação da [Dra. Ana Carolina de Moraes Fontes Varella](https://bv.fapesp.br/en/pesquisador/690479/ana-carolina-de-moraes-fontes-varella/) como supervisora de dados.
 
+Sob orientação de Paulo Lotufo e a supervisão de Ana Varella,
+o desenvolvimento está sendo feito por:
+
+- Débora Lina Nascimento Ciriaco Pereira (bolsista de dez/2020 a set/2021);
+- Vinícius Bitencourt Matos (bolsista de dez/2020 a set/2021).
 
 
 ## Apoio
@@ -106,12 +111,13 @@ Agradecemos também à
 [Secretaria Municipal da Saúde da Prefeitura da Cidade de São Paulo](https://www.prefeitura.sp.gov.br/cidade/secretarias/saude/)
 pela parceria durante a execução do projeto. 
 
-
-
-## Autores
-
-Sob orientação de Paulo Lotufo e a supervisão de Ana Varella,
-os programas estão sendo desenvolvidos pelos seguintes membros do projeto:
-
-- Débora Lina Nascimento Ciriaco Pereira (bolsista de dez/2020 a set/2021);
-- Vinícius Bitencourt Matos (bolsista de dez/2020 a set/2021).
+Esta ferramenta de *record linkage* foi desenvolvida a partir do código do programa
+[Cidacs-RL](https://github.com/gcgbarbosa/cidacs-rl-v1), criado pelo
+*[Centro de Integração de Dados e Conhecimentos para Saúde](https://cidacs.bahia.fiocruz.br/)* \(Cidacs\),
+da [Fiocruz Bahia](https://www.bahia.fiocruz.br/).
+O programa foi adaptado para adequar-se às necessidades
+de nosso projeto, com mudanças em algumas de suas partes e acréscimo de funcionalidades.
+<br/>
+**DISCLAIMER:** O Cidacs não possui vínculo com o projeto Recovida e não tem
+responsabilidade sobre esta ferramenta, suas novas funções e possíveis erros.
+Agradecemos ao Cidacs por disponibilizar livremente o código-fonte do Cidacs-RL.
