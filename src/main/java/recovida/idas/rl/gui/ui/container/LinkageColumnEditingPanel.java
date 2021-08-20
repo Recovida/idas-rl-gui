@@ -20,6 +20,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
+import recovida.idas.rl.core.config.ConfigReader;
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.ErrorIconLabel;
 import recovida.idas.rl.gui.ui.JComboBoxSuggestionProvider;
@@ -220,7 +221,7 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
                 .setLayout(new BoxLayout(numberContainer, BoxLayout.X_AXIS));
 
         numberField = new JSpinnerWithBlankValue(
-                new SpinnerNumberModel(0, -1, Integer.MAX_VALUE, 1), "0");
+                new SpinnerNumberModel(0, -1, ConfigReader.MAX_NUMBER, 1), "0");
         numberContainer.add(numberField);
         ((JSpinnerWithBlankValue) numberField)
                 .setBlankValue(Integer.valueOf(-1));
