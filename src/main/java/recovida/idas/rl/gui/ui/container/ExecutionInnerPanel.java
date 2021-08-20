@@ -223,6 +223,8 @@ public class ExecutionInnerPanel extends JPanel
 
         saveLogBtn.addActionListener(e -> {
             String fn = selectLogFile();
+            if (fn == null)
+                return;
             saveLogBtn.setEnabled(false);
             requestFocus();
             logSavingStatus = LogExportStatus.DOING;

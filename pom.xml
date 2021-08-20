@@ -3,8 +3,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>recovida</groupId>
-	<artifactId>idas-rl-gui</artifactId>
-	<name>IDaS-RL GUI</name>
+	<artifactId>linkasus-idas-rl-gui</artifactId>
+	<name>LinkaSUS (IDaS-RL GUI)</name>
 	<version>1.0.6-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
