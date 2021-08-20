@@ -858,14 +858,13 @@ public class MainWindow implements Translatable {
         });
     }
 
-    protected synchronized void doSave() {
+    protected synchronized boolean doSave() {
         if (columnPairTableModel.hasDuplicateNumbers()) {
             showDuplicateNumbersWarning();
-            return;
+            return false;
         }
         if (currentFileName == null) {
-            doSaveAs();
-            return;
+            return doSaveAs();
         }
         if (currentFileChangeWatcher != null)
             currentFileChangeWatcher.disable();
@@ -879,26 +878,29 @@ public class MainWindow implements Translatable {
                                 .getMessage("menu.file.save.containserrors"),
                         MessageProvider.getMessage("menu.file.save.warning"),
                         JOptionPane.WARNING_MESSAGE);
+            return true;
         } else {
             JOptionPane.showMessageDialog(frame,
                     MessageProvider.getMessage("menu.file.save.cantsave"),
                     MessageProvider.getMessage("menu.file.save.error"),
                     JOptionPane.ERROR_MESSAGE);
+            return false;
         }
     }
 
-    protected synchronized void doSaveAs() {
+    protected synchronized boolean doSaveAs() {
         if (columnPairTableModel.hasDuplicateNumbers()) {
             showDuplicateNumbersWarning();
-            return;
+            return false;
         }
         String fn = selectConfigFile(currentFileName, true);
         if (fn != null) {
             if (currentFileName != null)
                 dirty = true;
             currentFileName = fn;
-            doSave();
+            return doSave();
         }
+        return false;
     }
 
     protected void showDuplicateNumbersWarning() {
@@ -924,10 +926,10 @@ public class MainWindow implements Translatable {
     }
 
     protected void doRun() {
+        if (dirty && !doSave())
+            return;
         mainToolBar.setExecStatus(ExecutionStatus.RUNNING);
         menuBar.setExecStatus(ExecutionStatus.RUNNING);
-        if (dirty)
-            doSave();
         execution = new Execution(executionTabPanel.addExecutionPanel(),
                 currentFileName);
         tabbedPane.setSelectedComponent(executionTabPanel);
