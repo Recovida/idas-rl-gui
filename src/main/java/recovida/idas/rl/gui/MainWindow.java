@@ -82,7 +82,7 @@ public class MainWindow implements Translatable {
     /**
      * The name of the program as shown on the title bar.
      */
-    public static final String PROGRAM_NAME = "IDaS-RL";
+    public static final String PROGRAM_NAME = "LinkaSUS (IDaS-RL GUI)";
 
     UndoHistory history = new UndoHistory();
 

@@ -1,7 +1,7 @@
-# IDaS-RL (GUI)
+# LinkaSUS (IDaS-RL GUI)
 
-Esta é uma interface gráfica para o IDaS-RL, que é uma ferramenta de record
-linkage desenvolvida por uma equipe do projeto
+O LinkaSUS é uma interface gráfica para o IDaS-RL, que é uma ferramenta de
+_record linkage_ desenvolvida por uma equipe do projeto
 Recovida a partir do código
 do [Cidacs-RL](https://github.com/gcgbarbosa/cidacs-rl-v1).
 
@@ -28,18 +28,18 @@ terminal / prompt de comando / Powershell (a depender
 do sistema operacional) e entre no diretório do arquivo `.jar`.
 Para executar o programa, digite
 ```
-java -jar idas-rl-gui-packaged.jar
+java -jar linkasus-idas-rl-gui-packaged.jar
 ```
-(substituindo `idas-rl-gui-packaged.jar` pelo nome exato do arquivo salvo,
-  que varia conforme a versão).
+(substituindo `linkasus-idas-rl-gui-packaged.jar` pelo nome exato do arquivo
+  salvo, que varia conforme a versão).
 
 Caso queira abrir um arquivo de configurações automaticamente, passe o
 nome desse arquivo como o único argumento do programa,
 de acordo com o formato a seguir:
 ```
-java -jar idas-rl-gui-packaged.jar arquivo-de-configurações.properties
+java -jar linkasus-idas-rl-gui-packaged.jar arquivo-de-configurações.properties
 ```
-(substituindo `idas-rl-gui-packaged.jar`
+(substituindo `linkasus-idas-rl-gui-packaged.jar`
   e `arquivo-de-configurações.properties`
   pelos nomes exatos dos arquivos).
 
