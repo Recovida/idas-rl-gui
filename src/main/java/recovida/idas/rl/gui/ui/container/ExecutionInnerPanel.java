@@ -26,6 +26,7 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -66,6 +67,19 @@ public class ExecutionInnerPanel extends JPanel
     private JProgressBar progressBar;
 
     private JButton openDirBtn;
+
+    /**
+     * Represents the type of a logged message.
+     */
+    protected enum MessageType {
+        DEBUGGING, INFORMATION, WARNING, ERROR;
+
+        @Override
+        public String toString() {
+            return MessageProvider
+                    .getMessage("execution.table." + name().toLowerCase());
+        }
+    }
 
     /**
      * Represents the status of the log export (copy/save) operation.
@@ -147,11 +161,11 @@ public class ExecutionInnerPanel extends JPanel
         table.getColumnModel().getColumn(1).setCellRenderer(
                 (table, value, isSelected, hasFocus, row, column) -> {
                     DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-                    String type = (String) value;
-                    value = MessageProvider
-                            .getMessage("execution.table." + value);
+                    String typeName = (value instanceof MessageType)
+                            ? ((MessageType) value).name().toLowerCase()
+                            : (value == null ? "" : value.toString());
                     Icon icon = UIManager
-                            .getIcon("OptionPane." + type + "Icon");
+                            .getIcon("OptionPane." + typeName + "Icon");
                     Component comp = renderer.getTableCellRendererComponent(
                             table, value, isSelected, hasFocus, row, column);
                     if (icon != null && comp instanceof JLabel) {
@@ -180,9 +194,13 @@ public class ExecutionInnerPanel extends JPanel
                                 .toString();
                         boolean multiline = v.chars().filter(c -> c == '\n')
                                 .skip(1).findFirst().isPresent();
-                        if (!multiline)
-                            return super.getTableCellRendererComponent(table, v,
-                                    isSelected, hasFocus, row, column);
+                        if (!multiline) {
+                            Component c = super.getTableCellRendererComponent(
+                                    table, v, isSelected, hasFocus, row,
+                                    column);
+                            ((JComponent) c).setToolTipText(v);
+                            return c;
+                        }
                         JTextArea ta = new JTextArea(v);
                         ta.setFont(getFont());
                         if (isSelected) {
@@ -298,6 +316,11 @@ public class ExecutionInnerPanel extends JPanel
                 "txt");
         chooser.setFileFilter(filter);
         chooser.setAcceptAllFileFilterUsed(false);
+        chooser.setSelectedFile(
+                new File(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
+                        .format(DateTimeFormatter.ofPattern(
+                                "'LinkaSUS_IDaS-RL_'yyyyMMdd_HHmmss'.log'",
+                                MessageProvider.getLocale()))));
         if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
             return chooser.getSelectedFile().getAbsolutePath();
         return null;
@@ -410,7 +433,7 @@ public class ExecutionInnerPanel extends JPanel
         };
     }
 
-    protected void addMessageRow(String type, Supplier<String> message) {
+    protected void addMessageRow(MessageType type, Supplier<String> message) {
         SwingUtilities.invokeLater(() -> {
             model.addRow(new Object[] { getTime(), type,
                     getMessageObject(message) });
@@ -436,12 +459,12 @@ public class ExecutionInnerPanel extends JPanel
 
     @Override
     public void warn(Supplier<String> message) {
-        addMessageRow("warning", message);
+        addMessageRow(MessageType.WARNING, message);
     }
 
     @Override
     public void info(Supplier<String> message) {
-        addMessageRow("information", message);
+        addMessageRow(MessageType.INFORMATION, message);
     }
 
     @Override
@@ -451,12 +474,12 @@ public class ExecutionInnerPanel extends JPanel
 
     @Override
     public void error(Supplier<String> message) {
-        addMessageRow("error", message);
+        addMessageRow(MessageType.ERROR, message);
     }
 
     @Override
     public void debug(Supplier<String> message) {
-        addMessageRow("debugging", message);
+        addMessageRow(MessageType.DEBUGGING, message);
     }
 
 }

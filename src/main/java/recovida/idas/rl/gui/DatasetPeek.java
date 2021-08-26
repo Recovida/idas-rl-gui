@@ -16,6 +16,9 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.ByteOrderMark;
+import org.apache.commons.io.input.BOMInputStream;
+
 /**
  * This class provides methods to "peek" into dataset files and read their
  * column names.
@@ -164,9 +167,13 @@ public class DatasetPeek {
         }
 
         columnNames = new LinkedHashSet<>();
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                new FileInputStream(fileName), Charset.forName(encoding)))) {
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(
+                        new BOMInputStream(new FileInputStream(fileName),
+                                ByteOrderMark.UTF_8, ByteOrderMark.UTF_16LE,
+                                ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_32LE,
+                                ByteOrderMark.UTF_32BE),
+                        Charset.forName(encoding)))) {
             int c;
             CsvLineParseState state = CsvLineParseState.START;
             StringBuilder currentColumnName = new StringBuilder();
