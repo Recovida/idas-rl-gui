@@ -57,13 +57,13 @@ public class AboutWindow extends JDialog {
                 MessageProvider.getMessage("menu.help.about.about"),
                 MainWindow.PROGRAM_NAME));
 
-        JPanel panel = new JPanel();
-        getContentPane().add(panel, BorderLayout.SOUTH);
+        JPanel bottomPanel = new JPanel();
+        getContentPane().add(bottomPanel, BorderLayout.SOUTH);
 
         JButton closeBtn = new JButton(
                 MessageProvider.getMessage("menu.help.about.close"));
         closeBtn.addActionListener(e -> dispose());
-        panel.add(closeBtn);
+        bottomPanel.add(closeBtn);
 
         JPanel mainPanel = new JPanel();
         getContentPane().add(mainPanel, BorderLayout.CENTER);
@@ -72,22 +72,23 @@ public class AboutWindow extends JDialog {
         JPanel topPanel = new JPanel();
         mainPanel.add(topPanel);
 
-        JPanel panel_1 = new JPanel();
-        mainPanel.add(panel_1);
-        panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
+        JPanel descriptionPanel = new JPanel();
+        mainPanel.add(descriptionPanel);
+        descriptionPanel
+                .setLayout(new BoxLayout(descriptionPanel, BoxLayout.X_AXIS));
 
         Component horizontalStrut = Box.createHorizontalStrut(20);
-        panel_1.add(horizontalStrut);
+        descriptionPanel.add(horizontalStrut);
 
         JLabel descriptionLabel = new JLabel("<html>"
                 + MessageProvider.getMessage("menu.help.about.description")
                 + "</html>");
-        panel_1.add(descriptionLabel);
+        descriptionPanel.add(descriptionLabel);
         descriptionLabel.setHorizontalAlignment(SwingConstants.CENTER);
         descriptionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        Component horizontalStrut_1 = Box.createHorizontalStrut(20);
-        panel_1.add(horizontalStrut_1);
+        Component hs1 = Box.createHorizontalStrut(20);
+        descriptionPanel.add(hs1);
 
         Component vg1 = Box.createVerticalGlue();
         mainPanel.add(vg1);
