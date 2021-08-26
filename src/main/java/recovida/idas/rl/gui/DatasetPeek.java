@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
@@ -15,6 +16,8 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.any23.encoding.TikaEncodingDetector;
 
 /**
  * This class provides methods to "peek" into dataset files and read their
@@ -299,5 +302,24 @@ public class DatasetPeek {
 
     public DatasetPeekResult getResult() {
         return result;
+    }
+
+    /**
+     * Tries to guess the encoding of a file.
+     *
+     * @param fn file name
+     * @return the (guessed) encoding of the file, or {@code null} if a guess
+     *         cannot be made
+     */
+    public static String guessEncoding(String fn) {
+        File f = new File(fn);
+        try (InputStream is = new FileInputStream(f)) {
+            String s = new TikaEncodingDetector().guessEncoding(is);
+            System.out.println(">" + s);
+            return s;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

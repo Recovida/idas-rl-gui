@@ -9,6 +9,7 @@ import java.awt.Insets;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -67,6 +68,10 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
     private final JButton firstDatasetBtn;
 
     private final JButton secondDatasetBtn;
+
+    private JButton firstEncodingGuessBtn;
+
+    private JButton secondEncodingGuessBtn;
 
     // labels
     private final JLabel firstDatasetLabel;
@@ -237,6 +242,12 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
         new JComboBoxSuggestionProvider(firstEncodingField);
         firstEncodingContainer.add(firstEncodingField);
 
+        firstEncodingGuessBtn = new JButton("");
+        firstEncodingGuessBtn
+                .setIcon(new ImageIcon(DatasetsTabPanel.class.getResource(
+                        "/toolbarButtonGraphics/general/TipOfTheDay16.gif")));
+        firstEncodingContainer.add(firstEncodingGuessBtn);
+
         // encoding (B)
 
         JPanel secondEncodingContainer = new JPanel();
@@ -252,6 +263,12 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
         secondEncodingField = new EncodingComboBox();
         new JComboBoxSuggestionProvider(secondEncodingField);
         secondEncodingContainer.add(secondEncodingField);
+
+        secondEncodingGuessBtn = new JButton("");
+        secondEncodingGuessBtn
+                .setIcon(new ImageIcon(DatasetsTabPanel.class.getResource(
+                        "/toolbarButtonGraphics/general/TipOfTheDay16.gif")));
+        secondEncodingContainer.add(secondEncodingGuessBtn);
 
         secondEncodingWarningLbl = new ErrorIconLabel();
         GridBagConstraints secondEncodingWarningLblGBC = new GridBagConstraints();
@@ -386,6 +403,10 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
                 .setText(MessageProvider.getMessage("datasets.dataseta"));
         secondDatasetLabel
                 .setText(MessageProvider.getMessage("datasets.datasetb"));
+        firstEncodingGuessBtn.setToolTipText(
+                MessageProvider.getMessage("datasets.encoding.guess"));
+        secondEncodingGuessBtn.setToolTipText(
+                MessageProvider.getMessage("datasets.encoding.guess"));
         firstDatasetBtn.setText(MessageProvider.getMessage("datasets.select"));
         secondDatasetBtn.setText(MessageProvider.getMessage("datasets.select"));
         fileNameLbl.setText(
@@ -491,6 +512,14 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
 
     public JLabel getRowNumColLbl() {
         return rowNumColLbl;
+    }
+
+    public JButton getFirstEncodingGuessBtn() {
+        return firstEncodingGuessBtn;
+    }
+
+    public JButton getSecondEncodingGuessBtn() {
+        return secondEncodingGuessBtn;
     }
 
 }

@@ -21,13 +21,16 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -225,6 +228,28 @@ public class MainWindow implements Translatable {
                 new StringSettingItem(history, "", "#B",
                         datasetsTabPanel.getSecondDatasetRowNumColField(),
                         datasetsTabEventListenerBottom));
+        datasetsTabPanel.getFirstEncodingGuessBtn().addActionListener(e -> {
+            guessEncoding(() -> {
+                Path dir = currentFileName == null ? null
+                        : Paths.get(currentFileName).getParent();
+                String f = (String) cf.getSettingItems().get("db_a")
+                        .getCurrentValue();
+                return dir == null ? f
+                        : dir.resolve(f).toAbsolutePath().toString();
+            }, datasetsTabPanel.getFirstEncodingGuessBtn(),
+                    datasetsTabPanel.getFirstEncodingField());
+        });
+        datasetsTabPanel.getSecondEncodingGuessBtn().addActionListener(e -> {
+            guessEncoding(() -> {
+                Path dir = currentFileName == null ? null
+                        : Paths.get(currentFileName).getParent();
+                String f = (String) cf.getSettingItems().get("db_b")
+                        .getCurrentValue();
+                return dir == null ? f
+                        : dir.resolve(f).toAbsolutePath().toString();
+            }, datasetsTabPanel.getSecondEncodingGuessBtn(),
+                    datasetsTabPanel.getSecondEncodingField());
+        });
 
         // Tab: OPTIONS
         SettingItemChangeListener optionsTabEventListener = o -> {
@@ -481,6 +506,9 @@ public class MainWindow implements Translatable {
             datasetsTabPanel.getFirstDatasetWarningLbl().setVisible(true);
         } else
             datasetsTabPanel.getFirstDatasetWarningLbl().setVisible(false);
+        datasetsTabPanel.getFirstEncodingGuessBtn()
+                .setEnabled(result != DatasetPeekResult.FILE_NOT_FOUND
+                        && result != DatasetPeekResult.BLANK_NAME);
         manager.setFirstDatasetColumnNames(p.getColumnNames());
         if (!peekFromFileNameAndEncoding.containsKey(fn2))
             peekFromFileNameAndEncoding.put(fn2,
@@ -511,6 +539,9 @@ public class MainWindow implements Translatable {
             datasetsTabPanel.getSecondDatasetWarningLbl().setVisible(true);
         } else
             datasetsTabPanel.getSecondDatasetWarningLbl().setVisible(false);
+        datasetsTabPanel.getSecondEncodingGuessBtn()
+                .setEnabled(result != DatasetPeekResult.FILE_NOT_FOUND
+                        && result != DatasetPeekResult.BLANK_NAME);
         manager.setSecondDatasetColumnNames(p.getColumnNames());
         if (manager.getColumnPairCount() > 0)
             manager.getTableModel().fireTableRowsUpdated(0,
@@ -1194,6 +1225,37 @@ public class MainWindow implements Translatable {
                 + (summary != null ? String.format(" (%s)", summary) : "");
         menuBar.getRedoMenuItem().setText(txt);
         mainToolBar.getRedoBtn().setToolTipText(txt);
+    }
+
+    protected void guessEncoding(Supplier<String> fnProvider, JButton button,
+            JComboBox<String> field) {
+        button.setVisible(false);
+        JDialog d = new JDialog(frame, true);
+        d.setLocationByPlatform(true);
+        d.setLocationRelativeTo(frame);
+        d.setMinimumSize(new Dimension(300, 200));
+        d.add(new JLabel(
+                MessageProvider.getMessage("datasets.encoding.guessing")));
+        d.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        d.pack();
+        SwingUtilities.invokeLater(() -> {
+            d.setVisible(true);
+        });
+        CompletableFuture<String> f = CompletableFuture.supplyAsync(() -> {
+            return DatasetPeek.guessEncoding(fnProvider.get());
+        }).whenComplete((enc, t) -> {
+            SwingUtilities.invokeLater(() -> {
+                field.setSelectedItem(enc);
+                d.setVisible(false);
+                d.dispose();
+                button.setVisible(true);
+                field.grabFocus();
+            });
+        }).exceptionally(t -> {
+            t.printStackTrace();
+            return null;
+        });
+        button.setVisible(true);
     }
 
     @Override
