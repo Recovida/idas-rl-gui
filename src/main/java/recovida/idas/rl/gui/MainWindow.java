@@ -963,11 +963,17 @@ public class MainWindow implements Translatable {
             if (!fn.equals(currentFileName) || currentFileChangeWatcher == null)
                 currentFileChangeWatcher = new FileChangeWatcher(Paths.get(fn),
                         () -> {
-                            int result = promptToSaveChangesAfterChangeOnDisk();
-                            if (result == JOptionPane.YES_OPTION)
-                                doSave();
-                            else if (result == JOptionPane.NO_OPTION)
-                                doOpen(currentFileName);
+                            this.currentFileChangeWatcher.disable();
+                            SwingUtilities.invokeLater(() -> {
+                                int result = promptToSaveChangesAfterChangeOnDisk();
+                                this.currentFileChangeWatcher.enable();
+                                if (result == JOptionPane.YES_OPTION)
+                                    doSave();
+                                else if (result == JOptionPane.NO_OPTION)
+                                    doOpen(currentFileName);
+                                else
+                                    this.currentFileChangeWatcher.enable();
+                            });
                         });
             currentFileChangeWatcher.enable();
         } else
