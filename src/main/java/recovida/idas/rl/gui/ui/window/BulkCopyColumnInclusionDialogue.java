@@ -7,11 +7,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Toolkit;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -23,9 +25,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import recovida.idas.rl.gui.lang.MessageProvider;
 import recovida.idas.rl.gui.ui.table.ColumnPairTable;
+import javax.swing.Box;
 
 /**
  * This dialogue is used to ask the user which columns (represented in rows) of
@@ -41,6 +45,10 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
     private final Map<String, JCheckBox> leftMap = new LinkedHashMap<>();
 
     private final Map<String, JCheckBox> rightMap = new LinkedHashMap<>();
+
+    private final Set<JCheckBox> nonGreyLeft = new HashSet<>();
+
+    private final Set<JCheckBox> nonGreyRight = new HashSet<>();
 
     @SuppressWarnings("unchecked")
     LinkedList<String>[] result = new LinkedList[] { new LinkedList<>(),
@@ -88,24 +96,66 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
 
         JPanel firstDatasetLblContainer = new JPanel();
         leftScrollPane.setColumnHeaderView(firstDatasetLblContainer);
+        firstDatasetLblContainer.setLayout(
+                new BoxLayout(firstDatasetLblContainer, BoxLayout.PAGE_AXIS));
 
         JLabel firstDatasetLbl = new JLabel(
                 MessageProvider.getMessage("columns.addcopy.dataseta"));
+        firstDatasetLbl.setAlignmentX(0.5f);
+        firstDatasetLbl.setHorizontalAlignment(SwingConstants.CENTER);
         firstDatasetLblContainer.add(firstDatasetLbl);
         firstDatasetLbl
                 .setFont(firstDatasetLbl.getFont().deriveFont(Font.BOLD));
+
+        JPanel leftBtnPanel = new JPanel();
+        firstDatasetLblContainer.add(leftBtnPanel);
+        leftBtnPanel.setLayout(new BoxLayout(leftBtnPanel, BoxLayout.X_AXIS));
+
+        JButton leftSelectUniqueBtn = new JButton(
+                MessageProvider.getMessage("columns.addcopy.selectunique"));
+        leftBtnPanel.add(leftSelectUniqueBtn);
+        setSelectAllEvent(leftSelectUniqueBtn, nonGreyLeft);
+
+        JButton leftSelectAllBtn = new JButton(
+                MessageProvider.getMessage("columns.addcopy.selectall"));
+        setSelectAllEvent(leftSelectAllBtn, leftMap.values());
+
+        Component horizontalGlue = Box.createHorizontalGlue();
+        leftBtnPanel.add(horizontalGlue);
+        leftBtnPanel.add(leftSelectAllBtn);
 
         JScrollPane rightScrollPane = new JScrollPane();
         splitPane.setRightComponent(rightScrollPane);
 
         JPanel secondDatasetLblContainer = new JPanel();
         rightScrollPane.setColumnHeaderView(secondDatasetLblContainer);
+        secondDatasetLblContainer.setLayout(
+                new BoxLayout(secondDatasetLblContainer, BoxLayout.PAGE_AXIS));
 
         JLabel secondDatasetLbl = new JLabel(
                 MessageProvider.getMessage("columns.addcopy.datasetb"));
+        secondDatasetLbl.setAlignmentX(0.5f);
+        secondDatasetLbl.setHorizontalAlignment(SwingConstants.CENTER);
         secondDatasetLbl
                 .setFont(secondDatasetLbl.getFont().deriveFont(Font.BOLD));
         secondDatasetLblContainer.add(secondDatasetLbl);
+
+        JPanel rightBtnPanel = new JPanel();
+        secondDatasetLblContainer.add(rightBtnPanel);
+        rightBtnPanel.setLayout(new BoxLayout(rightBtnPanel, BoxLayout.X_AXIS));
+
+        JButton rightSelectUniqueBtn = new JButton(
+                MessageProvider.getMessage("columns.addcopy.selectunique"));
+        rightBtnPanel.add(rightSelectUniqueBtn);
+        setSelectAllEvent(rightSelectUniqueBtn, nonGreyRight);
+
+        Component horizontalGlue_1 = Box.createHorizontalGlue();
+        rightBtnPanel.add(horizontalGlue_1);
+
+        JButton rightSelectAllBtn = new JButton(
+                MessageProvider.getMessage("columns.addcopy.selectall"));
+        rightBtnPanel.add(rightSelectAllBtn);
+        setSelectAllEvent(rightSelectAllBtn, rightMap.values());
 
         rightPanel = new JPanel();
         rightScrollPane.setViewportView(rightPanel);
@@ -162,6 +212,8 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
     public JCheckBox addItemToLeftPanel(String item, boolean grey) {
         JCheckBox cb = addItem(leftPanel, item, grey);
         leftMap.put(item, cb);
+        if (!grey)
+            nonGreyLeft.add(cb);
         return cb;
     }
 
@@ -175,6 +227,8 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
     public JCheckBox addItemToRightPanel(String item, boolean grey) {
         JCheckBox cb = addItem(rightPanel, item, grey);
         rightMap.put(item, cb);
+        if (!grey)
+            nonGreyRight.add(cb);
         return cb;
     }
 
@@ -184,6 +238,15 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
             cb.setForeground(Color.GRAY);
         container.add(cb);
         return cb;
+    }
+
+    private void setSelectAllEvent(JButton button, Iterable<JCheckBox> items) {
+        button.addActionListener(e -> {
+            SwingUtilities.invokeLater(() -> {
+                for (JCheckBox c : items)
+                    c.setSelected(true);
+            });
+        });
     }
 
     /**
