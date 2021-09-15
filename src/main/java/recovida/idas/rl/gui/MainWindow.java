@@ -53,6 +53,7 @@ import recovida.idas.rl.gui.listener.SettingItemChangeListener;
 import recovida.idas.rl.gui.pair.ColumnPairManager;
 import recovida.idas.rl.gui.settingitem.AbstractObjectFromListSettingItem;
 import recovida.idas.rl.gui.settingitem.AbstractSettingItem;
+import recovida.idas.rl.gui.settingitem.BooleanSettingItem;
 import recovida.idas.rl.gui.settingitem.NumberSettingItem;
 import recovida.idas.rl.gui.settingitem.StringFromListSettingItem;
 import recovida.idas.rl.gui.settingitem.StringSettingItem;
@@ -208,6 +209,8 @@ public class MainWindow implements Translatable {
                 new StringSettingItem(history, "", "#A",
                         datasetsTabPanel.getFirstDatasetRowNumColField(),
                         datasetsTabEventListenerBottom));
+        cf.addSettingItem("lenient_a", new BooleanSettingItem(history, false,
+                false, datasetsTabPanel.getFirstLenientCheckbox()));
 
         cf.addSettingItem("db_b",
                 new StringSettingItem(history, "", "",
@@ -225,6 +228,8 @@ public class MainWindow implements Translatable {
                 new StringSettingItem(history, "", "#B",
                         datasetsTabPanel.getSecondDatasetRowNumColField(),
                         datasetsTabEventListenerBottom));
+        cf.addSettingItem("lenient_b", new BooleanSettingItem(history, false,
+                false, datasetsTabPanel.getSecondLenientCheckbox()));
 
         // Tab: OPTIONS
         SettingItemChangeListener optionsTabEventListener = o -> {

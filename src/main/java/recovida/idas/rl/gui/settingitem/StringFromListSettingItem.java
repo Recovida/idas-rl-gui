@@ -83,16 +83,6 @@ public class StringFromListSettingItem
     }
 
     @Override
-    public void onChange(String newValue) {
-        if (newValue.equals(currentValue))
-            return;
-        currentValue = newValue;
-        for (SettingItemChangeListener listener : listeners)
-            if (listener != null)
-                listener.changed(newValue);
-    }
-
-    @Override
     public void setValue(String newValue) {
         SwingUtilities.invokeLater(() -> {
             supressDocumentListener = true;

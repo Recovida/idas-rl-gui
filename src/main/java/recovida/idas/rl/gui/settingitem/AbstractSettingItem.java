@@ -92,7 +92,15 @@ public abstract class AbstractSettingItem<V, F extends JComponent> {
      *
      * @param newValue the new value
      */
-    public abstract void onChange(V newValue);
+    public void onChange(V newValue) {
+        if (newValue.equals(currentValue))
+            return;
+        currentValue = newValue;
+        for (SettingItemChangeListener listener : listeners)
+            if (listener != null) {
+                listener.changed(newValue);
+            }
+    }
 
     /**
      * Adds a listener to be notified whenever the value of this setting item

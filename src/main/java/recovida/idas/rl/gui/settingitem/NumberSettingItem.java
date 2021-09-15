@@ -63,16 +63,6 @@ public class NumberSettingItem extends AbstractSettingItem<Number, JSpinner> {
     }
 
     @Override
-    public void onChange(Number newValue) {
-        if (newValue.equals(currentValue))
-            return;
-        currentValue = newValue;
-        for (SettingItemChangeListener listener : listeners)
-            if (listener != null)
-                listener.changed(newValue);
-    }
-
-    @Override
     public synchronized void setValue(Number newValue) {
         SwingUtilities.invokeLater(() -> {
             supressDocumentListener = true;

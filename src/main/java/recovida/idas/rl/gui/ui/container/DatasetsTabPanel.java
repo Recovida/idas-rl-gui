@@ -21,6 +21,7 @@ import recovida.idas.rl.gui.ui.Translatable;
 import recovida.idas.rl.gui.ui.field.EncodingComboBox;
 import recovida.idas.rl.gui.ui.field.JComboBoxWithPlaceholder;
 import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
+import javax.swing.JCheckBox;
 
 /**
  * A panel to let the user enter information about the datasets.
@@ -45,6 +46,11 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
     private final JTextFieldWithPlaceholder firstDatasetRowNumColField;
 
     private final JTextFieldWithPlaceholder secondDatasetRowNumColField;
+    
+    private final JCheckBox firstLenientCheckbox;
+    
+    private final JCheckBox secondLenientCheckbox;
+    
 
     // error icons
     private final ErrorIconLabel firstDatasetWarningLbl;
@@ -80,6 +86,7 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
     private final JLabel suffixLbl;
 
     private final JLabel rowNumColLbl;
+    
 
     /**
      * Creates an instance of the panel.
@@ -236,6 +243,9 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
         firstEncodingField = new EncodingComboBox();
         new JComboBoxSuggestionProvider(firstEncodingField);
         firstEncodingContainer.add(firstEncodingField);
+        
+        firstLenientCheckbox = new JCheckBox("_Lenient");
+        firstEncodingContainer.add(firstLenientCheckbox);
 
         // encoding (B)
 
@@ -252,6 +262,9 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
         secondEncodingField = new EncodingComboBox();
         new JComboBoxSuggestionProvider(secondEncodingField);
         secondEncodingContainer.add(secondEncodingField);
+        
+        secondLenientCheckbox = new JCheckBox("_Lenient");
+        secondEncodingContainer.add(secondLenientCheckbox);
 
         secondEncodingWarningLbl = new ErrorIconLabel();
         GridBagConstraints secondEncodingWarningLblGBC = new GridBagConstraints();
@@ -394,7 +407,8 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
         suffixLbl.setText(MessageProvider.getMessage("datasets.suffix"));
         rowNumColLbl
                 .setText(MessageProvider.getMessage("datasets.rownumcolname"));
-
+        firstLenientCheckbox.setText(MessageProvider.getMessage("datasets.encoding.lenient"));
+        secondLenientCheckbox.setText(MessageProvider.getMessage("datasets.encoding.lenient"));
     }
 
     public JTextField getFirstDatasetField() {
@@ -491,6 +505,14 @@ public class DatasetsTabPanel extends JPanel implements Translatable {
 
     public JLabel getRowNumColLbl() {
         return rowNumColLbl;
+    }
+
+    public JCheckBox getFirstLenientCheckbox() {
+        return firstLenientCheckbox;
+    }
+
+    public JCheckBox getSecondLenientCheckbox() {
+        return secondLenientCheckbox;
     }
 
 }
