@@ -11,6 +11,6 @@ import recovida.idas.rl.gui.ui.table.ColumnPairTable;
 public class TypeColumnPairCellRenderer extends NameColumnPairCellRenderer
         implements TableCellRenderer {
 
-    private static final long serialVersionUID = -6058642647063510809L;
+    private static final long serialVersionUID = -1942712147227403557L;
 
 }

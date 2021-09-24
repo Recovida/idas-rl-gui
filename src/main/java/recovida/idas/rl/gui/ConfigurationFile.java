@@ -66,7 +66,8 @@ public class ConfigurationFile {
     public static final int MAX_NUMBER = 999;
 
     protected static final String[] COL_KEYS = { "type", "index_a", "index_b",
-            "rename_a", "rename_b", "weight", "phon_weight" };
+            "rename_a", "rename_b", "weight", "phon_weight", "col_similarity",
+            "min_similarity" };
 
     protected static final Pattern COL_KEY_PATTERN = Pattern
             .compile("^[0-9]+_(" + String.join("|", COL_KEYS) + ")$");
@@ -130,7 +131,8 @@ public class ConfigurationFile {
                 } else {
                     index = cols.get(number);
                 }
-                if ("weight".equals(k) || "phon_weight".equals(k)) { // double
+                if ("weight".equals(k) || "phon_weight".equals(k)
+                        || "min_similarity".equals(k)) { // double
                     try {
                         pairManager.onChange(index, k,
                                 Math.max(

@@ -10,6 +10,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import recovida.idas.rl.gui.ui.table.cellrendering.MinimumSimilarityColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.table.cellrendering.NameColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.table.cellrendering.NumberColumnPairCellRenderer;
 import recovida.idas.rl.gui.ui.table.cellrendering.PhonWeightColumnPairCellRenderer;
@@ -66,6 +67,9 @@ public class ColumnPairTable extends JTable {
                     .setCellRenderer(new TypeColumnPairCellRenderer());
             getColumnModel().getColumn(model.getColumnIndex("number"))
                     .setCellRenderer(new NumberColumnPairCellRenderer());
+            getColumnModel().getColumn(model.getColumnIndex("min_similarity"))
+            .setCellRenderer(new MinimumSimilarityColumnPairCellRenderer());
+            
         });
 
     }

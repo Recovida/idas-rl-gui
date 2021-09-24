@@ -203,7 +203,11 @@ public class ColumnPairManager {
                             .setText(model.getStringValue(index, "rename_a"));
                     editingPanel.getSecondRenameField()
                             .setText(model.getStringValue(index, "rename_b"));
-                    updateWeightFieldVisibility(
+                    editingPanel.getSimilarityMinField().setValue(zeroIfNull(
+                            model.getDoubleValue(index, "min_similarity")));
+                    editingPanel.getSimilarityColField().setText(
+                            model.getStringValue(index, "col_similarity"));
+                    updateConditionalFieldVisibility(
                             model.getStringValue(index, "type"));
                     editingPanel.setEnabled(true);
                     completelyIgnoreChangeEvent = false;
@@ -224,6 +228,10 @@ public class ColumnPairManager {
         associateKeyWithField("weight", editingPanel.getWeightField());
         associateKeyWithField("phon_weight", editingPanel.getPhonWeightField());
         associateKeyWithField("number", editingPanel.getNumberField());
+        associateKeyWithField("col_similarity",
+                editingPanel.getSimilarityColField());
+        associateKeyWithField("min_similarity",
+                editingPanel.getSimilarityMinField());
 
         table.addMouseListener(new MouseAdapter() {
             @Override
@@ -241,6 +249,7 @@ public class ColumnPairManager {
 
         editingPanel.getPhonWeightLbl().setVisible(false);
         editingPanel.getPhonWeightField().setVisible(false);
+        editingPanel.getSimilarityPanel().setVisible(false);
 
     }
 
@@ -370,19 +379,20 @@ public class ColumnPairManager {
             if (listener != null)
                 listener.changed(rowIndex, key, newValue);
         if ("type".equals(key)) {
-            updateWeightFieldVisibility((String) newValue);
+            updateConditionalFieldVisibility((String) newValue);
         } else if ("index_a".equals(key) || "index_b".equals(key)) {
             updateRenameFieldPlaceholder();
         }
     }
 
-    protected void updateWeightFieldVisibility(String type) {
-        boolean hasPhonWeight = "name".equals(type);
-        boolean hasWeight = !"copy".equals(type);
-        editingPanel.getPhonWeightLbl().setVisible(hasPhonWeight);
-        editingPanel.getPhonWeightField().setVisible(hasPhonWeight);
-        editingPanel.getWeightField().setVisible(hasWeight);
-        editingPanel.getWeightLbl().setVisible(hasWeight);
+    protected void updateConditionalFieldVisibility(String type) {
+        boolean isName = "name".equals(type);
+        boolean isNotCopy = !"copy".equals(type);
+        editingPanel.getPhonWeightLbl().setVisible(isName);
+        editingPanel.getPhonWeightField().setVisible(isName);
+        editingPanel.getSimilarityPanel().setVisible(isName);
+        editingPanel.getWeightField().setVisible(isNotCopy);
+        editingPanel.getWeightLbl().setVisible(isNotCopy);
     }
 
     protected void updateRenameFieldPlaceholder() {

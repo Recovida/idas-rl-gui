@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -28,6 +29,9 @@ import recovida.idas.rl.gui.ui.Translatable;
 import recovida.idas.rl.gui.ui.field.JSpinnerWithBlankValue;
 import recovida.idas.rl.gui.ui.field.JTextFieldWithPlaceholder;
 import recovida.idas.rl.gui.ui.table.ColumnPairTable;
+import javax.swing.JTextField;
+import javax.swing.border.TitledBorder;
+import java.awt.Color;
 
 /**
  * A panel to let the user edit the column pair fields in a
@@ -43,8 +47,6 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
     private final JTextFieldWithPlaceholder firstRenameField;
 
     private final JTextFieldWithPlaceholder secondRenameField;
-
-    private final Component rightHorizontalGlue = Box.createHorizontalGlue();
 
     private final JSpinnerWithBlankValue weightField;
 
@@ -85,6 +87,13 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
     private final JLabel nameFirstLbl;
 
     private final JLabel numberLbl;
+    private JTextField similarityColField;
+    private JPanel similarityPanel;
+    private JSpinnerWithBlankValue similarityMinField;
+    private JLabel similarityColLbl;
+    private JLabel similarityMinLbl;
+    private Component verticalGlue;
+    private Component verticalGlue_1;
 
     public JTextFieldWithPlaceholder getFirstRenameField() {
         return firstRenameField;
@@ -128,19 +137,19 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         JPanel panel = new JPanel();
         add(panel);
         GridBagLayout panelGBL = new GridBagLayout();
-        panelGBL.columnWidths = new int[] { 0, 50, 35, 60, 35, 50, 45, 35, 35,
-                40, 35 };
-        panelGBL.rowHeights = new int[] { 0, 35, 35, 35, 35, 0, 0 };
-        panelGBL.columnWeights = new double[] { 0.0, 1.0, 0.0, 1.0, 0.0, 1.0,
-                1.0, 0.0, 0.0, 1.0, 0.0, 0.0 };
-        panelGBL.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                Double.MIN_VALUE };
+        panelGBL.columnWidths = new int[] { 0, 50, 35, 171, 10, 35, 107, 169,
+                0 };
+        panelGBL.rowHeights = new int[] { 13, 35, 35, 35, 35, 35 };
+        panelGBL.columnWeights = new double[] { 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
+                0.0, 0.0, 0.0 };
+        panelGBL.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0 };
         panel.setLayout(panelGBL);
 
         Component vg = Box.createVerticalGlue();
         GridBagConstraints vgGBC = new GridBagConstraints();
         vgGBC.insets = new Insets(0, 0, 5, 5);
-        vgGBC.gridx = 5;
+        vgGBC.gridx = 0;
         vgGBC.gridy = 0;
         panel.add(vg, vgGBC);
 
@@ -161,7 +170,6 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         nameFirstLbl.setPreferredSize(new Dimension(123, 17));
         nameFirstLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         GridBagConstraints nameFirstLblGBC = new GridBagConstraints();
-        nameFirstLblGBC.gridwidth = 2;
         nameFirstLblGBC.fill = GridBagConstraints.HORIZONTAL;
         nameFirstLblGBC.insets = new Insets(0, 0, 5, 5);
         nameFirstLblGBC.gridx = 3;
@@ -171,9 +179,8 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         JPanel firstNameContainer = new JPanel();
         GridBagConstraints firstNameContainerGBC = new GridBagConstraints();
         firstNameContainerGBC.fill = GridBagConstraints.BOTH;
-        firstNameContainerGBC.gridwidth = 2;
         firstNameContainerGBC.insets = new Insets(0, 0, 5, 5);
-        firstNameContainerGBC.gridx = 5;
+        firstNameContainerGBC.gridx = 4;
         firstNameContainerGBC.gridy = 1;
         panel.add(firstNameContainer, firstNameContainerGBC);
         firstNameContainer
@@ -188,7 +195,7 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         GridBagConstraints firstNameWarningLblGBC = new GridBagConstraints();
         firstNameWarningLblGBC.anchor = GridBagConstraints.WEST;
         firstNameWarningLblGBC.insets = new Insets(0, 0, 5, 5);
-        firstNameWarningLblGBC.gridx = 7;
+        firstNameWarningLblGBC.gridx = 5;
         firstNameWarningLblGBC.gridy = 1;
         panel.add(firstNameWarningLbl, firstNameWarningLblGBC);
 
@@ -197,7 +204,7 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         GridBagConstraints renameFirstLblGBC = new GridBagConstraints();
         renameFirstLblGBC.fill = GridBagConstraints.HORIZONTAL;
         renameFirstLblGBC.insets = new Insets(0, 0, 5, 5);
-        renameFirstLblGBC.gridx = 8;
+        renameFirstLblGBC.gridx = 6;
         renameFirstLblGBC.gridy = 1;
         panel.add(renameFirstLbl, renameFirstLblGBC);
 
@@ -205,7 +212,7 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         GridBagConstraints firstRenameFieldGBC = new GridBagConstraints();
         firstRenameFieldGBC.insets = new Insets(0, 0, 5, 5);
         firstRenameFieldGBC.fill = GridBagConstraints.BOTH;
-        firstRenameFieldGBC.gridx = 9;
+        firstRenameFieldGBC.gridx = 7;
         firstRenameFieldGBC.gridy = 1;
         panel.add(firstRenameField, firstRenameFieldGBC);
         firstRenameField.setColumns(10);
@@ -240,7 +247,6 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         nameSecondLbl.setHorizontalAlignment(SwingConstants.TRAILING);
         nameSecondLbl.setPreferredSize(new Dimension(123, 17));
         GridBagConstraints nameSecondLblGBC = new GridBagConstraints();
-        nameSecondLblGBC.gridwidth = 2;
         nameSecondLblGBC.fill = GridBagConstraints.HORIZONTAL;
         nameSecondLblGBC.insets = new Insets(0, 0, 5, 5);
         nameSecondLblGBC.gridx = 3;
@@ -250,9 +256,8 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         JPanel secondNameContainer = new JPanel();
         GridBagConstraints secondNameContainerGBC = new GridBagConstraints();
         secondNameContainerGBC.fill = GridBagConstraints.BOTH;
-        secondNameContainerGBC.gridwidth = 2;
         secondNameContainerGBC.insets = new Insets(0, 0, 5, 5);
-        secondNameContainerGBC.gridx = 5;
+        secondNameContainerGBC.gridx = 4;
         secondNameContainerGBC.gridy = 2;
         panel.add(secondNameContainer, secondNameContainerGBC);
         secondNameContainer.setLayout(
@@ -267,7 +272,7 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         GridBagConstraints secondNameWarningLblGBC = new GridBagConstraints();
         secondNameWarningLblGBC.anchor = GridBagConstraints.WEST;
         secondNameWarningLblGBC.insets = new Insets(0, 0, 5, 5);
-        secondNameWarningLblGBC.gridx = 7;
+        secondNameWarningLblGBC.gridx = 5;
         secondNameWarningLblGBC.gridy = 2;
         panel.add(secondNameWarningLbl, secondNameWarningLblGBC);
 
@@ -277,7 +282,7 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         GridBagConstraints renameSecondLblGBC = new GridBagConstraints();
         renameSecondLblGBC.fill = GridBagConstraints.HORIZONTAL;
         renameSecondLblGBC.insets = new Insets(0, 0, 5, 5);
-        renameSecondLblGBC.gridx = 8;
+        renameSecondLblGBC.gridx = 6;
         renameSecondLblGBC.gridy = 2;
         panel.add(renameSecondLbl, renameSecondLblGBC);
 
@@ -285,7 +290,7 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         GridBagConstraints secondRenameFieldGBC = new GridBagConstraints();
         secondRenameFieldGBC.insets = new Insets(0, 0, 5, 5);
         secondRenameFieldGBC.fill = GridBagConstraints.BOTH;
-        secondRenameFieldGBC.gridx = 9;
+        secondRenameFieldGBC.gridx = 7;
         secondRenameFieldGBC.gridy = 2;
         panel.add(secondRenameField, secondRenameFieldGBC);
         secondRenameField.setColumns(10);
@@ -299,8 +304,8 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         GridBagConstraints typeLblGBC = new GridBagConstraints();
         typeLblGBC.fill = GridBagConstraints.BOTH;
         typeLblGBC.insets = new Insets(0, 0, 5, 5);
-        typeLblGBC.gridx = 3;
-        typeLblGBC.gridy = 3;
+        typeLblGBC.gridx = 1;
+        typeLblGBC.gridy = 4;
         panel.add(typeLbl, typeLblGBC);
 
         weightLbl = new JLabel("_Weight");
@@ -309,63 +314,17 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         weightLbl.setHorizontalTextPosition(SwingConstants.CENTER);
         weightLbl.setHorizontalAlignment(SwingConstants.CENTER);
         GridBagConstraints weightLblGBC = new GridBagConstraints();
-        weightLblGBC.gridwidth = 2;
-        weightLblGBC.fill = GridBagConstraints.BOTH;
+        weightLblGBC.anchor = GridBagConstraints.EAST;
         weightLblGBC.insets = new Insets(0, 0, 5, 5);
-        weightLblGBC.gridx = 5;
-        weightLblGBC.gridy = 3;
+        weightLblGBC.gridx = 3;
+        weightLblGBC.gridy = 4;
         panel.add(weightLbl, weightLblGBC);
-
-        phonWeightLbl = new JLabel("_Phon. weight");
-        phonWeightLbl.setVerticalAlignment(SwingConstants.BOTTOM);
-        phonWeightLbl.setVerticalTextPosition(SwingConstants.BOTTOM);
-        phonWeightLbl.setHorizontalTextPosition(SwingConstants.CENTER);
-        phonWeightLbl.setHorizontalAlignment(SwingConstants.CENTER);
-        GridBagConstraints phonWeightLblGBC = new GridBagConstraints();
-        phonWeightLblGBC.fill = GridBagConstraints.BOTH;
-        phonWeightLblGBC.insets = new Insets(0, 0, 5, 5);
-        phonWeightLblGBC.gridx = 9;
-        phonWeightLblGBC.gridy = 3;
-        panel.add(phonWeightLbl, phonWeightLblGBC);
-
-        Component leftHorizontalGlue = Box.createHorizontalGlue();
-        GridBagConstraints leftHorizontalGlueGBC = new GridBagConstraints();
-        leftHorizontalGlueGBC.insets = new Insets(0, 0, 5, 5);
-        leftHorizontalGlueGBC.gridx = 0;
-        leftHorizontalGlueGBC.gridy = 4;
-        panel.add(leftHorizontalGlue, leftHorizontalGlueGBC);
-
-        JPanel typeContainer = new JPanel();
-        GridBagConstraints typeContainerGBC = new GridBagConstraints();
-        typeContainerGBC.fill = GridBagConstraints.BOTH;
-        typeContainerGBC.insets = new Insets(0, 0, 5, 5);
-        typeContainerGBC.gridx = 3;
-        typeContainerGBC.gridy = 4;
-        panel.add(typeContainer, typeContainerGBC);
-        typeContainer.setLayout(new BoxLayout(typeContainer, BoxLayout.X_AXIS));
-
-        typeField = new JComboBox<>();
-        typeContainer.add(typeField);
-        typeField.setEditable(true);
-        new JComboBoxSuggestionProvider(typeField);
-
-        Double zero = 0.0;
-
-        typeWarningLbl = new ErrorIconLabel();
-        typeWarningLbl.setVisible(false);
-        GridBagConstraints typeWarningLblGBC = new GridBagConstraints();
-        typeWarningLblGBC.anchor = GridBagConstraints.WEST;
-        typeWarningLblGBC.insets = new Insets(0, 0, 5, 5);
-        typeWarningLblGBC.gridx = 4;
-        typeWarningLblGBC.gridy = 4;
-        panel.add(typeWarningLbl, typeWarningLblGBC);
 
         JPanel weightContainer = new JPanel();
         GridBagConstraints weightContainerGBC = new GridBagConstraints();
-        weightContainerGBC.gridwidth = 2;
         weightContainerGBC.fill = GridBagConstraints.BOTH;
         weightContainerGBC.insets = new Insets(0, 0, 5, 5);
-        weightContainerGBC.gridx = 5;
+        weightContainerGBC.gridx = 4;
         weightContainerGBC.gridy = 4;
         panel.add(weightContainer, weightContainerGBC);
         weightContainer
@@ -382,16 +341,116 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         GridBagConstraints weightWarningLblGBC = new GridBagConstraints();
         weightWarningLblGBC.anchor = GridBagConstraints.WEST;
         weightWarningLblGBC.insets = new Insets(0, 0, 5, 5);
-        weightWarningLblGBC.gridx = 7;
+        weightWarningLblGBC.gridx = 5;
         weightWarningLblGBC.gridy = 4;
         panel.add(weightWarningLbl, weightWarningLblGBC);
+
+        similarityPanel = new JPanel();
+        similarityPanel.setBorder(new TitledBorder(null, "_Similarity", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(59, 59, 59)));
+        GridBagConstraints gbc_panel_1 = new GridBagConstraints();
+        gbc_panel_1.gridheight = 3;
+        gbc_panel_1.gridwidth = 2;
+        gbc_panel_1.insets = new Insets(0, 0, 5, 5);
+        gbc_panel_1.fill = GridBagConstraints.VERTICAL;
+        gbc_panel_1.gridx = 6;
+        gbc_panel_1.gridy = 3;
+        panel.add(similarityPanel, gbc_panel_1);
+        GridBagLayout gbl_similarityPanel = new GridBagLayout();
+        gbl_similarityPanel.columnWidths = new int[] { 95, 140 };
+        gbl_similarityPanel.rowHeights = new int[] { 33, 33, 0, 0 };
+        gbl_similarityPanel.columnWeights = new double[] { 0.0, 0.0 };
+        gbl_similarityPanel.rowWeights = new double[] { 1.0, 1.0, 0.0,
+                Double.MIN_VALUE };
+        similarityPanel.setLayout(gbl_similarityPanel);
+
+        similarityColLbl = new JLabel("_Column name");
+        similarityColLbl.setHorizontalAlignment(SwingConstants.TRAILING);
+        GridBagConstraints gbc_similarityColLbl = new GridBagConstraints();
+        gbc_similarityColLbl.fill = GridBagConstraints.BOTH;
+        gbc_similarityColLbl.insets = new Insets(0, 0, 5, 5);
+        gbc_similarityColLbl.gridx = 0;
+        gbc_similarityColLbl.gridy = 0;
+        similarityPanel.add(similarityColLbl, gbc_similarityColLbl);
+
+        similarityColField = new JTextField();
+        GridBagConstraints gbc_similarityColField = new GridBagConstraints();
+        gbc_similarityColField.fill = GridBagConstraints.BOTH;
+        gbc_similarityColField.insets = new Insets(0, 0, 5, 0);
+        gbc_similarityColField.gridx = 1;
+        gbc_similarityColField.gridy = 0;
+        similarityPanel.add(similarityColField, gbc_similarityColField);
+        similarityColField.setColumns(10);
+
+        SpinnerNumberModel minSimilarityModel = new SpinnerNumberModel(0.0, 0.0,
+                100, 0.001);
+
+        similarityMinLbl = new JLabel("_Minimum");
+        similarityMinLbl.setHorizontalAlignment(SwingConstants.TRAILING);
+        GridBagConstraints gbc_similarityMinLbl = new GridBagConstraints();
+        gbc_similarityMinLbl.fill = GridBagConstraints.BOTH;
+        gbc_similarityMinLbl.insets = new Insets(0, 0, 5, 5);
+        gbc_similarityMinLbl.gridx = 0;
+        gbc_similarityMinLbl.gridy = 1;
+        similarityPanel.add(similarityMinLbl, gbc_similarityMinLbl);
+        similarityMinField = new JSpinnerWithBlankValue(minSimilarityModel,
+                "0.000");
+        similarityMinField.setBlankValue(Double.valueOf(0.0));
+        GridBagConstraints gbc_similarityMinField = new GridBagConstraints();
+        gbc_similarityMinField.insets = new Insets(0, 0, 5, 0);
+        gbc_similarityMinField.fill = GridBagConstraints.BOTH;
+        gbc_similarityMinField.gridx = 1;
+        gbc_similarityMinField.gridy = 1;
+        similarityPanel.add(similarityMinField, gbc_similarityMinField);
+
+        verticalGlue_1 = Box.createVerticalGlue();
+        GridBagConstraints gbc_verticalGlue_1 = new GridBagConstraints();
+        gbc_verticalGlue_1.gridx = 1;
+        gbc_verticalGlue_1.gridy = 2;
+        similarityPanel.add(verticalGlue_1, gbc_verticalGlue_1);
+
+        Double zero = 0.0;
+
+        JPanel typeContainer = new JPanel();
+        GridBagConstraints typeContainerGBC = new GridBagConstraints();
+        typeContainerGBC.fill = GridBagConstraints.BOTH;
+        typeContainerGBC.insets = new Insets(0, 0, 5, 5);
+        typeContainerGBC.gridx = 1;
+        typeContainerGBC.gridy = 5;
+        panel.add(typeContainer, typeContainerGBC);
+        typeContainer.setLayout(new BoxLayout(typeContainer, BoxLayout.X_AXIS));
+
+        typeField = new JComboBox<>();
+        typeContainer.add(typeField);
+        typeField.setEditable(true);
+        new JComboBoxSuggestionProvider(typeField);
+
+        typeWarningLbl = new ErrorIconLabel();
+        typeWarningLbl.setVisible(false);
+        GridBagConstraints typeWarningLblGBC = new GridBagConstraints();
+        typeWarningLblGBC.anchor = GridBagConstraints.WEST;
+        typeWarningLblGBC.insets = new Insets(0, 0, 5, 5);
+        typeWarningLblGBC.gridx = 2;
+        typeWarningLblGBC.gridy = 5;
+        panel.add(typeWarningLbl, typeWarningLblGBC);
+
+        phonWeightLbl = new JLabel("_Phon. weight");
+        phonWeightLbl.setVerticalAlignment(SwingConstants.BOTTOM);
+        phonWeightLbl.setVerticalTextPosition(SwingConstants.BOTTOM);
+        phonWeightLbl.setHorizontalTextPosition(SwingConstants.CENTER);
+        phonWeightLbl.setHorizontalAlignment(SwingConstants.CENTER);
+        GridBagConstraints phonWeightLblGBC = new GridBagConstraints();
+        phonWeightLblGBC.anchor = GridBagConstraints.EAST;
+        phonWeightLblGBC.insets = new Insets(0, 0, 5, 5);
+        phonWeightLblGBC.gridx = 3;
+        phonWeightLblGBC.gridy = 5;
+        panel.add(phonWeightLbl, phonWeightLblGBC);
 
         JPanel phonWeightContainer = new JPanel();
         GridBagConstraints phonWeightContainerGBC = new GridBagConstraints();
         phonWeightContainerGBC.fill = GridBagConstraints.BOTH;
         phonWeightContainerGBC.insets = new Insets(0, 0, 5, 5);
-        phonWeightContainerGBC.gridx = 9;
-        phonWeightContainerGBC.gridy = 4;
+        phonWeightContainerGBC.gridx = 4;
+        phonWeightContainerGBC.gridy = 5;
         panel.add(phonWeightContainer, phonWeightContainerGBC);
         phonWeightContainer.setLayout(
                 new BoxLayout(phonWeightContainer, BoxLayout.X_AXIS));
@@ -409,21 +468,23 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         GridBagConstraints phonWeightWarningLblGBC = new GridBagConstraints();
         phonWeightWarningLblGBC.anchor = GridBagConstraints.WEST;
         phonWeightWarningLblGBC.insets = new Insets(0, 0, 5, 5);
-        phonWeightWarningLblGBC.gridx = 10;
-        phonWeightWarningLblGBC.gridy = 4;
+        phonWeightWarningLblGBC.gridx = 5;
+        phonWeightWarningLblGBC.gridy = 5;
         panel.add(phonWeightWarningLbl, phonWeightWarningLblGBC);
-        GridBagConstraints rightHorizontalGlueGBC = new GridBagConstraints();
-        rightHorizontalGlueGBC.insets = new Insets(0, 0, 5, 0);
-        rightHorizontalGlueGBC.gridx = 11;
-        rightHorizontalGlueGBC.gridy = 4;
-        panel.add(rightHorizontalGlue, rightHorizontalGlueGBC);
 
         Component bottomVerticalGlue = Box.createVerticalGlue();
         GridBagConstraints bottomVerticalGlueGBC = new GridBagConstraints();
-        bottomVerticalGlueGBC.insets = new Insets(0, 0, 0, 5);
-        bottomVerticalGlueGBC.gridx = 5;
-        bottomVerticalGlueGBC.gridy = 5;
+        bottomVerticalGlueGBC.insets = new Insets(0, 0, 5, 5);
+        bottomVerticalGlueGBC.gridx = 4;
+        bottomVerticalGlueGBC.gridy = 6;
         panel.add(bottomVerticalGlue, bottomVerticalGlueGBC);
+
+        verticalGlue = Box.createVerticalGlue();
+        GridBagConstraints gbc_verticalGlue = new GridBagConstraints();
+        gbc_verticalGlue.insets = new Insets(0, 0, 0, 5);
+        gbc_verticalGlue.gridx = 1;
+        gbc_verticalGlue.gridy = 7;
+        panel.add(verticalGlue, gbc_verticalGlue);
 
         init();
 
@@ -501,8 +562,27 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
                 "* " + MessageProvider.getMessage("columns.editing.weight"));
         phonWeightLbl.setText(
                 MessageProvider.getMessage("columns.editing.phonweight"));
+        similarityColLbl.setText(
+                MessageProvider.getMessage("columns.editing.colsimilarity"));
+        similarityMinLbl.setText(
+                MessageProvider.getMessage("columns.editing.minsimilarity"));
+        ((TitledBorder) similarityPanel.getBorder()).setTitle(
+                MessageProvider.getMessage("columns.editing.similarity"));
         weightField.updateLocalisedStrings();
         phonWeightField.updateLocalisedStrings();
+        similarityMinField.updateLocalisedStrings();
+    }
+
+    public JPanel getSimilarityPanel() {
+        return similarityPanel;
+    }
+
+    public JTextField getSimilarityColField() {
+        return similarityColField;
+    }
+
+    public JSpinnerWithBlankValue getSimilarityMinField() {
+        return similarityMinField;
     }
 
 }

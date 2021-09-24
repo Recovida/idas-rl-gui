@@ -26,11 +26,12 @@ public class ColumnPairTableModel extends DefaultTableModel {
     private static final long serialVersionUID = 1L;
 
     private final String[] keys = { "number", "type", "weight", "phon_weight",
-            "index_a", "rename_a", "index_b", "rename_b" };
+            "index_a", "rename_a", "index_b", "rename_b", "col_similarity",
+            "min_similarity" };
 
     private final Class<?>[] types = { Integer.class, String.class,
             Double.class, Double.class, String.class, String.class,
-            String.class, String.class };
+            String.class, String.class, String.class, Double.class };
 
     private final Map<String, Integer> indexFromKey = new HashMap<>();
 
@@ -185,6 +186,12 @@ public class ColumnPairTableModel extends DefaultTableModel {
         // validate rename_a and rename_b
         v[indexFromKey.get("rename_a")] = true;
         v[indexFromKey.get("rename_b")] = true;
+        // validate similarity column
+        v[indexFromKey.get("col_similarity")] = true;
+        // validate minimum similarity
+        value = getValue(rowIndex, "min_similarity");
+        v[indexFromKey.get("min_similarity")] = value == null
+                || value instanceof Double && (Double) value >= 0;
         // validate number
         value = getValue(rowIndex, "number");
         v[indexFromKey.get("number")] = value instanceof Integer
