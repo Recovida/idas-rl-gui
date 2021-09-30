@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Window;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -87,13 +86,18 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
     private final JLabel nameFirstLbl;
 
     private final JLabel numberLbl;
+    
     private JTextField similarityColField;
+    
     private JPanel similarityPanel;
+    
     private JSpinnerWithBlankValue similarityMinField;
+    
     private JLabel similarityColLbl;
+    
     private JLabel similarityMinLbl;
-    private Component verticalGlue;
-    private Component verticalGlue_1;
+    
+    private Component internalVerticalGlue;
 
     public JTextFieldWithPlaceholder getFirstRenameField() {
         return firstRenameField;
@@ -142,16 +146,15 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         panelGBL.rowHeights = new int[] { 13, 35, 35, 35, 35, 35 };
         panelGBL.columnWeights = new double[] { 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
                 0.0, 0.0, 0.0 };
-        panelGBL.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                0.0 };
+        panelGBL.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
         panel.setLayout(panelGBL);
 
-        Component vg = Box.createVerticalGlue();
-        GridBagConstraints vgGBC = new GridBagConstraints();
-        vgGBC.insets = new Insets(0, 0, 5, 5);
-        vgGBC.gridx = 0;
-        vgGBC.gridy = 0;
-        panel.add(vg, vgGBC);
+        Component topVerticalGlue = Box.createVerticalGlue();
+        GridBagConstraints topVerticalGlueGBC = new GridBagConstraints();
+        topVerticalGlueGBC.insets = new Insets(0, 0, 5, 5);
+        topVerticalGlueGBC.gridx = 0;
+        topVerticalGlueGBC.gridy = 0;
+        panel.add(topVerticalGlue, topVerticalGlueGBC);
 
         numberLbl = new JLabel("_Number");
         numberLbl.setPreferredSize(new Dimension(25, 17));
@@ -347,38 +350,38 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
 
         similarityPanel = new JPanel();
         similarityPanel.setBorder(new TitledBorder(null, "_Similarity", TitledBorder.CENTER, TitledBorder.TOP, null, new Color(59, 59, 59)));
-        GridBagConstraints gbc_panel_1 = new GridBagConstraints();
-        gbc_panel_1.gridheight = 3;
-        gbc_panel_1.gridwidth = 2;
-        gbc_panel_1.insets = new Insets(0, 0, 5, 5);
-        gbc_panel_1.fill = GridBagConstraints.VERTICAL;
-        gbc_panel_1.gridx = 6;
-        gbc_panel_1.gridy = 3;
-        panel.add(similarityPanel, gbc_panel_1);
-        GridBagLayout gbl_similarityPanel = new GridBagLayout();
-        gbl_similarityPanel.columnWidths = new int[] { 95, 140 };
-        gbl_similarityPanel.rowHeights = new int[] { 33, 33, 0, 0 };
-        gbl_similarityPanel.columnWeights = new double[] { 0.0, 0.0 };
-        gbl_similarityPanel.rowWeights = new double[] { 1.0, 1.0, 0.0,
+        GridBagConstraints similarityPanelGBC = new GridBagConstraints();
+        similarityPanelGBC.gridheight = 3;
+        similarityPanelGBC.gridwidth = 2;
+        similarityPanelGBC.insets = new Insets(0, 0, 5, 5);
+        similarityPanelGBC.fill = GridBagConstraints.VERTICAL;
+        similarityPanelGBC.gridx = 6;
+        similarityPanelGBC.gridy = 3;
+        panel.add(similarityPanel, similarityPanelGBC);
+        GridBagLayout similarityPanelGBL = new GridBagLayout();
+        similarityPanelGBL.columnWidths = new int[] { 95, 140 };
+        similarityPanelGBL.rowHeights = new int[] { 33, 33, 0, 0 };
+        similarityPanelGBL.columnWeights = new double[] { 0.0, 0.0 };
+        similarityPanelGBL.rowWeights = new double[] { 1.0, 1.0, 0.0,
                 Double.MIN_VALUE };
-        similarityPanel.setLayout(gbl_similarityPanel);
+        similarityPanel.setLayout(similarityPanelGBL);
 
         similarityColLbl = new JLabel("_Column name");
         similarityColLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-        GridBagConstraints gbc_similarityColLbl = new GridBagConstraints();
-        gbc_similarityColLbl.fill = GridBagConstraints.BOTH;
-        gbc_similarityColLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_similarityColLbl.gridx = 0;
-        gbc_similarityColLbl.gridy = 0;
-        similarityPanel.add(similarityColLbl, gbc_similarityColLbl);
+        GridBagConstraints similarityColLblGBC = new GridBagConstraints();
+        similarityColLblGBC.fill = GridBagConstraints.BOTH;
+        similarityColLblGBC.insets = new Insets(0, 0, 5, 5);
+        similarityColLblGBC.gridx = 0;
+        similarityColLblGBC.gridy = 0;
+        similarityPanel.add(similarityColLbl, similarityColLblGBC);
 
         similarityColField = new JTextField();
-        GridBagConstraints gbc_similarityColField = new GridBagConstraints();
-        gbc_similarityColField.fill = GridBagConstraints.BOTH;
-        gbc_similarityColField.insets = new Insets(0, 0, 5, 0);
-        gbc_similarityColField.gridx = 1;
-        gbc_similarityColField.gridy = 0;
-        similarityPanel.add(similarityColField, gbc_similarityColField);
+        GridBagConstraints similarityColFieldGBC = new GridBagConstraints();
+        similarityColFieldGBC.fill = GridBagConstraints.BOTH;
+        similarityColFieldGBC.insets = new Insets(0, 0, 5, 0);
+        similarityColFieldGBC.gridx = 1;
+        similarityColFieldGBC.gridy = 0;
+        similarityPanel.add(similarityColField, similarityColFieldGBC);
         similarityColField.setColumns(10);
 
         SpinnerNumberModel minSimilarityModel = new SpinnerNumberModel(0.0, 0.0,
@@ -386,27 +389,27 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
 
         similarityMinLbl = new JLabel("_Minimum");
         similarityMinLbl.setHorizontalAlignment(SwingConstants.TRAILING);
-        GridBagConstraints gbc_similarityMinLbl = new GridBagConstraints();
-        gbc_similarityMinLbl.fill = GridBagConstraints.BOTH;
-        gbc_similarityMinLbl.insets = new Insets(0, 0, 5, 5);
-        gbc_similarityMinLbl.gridx = 0;
-        gbc_similarityMinLbl.gridy = 1;
-        similarityPanel.add(similarityMinLbl, gbc_similarityMinLbl);
+        GridBagConstraints similarityMinLblGBC = new GridBagConstraints();
+        similarityMinLblGBC.fill = GridBagConstraints.BOTH;
+        similarityMinLblGBC.insets = new Insets(0, 0, 5, 5);
+        similarityMinLblGBC.gridx = 0;
+        similarityMinLblGBC.gridy = 1;
+        similarityPanel.add(similarityMinLbl, similarityMinLblGBC);
         similarityMinField = new JSpinnerWithBlankValue(minSimilarityModel,
                 "0.000");
         similarityMinField.setBlankValue(Double.valueOf(0.0));
-        GridBagConstraints gbc_similarityMinField = new GridBagConstraints();
-        gbc_similarityMinField.insets = new Insets(0, 0, 5, 0);
-        gbc_similarityMinField.fill = GridBagConstraints.BOTH;
-        gbc_similarityMinField.gridx = 1;
-        gbc_similarityMinField.gridy = 1;
-        similarityPanel.add(similarityMinField, gbc_similarityMinField);
+        GridBagConstraints similarityMinFieldGBC = new GridBagConstraints();
+        similarityMinFieldGBC.insets = new Insets(0, 0, 5, 0);
+        similarityMinFieldGBC.fill = GridBagConstraints.BOTH;
+        similarityMinFieldGBC.gridx = 1;
+        similarityMinFieldGBC.gridy = 1;
+        similarityPanel.add(similarityMinField, similarityMinFieldGBC);
 
-        verticalGlue_1 = Box.createVerticalGlue();
-        GridBagConstraints gbc_verticalGlue_1 = new GridBagConstraints();
-        gbc_verticalGlue_1.gridx = 1;
-        gbc_verticalGlue_1.gridy = 2;
-        similarityPanel.add(verticalGlue_1, gbc_verticalGlue_1);
+        internalVerticalGlue = Box.createVerticalGlue();
+        GridBagConstraints internalVerticalGlueGBC = new GridBagConstraints();
+        internalVerticalGlueGBC.gridx = 1;
+        internalVerticalGlueGBC.gridy = 2;
+        similarityPanel.add(internalVerticalGlue, internalVerticalGlueGBC);
 
         Double zero = 0.0;
 
@@ -478,13 +481,6 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
         bottomVerticalGlueGBC.gridx = 4;
         bottomVerticalGlueGBC.gridy = 6;
         panel.add(bottomVerticalGlue, bottomVerticalGlueGBC);
-
-        verticalGlue = Box.createVerticalGlue();
-        GridBagConstraints gbc_verticalGlue = new GridBagConstraints();
-        gbc_verticalGlue.insets = new Insets(0, 0, 0, 5);
-        gbc_verticalGlue.gridx = 1;
-        gbc_verticalGlue.gridy = 7;
-        panel.add(verticalGlue, gbc_verticalGlue);
 
         init();
 
@@ -584,5 +580,4 @@ public class LinkageColumnEditingPanel extends JPanel implements Translatable {
     public JSpinnerWithBlankValue getSimilarityMinField() {
         return similarityMinField;
     }
-
 }

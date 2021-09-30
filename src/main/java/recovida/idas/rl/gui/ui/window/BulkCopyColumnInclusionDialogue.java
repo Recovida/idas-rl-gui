@@ -120,8 +120,8 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
                 MessageProvider.getMessage("columns.addcopy.selectall"));
         setSelectAllEvent(leftSelectAllBtn, leftMap.values());
 
-        Component horizontalGlue = Box.createHorizontalGlue();
-        leftBtnPanel.add(horizontalGlue);
+        Component firstHorizontalGlue = Box.createHorizontalGlue();
+        leftBtnPanel.add(firstHorizontalGlue);
         leftBtnPanel.add(leftSelectAllBtn);
 
         JScrollPane rightScrollPane = new JScrollPane();
@@ -149,8 +149,8 @@ public class BulkCopyColumnInclusionDialogue extends JDialog {
         rightBtnPanel.add(rightSelectUniqueBtn);
         setSelectAllEvent(rightSelectUniqueBtn, nonGreyRight);
 
-        Component horizontalGlue_1 = Box.createHorizontalGlue();
-        rightBtnPanel.add(horizontalGlue_1);
+        Component secondHorizontalGlue = Box.createHorizontalGlue();
+        rightBtnPanel.add(secondHorizontalGlue);
 
         JButton rightSelectAllBtn = new JButton(
                 MessageProvider.getMessage("columns.addcopy.selectall"));
