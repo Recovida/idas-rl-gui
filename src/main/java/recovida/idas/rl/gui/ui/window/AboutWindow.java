@@ -38,7 +38,7 @@ public class AboutWindow extends JDialog {
     /**
      * Project URL.
      */
-    public static final String PROJECT_URL = "";
+    public static final String PROJECT_URL = "https://recovida.com.br/";
 
     /**
      * Creates the dialogue.
