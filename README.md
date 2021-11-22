@@ -14,8 +14,8 @@ repositório recovida/idas-rl-core>.
 Inicialmente, [instale o Java](https://www.java.com/pt-BR/download/manual.jsp)
 na versão 8 ou qualquer versão mais recente.
 
-Faça o download da última versão do IDaS-RL (GUI) na página
-[Releases](https://gitlab.com/recovida/idas-rl-gui/-/releases) deste
+Faça o download da última versão do LinkaSUS (IDaS-RL GUI) na página
+[Releases](https://github.com/Recovida/idas-rl-gui/releases) deste
 repositório.
 
 Dependendo das configurações do seu sistema operacional, pode ser possível
